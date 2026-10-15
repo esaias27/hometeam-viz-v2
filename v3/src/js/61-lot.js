@@ -47,11 +47,47 @@ void main(){
   v *= exp(-s2.y * dt); v.y -= uGrav * s2.w * dt;
   o0 = vec4(s0.xyz + v * dt, age + dt); o1 = vec4(v, s1.w); o2 = s2;
 }`;
+// how a spark looks at this moment: shared by the spark heads (particles) and their motion streaks (lines)
+const FW_LOOK = `
+const vec3 FWP[10] = vec3[10](${FW_PAL.split(',').reduce((a, v, k, arr) => k % 3 === 0 ? a.concat(`vec3(${arr[k]},${arr[k + 1]},${arr[k + 2]})`) : a, []).join(',')});
+bool fwLook(int j, out vec3 p, out vec3 v, out vec3 c, out float e, out float sz){
+  vec4 a = ff(uFS0, j), b = ff(uFS1, j), d = ff(uFS2, j);
+  p = a.xyz; v = b.xyz; c = vec3(0.0); e = 0.0; sz = 0.0;
+  if (d.x <= 0.0 || a.w >= d.x) return false;
+  float u = a.w / d.x, code = b.w; int type = int(mod(code, 16.0)); float pal = floor(code / 16.0);
+  int pa = int(mod(pal, 16.0)), pb = int(floor(pal / 16.0));
+  vec3 ca = FWP[clamp(pa, 0, 9)], cb = FWP[clamp(pb, 0, 9)];
+  c = type == 1 ? mix(ca, cb, sm(0.25, 0.7, u)) : h1(j, 2) < 0.33 ? cb : ca;
+  float en = pow(1.0 - u, 1.3) * 1.5;
+  if (type == 2 || type == 10) { en = (1.0 - u) * 1.2; c = mix(C_gold, C_amber, u); if (type == 10) en *= 0.7 + 0.6 * step(0.5, h1(j, int(a.w * 18.0))); }
+  else if (type == 11) en *= h1(j, int(a.w * 14.0)) < 0.35 + uHigh * 0.4 ? 1.8 : 0.15;
+  else if (type == 6) en *= step(0.55, fract(a.w * 8.0 + h1(j, 3))) * 2.2;
+  else if (type == 8 && u > 0.55) { en = h1(j, int(a.w * 25.0)) > 0.82 ? 3.0 : 0.15; c = C_white; }
+  else if (type == 12) { en = 0.9 * (1.0 - u); c = mix(C_white, C_amber, u); }
+  sz = d.z * (type == 12 ? 1.0 - u : 1.0) * (0.85 + 0.3 * h1(j, 6));
+  e = en * (1.4 + uLevel * 1.0);
+  return true;
+}`;
+// each spark draws a streak back along its own velocity, so trails follow the direction of travel
+const FW_LINE = `
+uniform sampler2D uFS0, uFS1, uFS2;
+vec4 ff(sampler2D t, int i){ return texelFetch(t, ivec2(i % ${FWS}, i / ${FWS}), 0); }
+${FW_LOOK}
+void seg(int id, out vec3 A, out vec3 B, out float wA, out float wB, out vec4 cA, out vec4 cB){
+  vec3 p, v, c; float e, sz;
+  A = B = vec3(0.0); wA = wB = 0.0; cA = cB = vec4(0.0);
+  if (!fwLook(id, p, v, c, e, sz) || p_trail < 0.01) return;
+  int type = int(mod(ff(uFS1, id).w, 16.0));
+  float len = (0.05 + p_trail * 0.3) * (type == 2 || type == 10 ? 2.2 : type == 3 ? 1.6 : type == 12 ? 0.6 : 1.0);
+  B = p; A = p - v * len;
+  wB = sz * 0.55; wA = sz * 0.12;
+  cB = vec4(c, e * 0.55); cA = vec4(c, 0.0);
+}`;
 const LOT_GLSL = `
 uniform int uC0, uH0, uST0, uFW0; uniform sampler2D uFS0, uFS1, uFS2;
 uniform vec2 uJump[10]; uniform float uHero, uLift, uFlashAt, uRise; uniform float uFlare;
-const vec3 FWP[10] = vec3[10](${FW_PAL.split(',').reduce((a, v, k, arr) => k % 3 === 0 ? a.concat(`vec3(${arr[k]},${arr[k + 1]},${arr[k + 2]})`) : a, []).join(',')});
 vec4 ff(sampler2D t, int i){ return texelFetch(t, ivec2(i % ${FWS}, i / ${FWS}), 0); }
+${FW_LOOK}
 void particle(int i, vec4 s, inout vec3 p, inout float r, inout vec3 c, inout float e, inout float g){
   float t = uT;
   if (i < uC0) {
@@ -87,21 +123,9 @@ void particle(int i, vec4 s, inout vec3 p, inout float r, inout vec3 c, inout fl
     return;
   }
   if (i < uFW0) { p = vec3((s.x - 0.5) * 40.0, 4.0 + s.y * 6.0, -22.0 + s.z * 8.0); r = 0.008; c = C_pearl; e = 0.05 + tw(s, t) * 0.8; g = 1.0; return; }
-  int j = i - uFW0;
-  vec4 a = ff(uFS0, j), b = ff(uFS1, j), d = ff(uFS2, j);
-  if (d.x <= 0.0 || a.w >= d.x) return;
-  float u = a.w / d.x, code = b.w; int type = int(mod(code, 16.0)); float pal = floor(code / 16.0);
-  int pa = int(mod(pal, 16.0)), pb = int(floor(pal / 16.0));
-  vec3 ca = FWP[clamp(pa, 0, 9)], cb = FWP[clamp(pb, 0, 9)];
-  c = type == 1 ? mix(ca, cb, sm(0.25, 0.7, u)) : h1(j, 2) < 0.33 ? cb : ca;
-  float en = pow(1.0 - u, 1.3) * 1.5;
-  if (type == 2 || type == 10) { en = (1.0 - u) * 1.2; c = mix(C_gold, C_amber, u); if (type == 10) en *= 0.7 + 0.6 * step(0.5, h1(j, int(a.w * 18.0))); }
-  else if (type == 11) en *= h1(j, int(a.w * 14.0)) < 0.35 + uHigh * 0.4 ? 1.8 : 0.15;
-  else if (type == 6) en *= step(0.55, fract(a.w * 8.0 + h1(j, 3))) * 2.2;
-  else if (type == 8 && u > 0.55) { en = h1(j, int(a.w * 25.0)) > 0.82 ? 3.0 : 0.15; c = C_white; }
-  else if (type == 12) { en = 0.9 * (1.0 - u); c = mix(C_white, C_amber, u); }
-  p = a.xyz; r = d.z * (type == 12 ? 1.0 - u : 1.0) * (0.85 + 0.3 * h1(j, 6));
-  e = en * (1.4 + uLevel * 1.0); g = 1.0;
+  int j = i - uFW0; vec3 v; float sz;
+  if (!fwLook(j, p, v, c, e, sz)) return;
+  r = sz * 0.75; g = 1.0;
 }`;
 function makeLot(P) {
   const NL = cnt(6000, P, P.lanterns), NCROWD = cnt(32000, P, P.crowd), NH = cnt(1500, P), NSTAR = cnt(2500, P);
@@ -149,11 +173,12 @@ function makeLot(P) {
   const uBA = new Float32Array(64), uBB = new Float32Array(64), uBC = new Float32Array(64);
   const W = {
     n: N, name: 'LOT', blurb: 'The show the sky puts on', tint: PAL.amber, flash: PAL.gold, coreLight: PAL.amber, coreGain: 0.9, coreLocal: [0, 2.5, -8],
-    wisps: [PAL.gold, PAL.pink, PAL.cyan], fils: [F, SF], lines: [], ay: 0, ax: 0, dofMul: 0.15,
+    wisps: [PAL.gold, PAL.pink, PAL.cyan], fils: [F, SF], ay: 0, ax: 0, dofMul: 0.15, echoZoom: 0,
     cam0: { tx: 0, ty: 0.6, tz: 0, dist: 8.6, h: 0, p: 2, b: 0, f: 38 },
     camLayer: { el: 0, az: 0, ty: 0, dist: 1, label: 'Crane on the drop' },
     prog: progFor('LOT', 'LOT', LOT_GLSL),
-    get trailFloor() { return P.trail; },
+    lines: [{ prog: progFor('LOT_L', 'LOT', FW_LINE, true), count: FWCAP, active: () => P.trail > 0.01,
+      uniforms(p) { bindT(p, 'uFS0', simR.tex[0]); bindT(p, 'uFS1', simR.tex[1]); bindT(p, 'uFS2', simR.tex[2]); } }],
     onset(kind, s) {
       if (kind === 'kick' || kind === 'touch') {
         const k = oldest(jumpAge); jumpAge[k] = 0; jumpStr[k] = s;

@@ -89,6 +89,7 @@ function frame(now) {
   stepWorld(wCur, dt);
   if (prevLive) stepWorld(wPrev, dt);
   const tk = inTr ? ease(clamp(k, 0, 1)) : 1;
+  echoZoomNow = lerp(wPrev && inTr ? (wPrev.echoZoom ?? 1) : (wCur.echoZoom ?? 1), wCur.echoZoom ?? 1, tk);
   tint = mixC(tintFrom, wCur.tint, tk);
   const flashC = wPrev && inTr ? mixC(wPrev.flash, wCur.flash, tk) : wCur.flash;
   for (let w = 0; w < WISP; w++) wispCols[w] = wPrev && inTr ? mixC(wPrev.wisps[w], wCur.wisps[w], tk) : wCur.wisps[w].slice();
@@ -238,7 +239,7 @@ function frame(now) {
   bindTex(0, scene.tex, pTrail, 'uScene'); bindTex(1, tr_.tex, pTrail, 'uPrev');
   { const tf = Math.max(wCur.trailFloor || 0, 0), trl = Math.max(V.trail, tf), dT = trl > 0.01 ? 0.55 + 0.38 * trl : 0, dE = V.echo > 0.01 ? 0.8 + 0.17 * V.echo : 0;
     gl.uniform1f(pTrail.u('uDecay'), Math.pow(Math.max(dT, dE), dt * 60));
-    gl.uniform1f(pTrail.u('uZoom'), 1 - V.echo * 0.022 * (1 + A.level * 0.8));
+    gl.uniform1f(pTrail.u('uZoom'), 1 - V.echo * 0.022 * (1 + A.level * 0.8) * echoZoomNow);
     gl.uniform1f(pTrail.u('uRot'), V.echo * 0.006 * Math.sin(t * 0.045 + 0.7));
     gl.uniform1f(pTrail.u('uAsp'), aspect); }
   drawFS();
@@ -279,7 +280,7 @@ function frame(now) {
   if (camUIdirty && panel.classList.contains('open')) syncCamUI();
   perfTick(now, cpuMid - cpu0, dt);
 }
-let kickedThisFrame = false;
+let kickedThisFrame = false, echoZoomNow = 1;
 
 /* adaptive quality: drop render scale if the device can't hold ~50 fps, creep back up when it can */
 function perfTick(now, cpuMs, dt) {

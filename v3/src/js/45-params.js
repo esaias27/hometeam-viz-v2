@@ -32,7 +32,7 @@ const SCHEMA = {
     { k: 'variety', l: 'Variety', min: 0, max: 1, st: 0.01, d: 0.8, g: 'Fireworks' },
     { k: 'gravity', l: 'Gravity', min: 0, max: 2, st: 0.01, d: 1, g: 'Fireworks' },
     { k: 'streak', l: 'Mortar streaks', min: 0, max: 2, st: 0.01, d: 1, g: 'Fireworks' },
-    { k: 'trail', l: 'Spark trails', min: 0, max: 1, st: 0.01, d: 0.5, g: 'Fireworks' },
+    { k: 'trail', l: 'Spark trail length', min: 0, max: 2, st: 0.01, d: 0.7, g: 'Fireworks' },
     { k: 'finale', l: 'Drop sensitivity', min: 0, max: 1, st: 0.01, d: 0.5, g: 'Fireworks' },
     { k: 'lanterns', l: 'Lanterns', min: 0, max: 2, st: 0.05, d: 1, rb: 1, g: 'Lot' },
     { k: 'crowd', l: 'Crowd', min: 0.1, max: 2, st: 0.05, d: 1, rb: 1, g: 'Lot' },
