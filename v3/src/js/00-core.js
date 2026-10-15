@@ -227,7 +227,7 @@ vec3 sceneK(vec2 uv){
 float sdf(vec2 lp){
   vec2 tuv = vec2(lp.x / 0.913 + 0.5, lp.y + 0.5);
   vec2 q = abs(tuv - 0.5) - 0.5;
-  return (texture(uLogo, clamp(tuv, 0.0, 1.0)).r - 0.5) * 0.25 + length(max(q, 0.0));
+  return texture(uLogo, clamp(tuv, 0.0, 1.0)).r + length(max(q, 0.0));
 }
 vec3 film(float x){ return 0.5 + 0.5 * cos(6.2831853 * (vec3(0.0, 0.33, 0.67) + x)); }
 void main(){
@@ -242,7 +242,8 @@ void main(){
       vec2 e = vec2(0.003, 0.0);
       vec2 g = vec2(sdf(lp + e.xy) - sdf(lp - e.xy), sdf(lp + e.yx) - sdf(lp - e.yx)); g /= length(g) + 1e-5;
       vec2 gs = vec2(cs * g.x - sn * g.y, sn * g.x + cs * g.y); gs.x /= asp;
-      float inside = smoothstep(0.002, -0.002, d), rim = exp(-abs(d) / 0.004), m = uLensMix;
+      float aa = max(fwidth(d) * 0.8, 1e-5);
+      float inside = smoothstep(aa, -aa, d), rim = exp(-abs(d) / max(0.004, aa * 1.5)), m = uLensMix;
       int mode = int(uLens + 0.5);
       vec3 c = base;
       if (mode == 1) {

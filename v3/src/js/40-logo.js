@@ -4,7 +4,7 @@ const LOGO = { n: 0, x: null, y: null, minY: -0.5, maxY: 0.5 };
 // The logo as a signed distance field, so the compositor can use it as glass, foil, a weight that bends light, or a window
 const logoTex = gl.createTexture();
 gl.bindTexture(gl.TEXTURE_2D, logoTex);
-gl.texImage2D(gl.TEXTURE_2D, 0, gl.R8, 1, 1, 0, gl.RED, gl.UNSIGNED_BYTE, new Uint8Array([255]));
+gl.texImage2D(gl.TEXTURE_2D, 0, gl.R16F, 1, 1, 0, gl.RED, gl.FLOAT, new Float32Array([1]));
 gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR); gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
 gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE); gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
 let logoSdfOK = false;
@@ -24,20 +24,26 @@ function edt2(g, w, h) {
   for (let y = 0; y < h; y++) { for (let x = 0; x < w; x++) f[x] = g[y * w + x]; edt1(f, w, d, v, z); for (let x = 0; x < w; x++) g[y * w + x] = Math.sqrt(d[x]); }
   return g;
 }
-function bakeLogoSDF(data, CW, CH) {
-  const GW = 320, GH = Math.round(320 * CH / CW), inn = new Uint8Array(GW * GH);
-  for (let y = 0; y < GH; y++) for (let x = 0; x < GW; x++) { const sx = Math.min(CW - 1, Math.round((x + 0.5) * CW / GW)), sy = Math.min(CH - 1, Math.round((y + 0.5) * CH / GH)); inn[y * GW + x] = data[(sy * CW + sx) * 4 + 3] > 110 ? 1 : 0; }
-  const dOut = new Float64Array(GW * GH), dIn = new Float64Array(GW * GH);
-  for (let i = 0; i < GW * GH; i++) { dOut[i] = inn[i] ? 0 : 1e20; dIn[i] = inn[i] ? 1e20 : 0; }
+// The field is baked from a large anti-aliased render of the logo: partially covered edge pixels give sub-pixel
+// distances, and it is stored as half floats in logo heights, so the outline stays smooth at any size.
+function bakeLogoSDF(img) {
+  const GW = 1024, GH = Math.round(1024 * 920 / 840);
+  const cnv = document.createElement('canvas'); cnv.width = GW; cnv.height = GH;
+  const cx = cnv.getContext('2d'); cx.drawImage(img, 0, 0, GW, GH);
+  const data = cx.getImageData(0, 0, GW, GH).data, n = GW * GH, al = new Float32Array(n);
+  for (let i = 0; i < n; i++) al[i] = data[i * 4 + 3] / 255;
+  const dOut = new Float64Array(n), dIn = new Float64Array(n);
+  for (let i = 0; i < n; i++) { const inside = al[i] >= 0.5; dOut[i] = inside ? 0 : 1e20; dIn[i] = inside ? 1e20 : 0; }
   edt2(dOut, GW, GH); edt2(dIn, GW, GH);
-  const px = new Uint8Array(GW * GH);
+  const px = new Float32Array(n);
   for (let r = 0; r < GH; r++) for (let x = 0; x < GW; x++) {
-    const i = (GH - 1 - r) * GW + x, sd = (inn[i] ? -(dIn[i] - 0.5) : dOut[i] - 0.5) / GH;
-    px[r * GW + x] = Math.round(clamp(0.5 + sd * 4, 0, 1) * 255);
+    const i = (GH - 1 - r) * GW + x, a = al[i];
+    let sd = a >= 0.5 ? -(dIn[i] - 0.5) : dOut[i] - 0.5;
+    if (a > 0.02 && a < 0.98) sd = 0.5 - a;   // edge pixel: coverage gives the sub-pixel distance
+    px[r * GW + x] = sd / GH;
   }
-  gl.bindTexture(gl.TEXTURE_2D, logoTex); gl.pixelStorei(gl.UNPACK_ALIGNMENT, 1);
-  gl.texImage2D(gl.TEXTURE_2D, 0, gl.R8, GW, GH, 0, gl.RED, gl.UNSIGNED_BYTE, px);
-  gl.pixelStorei(gl.UNPACK_ALIGNMENT, 4);
+  gl.bindTexture(gl.TEXTURE_2D, logoTex);
+  gl.texImage2D(gl.TEXTURE_2D, 0, gl.R16F, GW, GH, 0, gl.RED, gl.FLOAT, px);
   logoSdfOK = true;
 }
 const svgToE = (sx, sy) => [(sx - 460) / 920, -(sy - 500) / 920];
@@ -56,7 +62,7 @@ async function loadLogo() {
     const cx = cnv.getContext('2d'); cx.drawImage(img, 0, 0, CW, CH);
     URL.revokeObjectURL(url);
     const data = cx.getImageData(0, 0, CW, CH).data, filled = [];
-    try { bakeLogoSDF(data, CW, CH); } catch (e) { console.warn('logo field failed', e); }
+    try { bakeLogoSDF(img); } catch (e) { console.warn('logo field failed', e); }
     for (let y = 0; y < CH; y++) for (let x = 0; x < CW; x++) if (data[(y * CW + x) * 4 + 3] > 110) filled.push(x, y);
     const nf = filled.length / 2;
     if (nf < 200) throw new Error('empty');
