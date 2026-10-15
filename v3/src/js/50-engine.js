@@ -181,7 +181,7 @@ void main(){
     oP = vec4(p, -(0.006 + 0.012 * s.y)); oC = vec4(col, e);
     return;
   }
-  if (idx < ${WO}) { int j = idx - ${LG + MDUST}; oP = vec4(uWisp[j].xyz, -0.026); oC = vec4(uWispC[j], uWisp[j].w); return; }
+  if (idx < ${WO}) { int j = idx - ${LG + MDUST}; oP = vec4(uWisp[j].xyz, uWisp[j].w > 0.01 ? -0.026 : 0.0); oC = vec4(uWispC[j], uWisp[j].w); return; }
   int i = idx - ${WO};
   vec4 cp = i < uNC ? fetch(uCP, i) : vec4(0.0), cc = i < uNC ? fetch(uCC, i) : vec4(0.0);
   vec4 P, C;

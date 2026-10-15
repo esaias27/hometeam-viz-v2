@@ -95,6 +95,7 @@ function frame(now) {
   const flashC = wPrev && inTr ? mixC(wPrev.flash, wCur.flash, tk) : wCur.flash;
   for (let w = 0; w < WISP; w++) wispCols[w] = wPrev && inTr ? mixC(wPrev.wisps[w], wCur.wisps[w], tk) : wCur.wisps[w].slice();
   updateWisps(dt, t);
+  wispAmt = lerp(wispAmt, S.wisps ? 1 : 0, 1 - Math.exp(-dt * 2));
   updateLook(dt);
   updateLogo(dt);
 
@@ -140,9 +141,9 @@ function frame(now) {
   }
   for (let w = 0; w < WISP; w++) {
     toViewM(MV, wispPos[w * 3], wispPos[w * 3 + 1], wispPos[w * 3 + 2], LP, 4 + w * 4);
-    LP[7 + w * 4] = 0.5 + 0.25 * Math.sin(t * 1.3 + w * 2) + wispFlash[w] * 1.8 + A.level * 0.7;
+    LP[7 + w * 4] = (0.5 + 0.25 * Math.sin(t * 1.3 + w * 2) + wispFlash[w] * 1.8 + A.level * 0.7) * wispAmt;
     LC[3 + w * 3] = wispCols[w][0]; LC[4 + w * 3] = wispCols[w][1]; LC[5 + w * 3] = wispCols[w][2];
-    uWisp.set([wispPos[w * 3], wispPos[w * 3 + 1], wispPos[w * 3 + 2], 1.6 + wispFlash[w] * 2.5 + A.level * 0.8], w * 4); uWispC.set(wispCols[w], w * 3);
+    uWisp.set([wispPos[w * 3], wispPos[w * 3 + 1], wispPos[w * 3 + 2], (1.6 + wispFlash[w] * 2.5 + A.level * 0.8) * wispAmt], w * 4); uWispC.set(wispCols[w], w * 3);
   }
   const hc = [0, 0, 0];
   for (let a = 0; a < 4; a++) { hc[0] = LC[a * 3]; hc[1] = LC[a * 3 + 1]; hc[2] = LC[a * 3 + 2]; hueRotJS(hc, hueNow, hc); LC[a * 3] = hc[0]; LC[a * 3 + 1] = hc[1]; LC[a * 3 + 2] = hc[2]; }
@@ -152,7 +153,7 @@ function frame(now) {
   for (const F of wCur.fils) gatherFil(F, wCur.P.bright, gNew);
   const wOld = prevLive ? (1 - smooth(0, 0.6, k)) * wPrev.P.bright : 0;
   if (prevLive) for (const F of wPrev.fils) gatherFil(F, wOld, 1);
-  gatherFil(wispFil, 1, 1);
+  gatherFil(wispFil, wispAmt, 1);
 
   const ex = tx - px, ey = ty - py, ez = tz - pz;
   const evx = ex * rx + ey * ry + ez * rz, evy = ex * ux + ey * uy + ez * uz, evz = ex * fx + ey * fy + ez * fz;
@@ -285,7 +286,7 @@ function frame(now) {
   if (camUIdirty && panel.classList.contains('open')) syncCamUI();
   perfTick(now, cpuMid - cpu0, dt);
 }
-let kickedThisFrame = false, echoZoomNow = 1;
+let kickedThisFrame = false, echoZoomNow = 1, wispAmt = 1;
 
 /* adaptive quality: drop render scale if the device can't hold ~50 fps, creep back up when it can */
 function perfTick(now, cpuMs, dt) {

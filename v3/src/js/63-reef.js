@@ -51,10 +51,49 @@ void seg(int id, out vec3 A, out vec3 B, out float wA, out float wB, out vec4 cA
 }`;
 const REEF_GLSL = `
 ${REEF_SHARED}
-uniform int uSL, uCO0, uSN0, uSA0, uNClump; uniform float uTravel, uKick;
+uniform int uSL, uCO0, uSN0, uSA0, uNClump, uFI0, uPerSchool; uniform float uTravel, uKick, uFT, uStartle;
+// a school's path through the water (z unwrapped; the caller wraps after adding each fish's offset)
+vec3 schoolRaw(int sc, float t){
+  float hs = h1(sc, 41), hy = h1(sc, 42), hz = h1(sc, 43), dir = h1(sc, 44) < 0.5 ? -1.0 : 1.0, sp = 0.45 + 0.7 * h1(sc, 45);
+  return vec3((hs - 0.5) * 12.0 + sin(t * 0.21 + hs * 20.0) * 2.4 + vnoise(vec3(t * 0.09, hs * 9.0, 1.0)) * 3.0,
+              -1.15 + hy * 3.0 + sin(t * 0.17 + hy * 13.0) * 0.6 + vnoise(vec3(t * 0.11, hy * 7.0, 4.0)) * 0.5,
+              hz * (ZN - ZF) + dir * t * sp + sin(t * 0.13 + hz * 11.0) * 1.5);
+}
+// one point of one fish: a wagging spine with a forked tail, oriented along the school's heading
+void fish(int j, inout vec3 p, inout float r, inout vec3 c, inout float e){
+  int f = j / 14, k = j - f * 14, sc = f / max(1, uPerSchool);
+  vec4 q = vec4(h1(f, 51), h1(f, 52), h1(f, 53), h1(f, 54));
+  float tt = uFT - q.w * 0.8;
+  vec3 c0 = schoolRaw(sc, tt), c1 = schoolRaw(sc, tt + 0.05);
+  vec3 fwd = normalize(c1 - c0 + vec3(1e-4, 0.0, 0.0));
+  vec3 side = normalize(cross(fwd, vec3(0.0, 1.0, 0.0)) + vec3(1e-4)), up = cross(side, fwd);
+  float spread = p_school * (1.0 + uStartle * 1.8), ra = uFT * 0.2 * (q.x - 0.5);
+  vec3 o = (q.xyz - 0.5) * vec3(1.7, 0.6, 1.7) * spread;
+  o = vec3(o.x * cos(ra) - o.z * sin(ra), o.y + sin(uFT * 0.7 + q.w * 9.0) * 0.08, o.x * sin(ra) + o.z * cos(ra));
+  vec3 pos = c0 + o;
+  pos.z = ZF + mod(pos.z + uTravel - ZF + 400.0 * (ZN - ZF), ZN - ZF);
+  float vis = sm(ZF, ZF + 10.0, pos.z) * (1.0 - sm(ZN - 1.5, ZN, pos.z));
+  if (vis <= 0.001) return;
+  float L = (0.13 + 0.1 * h1(sc, 46)) * p_fishSize * (0.8 + 0.4 * q.y);
+  float wag = sin(uFT * (7.0 + 5.0 * p_fishSpeed) * (1.0 + uStartle) + q.z * 6.28);
+  if (k < 10) {
+    float u = float(k) / 9.0;
+    p = pos + fwd * (0.5 - u) * L + side * wag * u * u * 0.24 * L;
+    r = L * 0.11 * sin(3.14159 * pow(u * 0.9 + 0.05, 0.75)) + 0.0015;
+  } else {
+    int tk = k - 10; float back = 0.62 + 0.1 * float(tk % 2), fork = (tk < 2 ? 1.0 : -1.0) * (0.1 + 0.08 * float(tk % 2));
+    p = pos - fwd * back * L + side * wag * 0.3 * L + up * fork * L;
+    r = L * 0.035 + 0.001;
+  }
+  float sp = h1(sc, 47), u2 = float(k) / 13.0;
+  c = sp < 0.3 ? mix(C_pearl, C_azure, u2 * 0.6) : sp < 0.55 ? mix(C_gold, C_ember, u2) : sp < 0.8 ? (k % 3 == 0 ? C_pink : C_cyan) : mix(C_lime, C_teal, u2);
+  r *= vis;
+  e = (0.26 + uHigh * 0.35 * step(0.7, h1(f, int(uT * 6.0))) + uStartle * 0.7 + uLevel * 0.15) * vis;
+}
 uniform float uSparkleT;
 void particle(int i, vec4 s, inout vec3 p, inout float r, inout vec3 c, inout float e, inout float g){
   float t = uT;
+  if (i >= uFI0) { fish(i - uFI0, p, r, c, e); return; }
   if (i < uCO0) {
     // polyps and beads riding the stalks
     int stalk = i / ${REEF_BEADS}, k = i - stalk * ${REEF_BEADS};
@@ -136,7 +175,9 @@ function makeReef(P) {
   buildReefTemplates();
   const SL = Math.min(512, Math.round(P.stalks * Math.min(1, 0.5 + S.detail * 0.5))), LEN = REEF_ZN - REEF_ZF;
   const NB = SL * REEF_BEADS, NCO = Math.floor(cnt(19000, P, P.coral) / 140) * 140, NSNOW = cnt(10000, P, P.snow), NSAND = cnt(8000, P);
-  const CO0 = NB, SN0 = CO0 + NCO, SA0 = SN0 + NSNOW, N = Math.min(CAP, SA0 + NSAND);
+  const PER = 36, NFISH = Math.round(cnt(420, P, P.fish) / PER) * PER, FI0 = NB + NCO + NSNOW + NSAND;
+  const CO0 = NB, SN0 = CO0 + NCO, SA0 = SN0 + NSNOW, N = Math.min(CAP, FI0 + NFISH * 14);
+  let fishT = 0, startle = 0;
   const slot = new Float32Array(512 * 2 * 4), slotZ = new Float32Array(SL), slotPrev = new Float32Array(SL);
   const dens = d => clamp(0.55 + P.variation * (noise3(d * 0.045, 3.3, 1.1) * 1.3 + noise3(d * 0.13, 7.1, 2.2) * 0.5), 0.02, 1);
   let travel = 0, distIdx = 0, current = 0, kick = 0;
@@ -159,14 +200,15 @@ function makeReef(P) {
     lines: [{ prog: progFor('REEF_L', 'REEF', REEF_LINE, true), count: SL * REEF_NODES }],
     get fog() { return { d: 0.05 * P.fog, col: fogCol() }; },
     onset(kind, s) {
-      if (kind === 'kick' || kind === 'touch') { push(0.7 + s, clamp(0.35 + s * 0.5, 0, 1), 2.4); kick = Math.max(kick, s); }
+      if (kind === 'kick' || kind === 'touch') { push(0.7 + s, clamp(0.35 + s * 0.5, 0, 1), 2.4); kick = Math.max(kick, s); if (s > 0.8 || kind === 'touch') startle = Math.max(startle, s * 0.8); }
       else if (kind === 'snare') push(0.5 + s * 0.5, 0.3, 3.2);
       else if (kind === 'idle') push(0.5, 0.25, 1.6);
     },
     update(dt, t) {
       for (const q of pz) q.age += dt;
       while (pz.length && (pz[0].age * pz[0].spd > 7.5 || pz[0].age > 8)) pz.shift();
-      kick *= Math.exp(-dt * 2);
+      kick *= Math.exp(-dt * 2); startle *= Math.exp(-dt * 1.4);
+      fishT += dt * P.fishSpeed * (0.7 + A.level * 0.6 + startle * 1.5);
       current = lerp(current, P.current * (0.12 + A.low * 0.45 + A.presence * 0.1), 1 - Math.exp(-dt * 2));
       const v = P.travel * (0.9 + A.level * 1.2 + kick * 1.5);
       travel += dt * v; distIdx += dt * v;
@@ -188,6 +230,7 @@ function makeReef(P) {
       W.shared(p);
       gl.uniform1i(p.u('uCO0'), CO0); gl.uniform1i(p.u('uSN0'), SN0); gl.uniform1i(p.u('uSA0'), SA0);
       gl.uniform1f(p.u('uTravel'), travel); gl.uniform1f(p.u('uKick'), kick);
+      gl.uniform1i(p.u('uFI0'), FI0); gl.uniform1i(p.u('uPerSchool'), PER); gl.uniform1f(p.u('uFT'), fishT); gl.uniform1f(p.u('uStartle'), startle);
     }
   };
   W.lines[0].uniforms = p => W.shared(p);

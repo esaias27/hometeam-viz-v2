@@ -272,7 +272,7 @@ function updateUI() {
   $('#lensPos').querySelectorAll('.pill').forEach((b, i) => b.classList.toggle('on', i === Math.round(S.lensPos)));
   document.querySelectorAll('input[data-k]').forEach(el => { if (+el.value !== +S[el.dataset.k]) { el.value = S[el.dataset.k]; const o = el.parentElement.querySelector('output'); if (o) o.textContent = (+S[el.dataset.k]).toFixed(2); } });
   $('#cams').querySelectorAll('.pill').forEach((b, i) => b.classList.toggle('on', ['off', 'user', 'environment'][i] === S.cam));
-  [['#autoBtn', 'auto'], ['#cycleBtn', 'cycle'], ['#logoBtn', 'logo'], ['#motionBtn', 'camMotion'], ['#flowBtn', 'flow'], ['#demoBtn', 'demo'], ['#statsBtn', 'stats'], ['#lensSpinBtn', 'lensSpin']].forEach(([id, k]) => $(id).classList.toggle('on', !!S[k]));
+  [['#autoBtn', 'auto'], ['#cycleBtn', 'cycle'], ['#logoBtn', 'logo'], ['#motionBtn', 'camMotion'], ['#flowBtn', 'flow'], ['#wispBtn', 'wisps'], ['#demoBtn', 'demo'], ['#statsBtn', 'stats'], ['#lensSpinBtn', 'lensSpin']].forEach(([id, k]) => $(id).classList.toggle('on', !!S[k]));
   $('#stats').hidden = !S.stats;
   if (wsetFor !== NAMES[cur]) buildWorldSettings();
   if (presetsFor !== NAMES[cur]) { presetsFor = NAMES[cur]; buildPresets(); }
@@ -284,6 +284,7 @@ $('#cycleBtn').addEventListener('click', () => toggle('cycle'));
 $('#logoBtn').addEventListener('click', () => toggle('logo'));
 $('#motionBtn').addEventListener('click', () => toggle('camMotion'));
 $('#flowBtn').addEventListener('click', () => toggle('flow'));
+$('#wispBtn').addEventListener('click', () => toggle('wisps', 'Light wisps on', 'Light wisps off'));
 $('#statsBtn').addEventListener('click', () => toggle('stats'));
 $('#demoBtn').addEventListener('click', () => { S.demo = !S.demo; demoBeat = -1; updateUI(); toast(S.demo ? 'Demo groove on' : A.live ? 'Listening to the mic' : 'Demo off · no mic connected'); });
 $('#micBtn').addEventListener('click', async () => { try { await startMic(); toast('Mic live · play some music'); } catch (e) { showMicHelp(e); } });
@@ -349,6 +350,7 @@ window.addEventListener('keydown', e => {
   else if (k === 'arrowleft') setWorld((cur + WORLDS.length - 1) % WORLDS.length, tSim);
   else if (k === 'a') toggle('auto', 'Auto travel on', 'Staying in this world');
   else if (k === 'l') toggle('logo');
+  else if (k === 'w') toggle('wisps', 'Light wisps on', 'Light wisps off');
   else if (k === 'm') mutate();
   else if (k === 'o') { S.lens = (S.lens + 1) % LENSES.length; save(); updateUI(); toast('Logo overlay · ' + LENSES[S.lens]); }
   else if (k === 'k') { S.kaleido = (S.kaleido + 1) % MIRRORS.length; save(); updateUI(); toast(MIRRORS[S.kaleido] ? MIRRORS[S.kaleido] + ' fold kaleidoscope' : 'Kaleidoscope off'); }

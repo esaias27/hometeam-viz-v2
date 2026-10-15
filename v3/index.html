@@ -209,6 +209,7 @@ input[type=text]::placeholder{color:var(--dim)}
     <div class="hint">A preset keeps the world and its settings plus the lens, logo and color. A share link opens straight into the look.</div></div></details>
   <details class="sec"><summary>Lens</summary><div class="body">
     <div class="row" id="kaleidos"></div>
+    <div class="row"><button class="pill" id="wispBtn">Light wisps</button></div>
     <div class="ctl"><label for="s_echo">Echo</label><output></output><input type="range" id="s_echo" data-k="echo" min="0" max="1" step="0.01"></div>
     <div class="ctl"><label for="s_glow">Glow</label><output></output><input type="range" id="s_glow" data-k="glow" min="0" max="1" step="0.01"></div>
     <div class="ctl"><label for="s_trail">Trails</label><output></output><input type="range" id="s_trail" data-k="trail" min="0" max="1" step="0.01"></div>
@@ -252,7 +253,7 @@ input[type=text]::placeholder{color:var(--dim)}
     <div class="ctl"><label for="s_q">Resolution</label><output></output><input type="range" id="s_q" data-k="quality" min="0.5" max="1" step="0.05"></div>
     <div class="ctl"><label for="s_det">Detail (particle counts)</label><output></output><input type="range" id="s_det" data-k="detail" min="0.25" max="2" step="0.05"></div>
     <div class="row"><button class="pill" id="statsBtn">Stats</button><button class="pill" id="fsBtn">Full screen</button></div>
-    <div class="keys"><b>1–7</b> worlds · <b>←/→</b> travel · <b>A</b> auto · <b>M</b> mutate · <b>V</b> fly · <b>⇧1–6</b> store camera · <b>F1–F6</b> recall · <b>K</b> kaleido · <b>E</b> echo · <b>O</b> logo overlay · <b>L</b> particle logo · <b>G</b> color · <b>C</b> webcam · <b>D</b> demo · <b>Space</b> kick · <b>H</b> hide · <b>F</b> full screen · <b>P</b> stats</div></div></details>
+    <div class="keys"><b>1–7</b> worlds · <b>←/→</b> travel · <b>A</b> auto · <b>M</b> mutate · <b>V</b> fly · <b>⇧1–6</b> store camera · <b>F1–F6</b> recall · <b>K</b> kaleido · <b>W</b> wisps · <b>E</b> echo · <b>O</b> logo overlay · <b>L</b> particle logo · <b>G</b> color · <b>C</b> webcam · <b>D</b> demo · <b>Space</b> kick · <b>H</b> hide · <b>F</b> full screen · <b>P</b> stats</div></div></details>
 </div>
 
 <div id="help"><div class="card glass"><h2 id="helpTitle">MIC NOT AVAILABLE</h2><div id="helpBody"></div>
@@ -308,9 +309,9 @@ const DEF = { world: 0, auto: true, grade: 0, cycle: true, logo: false, logoSize
   glow: 0.6, trail: 0.3, dof: 0.5, quality: 1, stats: false, kaleido: 0, echo: 0.2,
   exposure: 0.95, rolloff: 0.6, white: 4, sat: 1.05, contrast: 1.0, hot: 0.4, thr: 0.12, limiter: 0.45,
   lens: 0, lensSize: 0.55, lensAmt: 0.7, lensPulse: 0.5, lensPos: 0, lensSpin: false,
-  detail: (window.matchMedia && matchMedia('(pointer:coarse)').matches) ? 0.6 : 1, fly: false, tour: 0, tourEvery: 16 };
+  detail: (window.matchMedia && matchMedia('(pointer:coarse)').matches) ? 0.6 : 1, fly: false, tour: 0, tourEvery: 16, wisps: true };
 // keys that travel with a preset or share link, besides the world's own parameters
-const LOOK_KEYS = ['kaleido', 'echo', 'glow', 'trail', 'dof', 'grade', 'cycle', 'exposure', 'rolloff', 'white', 'sat', 'contrast', 'hot', 'thr', 'limiter',
+const LOOK_KEYS = ['wisps', 'kaleido', 'echo', 'glow', 'trail', 'dof', 'grade', 'cycle', 'exposure', 'rolloff', 'white', 'sat', 'contrast', 'hot', 'thr', 'limiter',
   'logo', 'logoSize', 'lens', 'lensSize', 'lensAmt', 'lensPulse', 'lensPos', 'lensSpin'];
 const COLOR_KEYS = ['exposure', 'rolloff', 'white', 'sat', 'contrast', 'hot', 'thr', 'limiter'];
 const S = Object.assign({}, DEF);
@@ -1057,6 +1058,10 @@ const SCHEMA = {
     { k: 'current', l: 'Current', min: 0, max: 2.5, st: 0.01, d: 1, g: 'Reef' },
     { k: 'polyp', l: 'Polyp size', min: 0.3, max: 2.5, st: 0.01, d: 1, g: 'Reef' },
     { k: 'coral', l: 'Coral beds', min: 0, max: 2, st: 0.05, d: 1, rb: 1, g: 'Reef' },
+    { k: 'fish', l: 'Fish', min: 0, max: 4, st: 0.05, d: 1, rb: 1, g: 'Fish' },
+    { k: 'fishSize', l: 'Fish size', min: 0.3, max: 3, st: 0.01, d: 1.4, g: 'Fish' },
+    { k: 'fishSpeed', l: 'Swim speed', min: 0, max: 3, st: 0.01, d: 1, g: 'Fish' },
+    { k: 'school', l: 'School spread', min: 0.2, max: 4, st: 0.01, d: 1.8, g: 'Fish' },
     { k: 'fog', l: 'Fog', min: 0, max: 2.5, st: 0.01, d: 1, g: 'Water' },
     { k: 'fogHue', l: 'Water hue', min: 0, max: 1, st: 0.01, d: 0.5, g: 'Water' },
     { k: 'snow', l: 'Marine snow', min: 0, max: 2, st: 0.05, d: 1, rb: 1, g: 'Water' }
@@ -1311,7 +1316,7 @@ void main(){
     oP = vec4(p, -(0.006 + 0.012 * s.y)); oC = vec4(col, e);
     return;
   }
-  if (idx < ${WO}) { int j = idx - ${LG + MDUST}; oP = vec4(uWisp[j].xyz, -0.026); oC = vec4(uWispC[j], uWisp[j].w); return; }
+  if (idx < ${WO}) { int j = idx - ${LG + MDUST}; oP = vec4(uWisp[j].xyz, uWisp[j].w > 0.01 ? -0.026 : 0.0); oC = vec4(uWispC[j], uWisp[j].w); return; }
   int i = idx - ${WO};
   vec4 cp = i < uNC ? fetch(uCP, i) : vec4(0.0), cc = i < uNC ? fetch(uCC, i) : vec4(0.0);
   vec4 P, C;
@@ -2205,10 +2210,49 @@ void seg(int id, out vec3 A, out vec3 B, out float wA, out float wB, out vec4 cA
 }`;
 const REEF_GLSL = `
 ${REEF_SHARED}
-uniform int uSL, uCO0, uSN0, uSA0, uNClump; uniform float uTravel, uKick;
+uniform int uSL, uCO0, uSN0, uSA0, uNClump, uFI0, uPerSchool; uniform float uTravel, uKick, uFT, uStartle;
+// a school's path through the water (z unwrapped; the caller wraps after adding each fish's offset)
+vec3 schoolRaw(int sc, float t){
+  float hs = h1(sc, 41), hy = h1(sc, 42), hz = h1(sc, 43), dir = h1(sc, 44) < 0.5 ? -1.0 : 1.0, sp = 0.45 + 0.7 * h1(sc, 45);
+  return vec3((hs - 0.5) * 12.0 + sin(t * 0.21 + hs * 20.0) * 2.4 + vnoise(vec3(t * 0.09, hs * 9.0, 1.0)) * 3.0,
+              -1.15 + hy * 3.0 + sin(t * 0.17 + hy * 13.0) * 0.6 + vnoise(vec3(t * 0.11, hy * 7.0, 4.0)) * 0.5,
+              hz * (ZN - ZF) + dir * t * sp + sin(t * 0.13 + hz * 11.0) * 1.5);
+}
+// one point of one fish: a wagging spine with a forked tail, oriented along the school's heading
+void fish(int j, inout vec3 p, inout float r, inout vec3 c, inout float e){
+  int f = j / 14, k = j - f * 14, sc = f / max(1, uPerSchool);
+  vec4 q = vec4(h1(f, 51), h1(f, 52), h1(f, 53), h1(f, 54));
+  float tt = uFT - q.w * 0.8;
+  vec3 c0 = schoolRaw(sc, tt), c1 = schoolRaw(sc, tt + 0.05);
+  vec3 fwd = normalize(c1 - c0 + vec3(1e-4, 0.0, 0.0));
+  vec3 side = normalize(cross(fwd, vec3(0.0, 1.0, 0.0)) + vec3(1e-4)), up = cross(side, fwd);
+  float spread = p_school * (1.0 + uStartle * 1.8), ra = uFT * 0.2 * (q.x - 0.5);
+  vec3 o = (q.xyz - 0.5) * vec3(1.7, 0.6, 1.7) * spread;
+  o = vec3(o.x * cos(ra) - o.z * sin(ra), o.y + sin(uFT * 0.7 + q.w * 9.0) * 0.08, o.x * sin(ra) + o.z * cos(ra));
+  vec3 pos = c0 + o;
+  pos.z = ZF + mod(pos.z + uTravel - ZF + 400.0 * (ZN - ZF), ZN - ZF);
+  float vis = sm(ZF, ZF + 10.0, pos.z) * (1.0 - sm(ZN - 1.5, ZN, pos.z));
+  if (vis <= 0.001) return;
+  float L = (0.13 + 0.1 * h1(sc, 46)) * p_fishSize * (0.8 + 0.4 * q.y);
+  float wag = sin(uFT * (7.0 + 5.0 * p_fishSpeed) * (1.0 + uStartle) + q.z * 6.28);
+  if (k < 10) {
+    float u = float(k) / 9.0;
+    p = pos + fwd * (0.5 - u) * L + side * wag * u * u * 0.24 * L;
+    r = L * 0.11 * sin(3.14159 * pow(u * 0.9 + 0.05, 0.75)) + 0.0015;
+  } else {
+    int tk = k - 10; float back = 0.62 + 0.1 * float(tk % 2), fork = (tk < 2 ? 1.0 : -1.0) * (0.1 + 0.08 * float(tk % 2));
+    p = pos - fwd * back * L + side * wag * 0.3 * L + up * fork * L;
+    r = L * 0.035 + 0.001;
+  }
+  float sp = h1(sc, 47), u2 = float(k) / 13.0;
+  c = sp < 0.3 ? mix(C_pearl, C_azure, u2 * 0.6) : sp < 0.55 ? mix(C_gold, C_ember, u2) : sp < 0.8 ? (k % 3 == 0 ? C_pink : C_cyan) : mix(C_lime, C_teal, u2);
+  r *= vis;
+  e = (0.26 + uHigh * 0.35 * step(0.7, h1(f, int(uT * 6.0))) + uStartle * 0.7 + uLevel * 0.15) * vis;
+}
 uniform float uSparkleT;
 void particle(int i, vec4 s, inout vec3 p, inout float r, inout vec3 c, inout float e, inout float g){
   float t = uT;
+  if (i >= uFI0) { fish(i - uFI0, p, r, c, e); return; }
   if (i < uCO0) {
     // polyps and beads riding the stalks
     int stalk = i / ${REEF_BEADS}, k = i - stalk * ${REEF_BEADS};
@@ -2290,7 +2334,9 @@ function makeReef(P) {
   buildReefTemplates();
   const SL = Math.min(512, Math.round(P.stalks * Math.min(1, 0.5 + S.detail * 0.5))), LEN = REEF_ZN - REEF_ZF;
   const NB = SL * REEF_BEADS, NCO = Math.floor(cnt(19000, P, P.coral) / 140) * 140, NSNOW = cnt(10000, P, P.snow), NSAND = cnt(8000, P);
-  const CO0 = NB, SN0 = CO0 + NCO, SA0 = SN0 + NSNOW, N = Math.min(CAP, SA0 + NSAND);
+  const PER = 36, NFISH = Math.round(cnt(420, P, P.fish) / PER) * PER, FI0 = NB + NCO + NSNOW + NSAND;
+  const CO0 = NB, SN0 = CO0 + NCO, SA0 = SN0 + NSNOW, N = Math.min(CAP, FI0 + NFISH * 14);
+  let fishT = 0, startle = 0;
   const slot = new Float32Array(512 * 2 * 4), slotZ = new Float32Array(SL), slotPrev = new Float32Array(SL);
   const dens = d => clamp(0.55 + P.variation * (noise3(d * 0.045, 3.3, 1.1) * 1.3 + noise3(d * 0.13, 7.1, 2.2) * 0.5), 0.02, 1);
   let travel = 0, distIdx = 0, current = 0, kick = 0;
@@ -2313,14 +2359,15 @@ function makeReef(P) {
     lines: [{ prog: progFor('REEF_L', 'REEF', REEF_LINE, true), count: SL * REEF_NODES }],
     get fog() { return { d: 0.05 * P.fog, col: fogCol() }; },
     onset(kind, s) {
-      if (kind === 'kick' || kind === 'touch') { push(0.7 + s, clamp(0.35 + s * 0.5, 0, 1), 2.4); kick = Math.max(kick, s); }
+      if (kind === 'kick' || kind === 'touch') { push(0.7 + s, clamp(0.35 + s * 0.5, 0, 1), 2.4); kick = Math.max(kick, s); if (s > 0.8 || kind === 'touch') startle = Math.max(startle, s * 0.8); }
       else if (kind === 'snare') push(0.5 + s * 0.5, 0.3, 3.2);
       else if (kind === 'idle') push(0.5, 0.25, 1.6);
     },
     update(dt, t) {
       for (const q of pz) q.age += dt;
       while (pz.length && (pz[0].age * pz[0].spd > 7.5 || pz[0].age > 8)) pz.shift();
-      kick *= Math.exp(-dt * 2);
+      kick *= Math.exp(-dt * 2); startle *= Math.exp(-dt * 1.4);
+      fishT += dt * P.fishSpeed * (0.7 + A.level * 0.6 + startle * 1.5);
       current = lerp(current, P.current * (0.12 + A.low * 0.45 + A.presence * 0.1), 1 - Math.exp(-dt * 2));
       const v = P.travel * (0.9 + A.level * 1.2 + kick * 1.5);
       travel += dt * v; distIdx += dt * v;
@@ -2342,6 +2389,7 @@ function makeReef(P) {
       W.shared(p);
       gl.uniform1i(p.u('uCO0'), CO0); gl.uniform1i(p.u('uSN0'), SN0); gl.uniform1i(p.u('uSA0'), SA0);
       gl.uniform1f(p.u('uTravel'), travel); gl.uniform1f(p.u('uKick'), kick);
+      gl.uniform1i(p.u('uFI0'), FI0); gl.uniform1i(p.u('uPerSchool'), PER); gl.uniform1f(p.u('uFT'), fishT); gl.uniform1f(p.u('uStartle'), startle);
     }
   };
   W.lines[0].uniforms = p => W.shared(p);
@@ -3182,6 +3230,7 @@ function frame(now) {
   const flashC = wPrev && inTr ? mixC(wPrev.flash, wCur.flash, tk) : wCur.flash;
   for (let w = 0; w < WISP; w++) wispCols[w] = wPrev && inTr ? mixC(wPrev.wisps[w], wCur.wisps[w], tk) : wCur.wisps[w].slice();
   updateWisps(dt, t);
+  wispAmt = lerp(wispAmt, S.wisps ? 1 : 0, 1 - Math.exp(-dt * 2));
   updateLook(dt);
   updateLogo(dt);
 
@@ -3227,9 +3276,9 @@ function frame(now) {
   }
   for (let w = 0; w < WISP; w++) {
     toViewM(MV, wispPos[w * 3], wispPos[w * 3 + 1], wispPos[w * 3 + 2], LP, 4 + w * 4);
-    LP[7 + w * 4] = 0.5 + 0.25 * Math.sin(t * 1.3 + w * 2) + wispFlash[w] * 1.8 + A.level * 0.7;
+    LP[7 + w * 4] = (0.5 + 0.25 * Math.sin(t * 1.3 + w * 2) + wispFlash[w] * 1.8 + A.level * 0.7) * wispAmt;
     LC[3 + w * 3] = wispCols[w][0]; LC[4 + w * 3] = wispCols[w][1]; LC[5 + w * 3] = wispCols[w][2];
-    uWisp.set([wispPos[w * 3], wispPos[w * 3 + 1], wispPos[w * 3 + 2], 1.6 + wispFlash[w] * 2.5 + A.level * 0.8], w * 4); uWispC.set(wispCols[w], w * 3);
+    uWisp.set([wispPos[w * 3], wispPos[w * 3 + 1], wispPos[w * 3 + 2], (1.6 + wispFlash[w] * 2.5 + A.level * 0.8) * wispAmt], w * 4); uWispC.set(wispCols[w], w * 3);
   }
   const hc = [0, 0, 0];
   for (let a = 0; a < 4; a++) { hc[0] = LC[a * 3]; hc[1] = LC[a * 3 + 1]; hc[2] = LC[a * 3 + 2]; hueRotJS(hc, hueNow, hc); LC[a * 3] = hc[0]; LC[a * 3 + 1] = hc[1]; LC[a * 3 + 2] = hc[2]; }
@@ -3239,7 +3288,7 @@ function frame(now) {
   for (const F of wCur.fils) gatherFil(F, wCur.P.bright, gNew);
   const wOld = prevLive ? (1 - smooth(0, 0.6, k)) * wPrev.P.bright : 0;
   if (prevLive) for (const F of wPrev.fils) gatherFil(F, wOld, 1);
-  gatherFil(wispFil, 1, 1);
+  gatherFil(wispFil, wispAmt, 1);
 
   const ex = tx - px, ey = ty - py, ez = tz - pz;
   const evx = ex * rx + ey * ry + ez * rz, evy = ex * ux + ey * uy + ez * uz, evz = ex * fx + ey * fy + ez * fz;
@@ -3372,7 +3421,7 @@ function frame(now) {
   if (camUIdirty && panel.classList.contains('open')) syncCamUI();
   perfTick(now, cpuMid - cpu0, dt);
 }
-let kickedThisFrame = false, echoZoomNow = 1;
+let kickedThisFrame = false, echoZoomNow = 1, wispAmt = 1;
 
 /* adaptive quality: drop render scale if the device can't hold ~50 fps, creep back up when it can */
 function perfTick(now, cpuMs, dt) {
@@ -3664,7 +3713,7 @@ function updateUI() {
   $('#lensPos').querySelectorAll('.pill').forEach((b, i) => b.classList.toggle('on', i === Math.round(S.lensPos)));
   document.querySelectorAll('input[data-k]').forEach(el => { if (+el.value !== +S[el.dataset.k]) { el.value = S[el.dataset.k]; const o = el.parentElement.querySelector('output'); if (o) o.textContent = (+S[el.dataset.k]).toFixed(2); } });
   $('#cams').querySelectorAll('.pill').forEach((b, i) => b.classList.toggle('on', ['off', 'user', 'environment'][i] === S.cam));
-  [['#autoBtn', 'auto'], ['#cycleBtn', 'cycle'], ['#logoBtn', 'logo'], ['#motionBtn', 'camMotion'], ['#flowBtn', 'flow'], ['#demoBtn', 'demo'], ['#statsBtn', 'stats'], ['#lensSpinBtn', 'lensSpin']].forEach(([id, k]) => $(id).classList.toggle('on', !!S[k]));
+  [['#autoBtn', 'auto'], ['#cycleBtn', 'cycle'], ['#logoBtn', 'logo'], ['#motionBtn', 'camMotion'], ['#flowBtn', 'flow'], ['#wispBtn', 'wisps'], ['#demoBtn', 'demo'], ['#statsBtn', 'stats'], ['#lensSpinBtn', 'lensSpin']].forEach(([id, k]) => $(id).classList.toggle('on', !!S[k]));
   $('#stats').hidden = !S.stats;
   if (wsetFor !== NAMES[cur]) buildWorldSettings();
   if (presetsFor !== NAMES[cur]) { presetsFor = NAMES[cur]; buildPresets(); }
@@ -3676,6 +3725,7 @@ $('#cycleBtn').addEventListener('click', () => toggle('cycle'));
 $('#logoBtn').addEventListener('click', () => toggle('logo'));
 $('#motionBtn').addEventListener('click', () => toggle('camMotion'));
 $('#flowBtn').addEventListener('click', () => toggle('flow'));
+$('#wispBtn').addEventListener('click', () => toggle('wisps', 'Light wisps on', 'Light wisps off'));
 $('#statsBtn').addEventListener('click', () => toggle('stats'));
 $('#demoBtn').addEventListener('click', () => { S.demo = !S.demo; demoBeat = -1; updateUI(); toast(S.demo ? 'Demo groove on' : A.live ? 'Listening to the mic' : 'Demo off · no mic connected'); });
 $('#micBtn').addEventListener('click', async () => { try { await startMic(); toast('Mic live · play some music'); } catch (e) { showMicHelp(e); } });
@@ -3741,6 +3791,7 @@ window.addEventListener('keydown', e => {
   else if (k === 'arrowleft') setWorld((cur + WORLDS.length - 1) % WORLDS.length, tSim);
   else if (k === 'a') toggle('auto', 'Auto travel on', 'Staying in this world');
   else if (k === 'l') toggle('logo');
+  else if (k === 'w') toggle('wisps', 'Light wisps on', 'Light wisps off');
   else if (k === 'm') mutate();
   else if (k === 'o') { S.lens = (S.lens + 1) % LENSES.length; save(); updateUI(); toast('Logo overlay · ' + LENSES[S.lens]); }
   else if (k === 'k') { S.kaleido = (S.kaleido + 1) % MIRRORS.length; save(); updateUI(); toast(MIRRORS[S.kaleido] ? MIRRORS[S.kaleido] + ' fold kaleidoscope' : 'Kaleidoscope off'); }

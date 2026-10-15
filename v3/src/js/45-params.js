@@ -65,6 +65,10 @@ const SCHEMA = {
     { k: 'current', l: 'Current', min: 0, max: 2.5, st: 0.01, d: 1, g: 'Reef' },
     { k: 'polyp', l: 'Polyp size', min: 0.3, max: 2.5, st: 0.01, d: 1, g: 'Reef' },
     { k: 'coral', l: 'Coral beds', min: 0, max: 2, st: 0.05, d: 1, rb: 1, g: 'Reef' },
+    { k: 'fish', l: 'Fish', min: 0, max: 4, st: 0.05, d: 1, rb: 1, g: 'Fish' },
+    { k: 'fishSize', l: 'Fish size', min: 0.3, max: 3, st: 0.01, d: 1.4, g: 'Fish' },
+    { k: 'fishSpeed', l: 'Swim speed', min: 0, max: 3, st: 0.01, d: 1, g: 'Fish' },
+    { k: 'school', l: 'School spread', min: 0.2, max: 4, st: 0.01, d: 1.8, g: 'Fish' },
     { k: 'fog', l: 'Fog', min: 0, max: 2.5, st: 0.01, d: 1, g: 'Water' },
     { k: 'fogHue', l: 'Water hue', min: 0, max: 1, st: 0.01, d: 0.5, g: 'Water' },
     { k: 'snow', l: 'Marine snow', min: 0, max: 2, st: 0.05, d: 1, rb: 1, g: 'Water' }
