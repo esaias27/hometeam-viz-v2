@@ -272,7 +272,7 @@ function updateUI() {
   $('#lensPos').querySelectorAll('.pill').forEach((b, i) => b.classList.toggle('on', i === Math.round(S.lensPos)));
   document.querySelectorAll('input[data-k]').forEach(el => { if (+el.value !== +S[el.dataset.k]) { el.value = S[el.dataset.k]; const o = el.parentElement.querySelector('output'); if (o) o.textContent = (+S[el.dataset.k]).toFixed(2); } });
   $('#cams').querySelectorAll('.pill').forEach((b, i) => b.classList.toggle('on', ['off', 'user', 'environment'][i] === S.cam));
-  [['#autoBtn', 'auto'], ['#cycleBtn', 'cycle'], ['#logoBtn', 'logo'], ['#motionBtn', 'camMotion'], ['#demoBtn', 'demo'], ['#statsBtn', 'stats'], ['#lensSpinBtn', 'lensSpin']].forEach(([id, k]) => $(id).classList.toggle('on', !!S[k]));
+  [['#autoBtn', 'auto'], ['#cycleBtn', 'cycle'], ['#logoBtn', 'logo'], ['#motionBtn', 'camMotion'], ['#flowBtn', 'flow'], ['#demoBtn', 'demo'], ['#statsBtn', 'stats'], ['#lensSpinBtn', 'lensSpin']].forEach(([id, k]) => $(id).classList.toggle('on', !!S[k]));
   $('#stats').hidden = !S.stats;
   if (wsetFor !== NAMES[cur]) buildWorldSettings();
   if (presetsFor !== NAMES[cur]) { presetsFor = NAMES[cur]; buildPresets(); }
@@ -283,6 +283,7 @@ $('#autoBtn').addEventListener('click', () => toggle('auto', 'Auto travel on', '
 $('#cycleBtn').addEventListener('click', () => toggle('cycle'));
 $('#logoBtn').addEventListener('click', () => toggle('logo'));
 $('#motionBtn').addEventListener('click', () => toggle('camMotion'));
+$('#flowBtn').addEventListener('click', () => toggle('flow'));
 $('#statsBtn').addEventListener('click', () => toggle('stats'));
 $('#demoBtn').addEventListener('click', () => { S.demo = !S.demo; demoBeat = -1; updateUI(); toast(S.demo ? 'Demo groove on' : A.live ? 'Listening to the mic' : 'Demo off · no mic connected'); });
 $('#micBtn').addEventListener('click', async () => { try { await startMic(); toast('Mic live · play some music'); } catch (e) { showMicHelp(e); } });
@@ -422,5 +423,5 @@ async function init() {
 init().catch(e => { console.error(e); fatal('Something went wrong starting up.<br><br><button class="pill on" onclick="location.reload()">RELOAD</button>'); });
 if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost' || location.hostname === '127.0.0.1')) navigator.serviceWorker.register('sw.js').catch(() => {});
 
-window.__HT2 = { PROF, rebuildAll, S, CT, CL, recallSlot, storeSlot, navOrbit, navPan, navDolly, get na() { return NA; }, get segs() { return fcount + gpuSegs; }, A, fire, setWorld: i => setWorld(i, tSim), screenHit, get worlds() { return WORLDS.map(w => w.name); }, get cur() { return cur; }, get fcount() { return fcount; }, get t() { return tSim; }, get fps() { return PERF.fpsAvg; }, get cpu() { return PERF.cpu; }, setTime: x => { tSim = x; } };
+window.__HT2 = { PROF, rebuildAll, get flowMax() { let m = 0; for (let i = 0; i < flowField.length; i += 4) m = Math.max(m, Math.hypot(flowField[i], flowField[i + 1])); return m; }, get motion() { return A.motion; }, S, CT, CL, recallSlot, storeSlot, navOrbit, navPan, navDolly, get na() { return NA; }, get segs() { return fcount + gpuSegs; }, A, fire, setWorld: i => setWorld(i, tSim), screenHit, get worlds() { return WORLDS.map(w => w.name); }, get cur() { return cur; }, get fcount() { return fcount; }, get t() { return tSim; }, get fps() { return PERF.fpsAvg; }, get cpu() { return PERF.cpu; }, setTime: x => { tSim = x; } };
 })();

@@ -215,7 +215,10 @@ input[type=text]::placeholder{color:var(--dim)}
     <div class="hint">Whites running hot? Raise roll-off so bright cores keep their colour, lower hot cores, or let the limiter pull exposure down on big hits.</div></div></details>
   <details class="sec"><summary>Webcam</summary><div class="body"><div class="row" id="cams"></div>
     <div class="ctl"><label for="s_cam">Backdrop</label><output></output><input type="range" id="s_cam" data-k="camAmt" min="0" max="1.5" step="0.01"></div>
-    <div class="row"><button class="pill" id="motionBtn">Motion shockwaves</button></div></div></details>
+    <div class="row"><button class="pill" id="flowBtn">Motion pushes particles</button><button class="pill" id="motionBtn">Motion shockwaves</button></div>
+    <div class="ctl"><label for="s_fa">Push strength</label><output></output><input type="range" id="s_fa" data-k="flowAmt" min="0" max="4" step="0.01"></div>
+    <div class="ctl"><label for="s_fh">Push hold (seconds)</label><output></output><input type="range" id="s_fh" data-k="flowHold" min="0.1" max="4" step="0.05"></div>
+    <div class="hint">The camera reads optical flow: wherever something moves, the particles under it are shoved the same way, harder for faster movement, then drift back. Nothing is recorded or sent anywhere.</div></div></details>
   <details class="sec"><summary>Audio</summary><div class="body">
     <div class="row"><canvas id="meter" width="352" height="60"></canvas><span id="micStat">—</span></div>
     <div class="row"><button class="pill" id="demoBtn">Demo groove</button><button class="pill" id="micBtn">Reconnect mic</button></div>

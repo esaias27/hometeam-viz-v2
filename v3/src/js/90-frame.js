@@ -9,7 +9,8 @@ const cam = { px: 0, py: 0, pz: 8, rx: 1, ry: 0, rz: 0, ux: 0, uy: 1, uz: 0, fx:
 function perspective(fovy, aspect, near, far) { const f = 1 / Math.tan(fovy / 2), nf = 1 / (near - far); return new Float32Array([f / aspect, 0, 0, 0, 0, f, 0, 0, 0, 0, (far + near) * nf, -1, 0, 0, 2 * far * near * nf, 0]); }
 function drawFS() { gl.bindVertexArray(emptyVao); gl.drawArrays(gl.TRIANGLES, 0, 3); }
 function bindTex(unit, tex, p, name) { gl.activeTexture(gl.TEXTURE0 + unit); gl.bindTexture(gl.TEXTURE_2D, tex); gl.uniform1i(p.u(name), unit); }
-const VIEW = new Float32Array(16), MV = new Float32Array(16);
+const VIEW = new Float32Array(16), MV = new Float32Array(16), VP = new Float32Array(16);
+function mul4(o, a, b) { for (let c = 0; c < 4; c++) for (let r = 0; r < 4; r++) o[c * 4 + r] = a[r] * b[c * 4] + a[4 + r] * b[c * 4 + 1] + a[8 + r] * b[c * 4 + 2] + a[12 + r] * b[c * 4 + 3]; return o; }
 function buildView() {
   const c = cam;
   VIEW.set([c.rx, c.ux, -c.fx, 0, c.ry, c.uy, -c.fy, 0, c.rz, c.uz, -c.fz, 0,
@@ -184,6 +185,10 @@ function frame(now) {
     gl.uniform1f(p.u('uLW'), logoW); gl.uniform1f(p.u('uLSz'), LX.sz); gl.uniform1f(p.u('uLY0'), LX.y0); gl.uniform1f(p.u('uLZ0'), LX.z0); gl.uniform1f(p.u('uLFollow'), LX.follow);
     gl.uniform1f(p.u('uLAy'), wCur.ay); gl.uniform1f(p.u('uLAx'), wCur.ax); gl.uniform1f(p.u('uLTipF'), xf && xf.tip ? (wCur.tipFlash || 0) : 0); gl.uniform3fv(p.u('uLTip'), xf && xf.tip ? xf.tip : [0, 0, 0]);
     gl.uniform4fv(p.u('uWisp[0]'), uWisp); gl.uniform3fv(p.u('uWispC[0]'), uWispC);
+    bindT(p, 'uFlow', flowTex); gl.uniform1f(p.u('uFlowOn'), flowLive && S.flow ? 1 : 0);
+    mul4(VP, proj, MV); gl.uniformMatrix4fv(p.u('uVP'), false, VP);
+    gl.uniform3f(p.u('uCR'), cam.rx, cam.ry, cam.rz); gl.uniform3f(p.u('uCU'), cam.ux, cam.uy, cam.uz);
+    gl.uniform1f(p.u('uTanH'), Math.tan(fovNow / 2)); gl.uniform1f(p.u('uAsp'), aspect); gl.uniform1f(p.u('uScI'), 1 / sc);
     drawFS();
   }
   mark('blend');

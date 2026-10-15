@@ -169,31 +169,69 @@ async function startCam(facing) {
   }
 }
 function stopCam() { if (CAM.stream) CAM.stream.getTracks().forEach(t => t.stop()); CAM.stream = null; CAM.on = false; }
+// Optical flow: Lucas-Kanade on a small greyscale copy of the camera. The flow accumulates into a push field
+// (screen space, 32 x 24) that decays over time; the blend pass moves every particle by the field where it sits on screen.
+const FW_W = 64, FW_H = 48, FL_W = 32, FL_H = 24;
+const flowField = new Float32Array(FL_W * FL_H * 4), flowTmp = new Float32Array(FL_W * FL_H * 2), flowTex = dataTex(FL_W, FL_H, gl.RGBA16F, gl.LINEAR);
+let flowLive = 0, flowLast = 0;
+function lucasKanade(I0, I1, out) {
+  const W = FW_W, H = FW_H, R = 3;
+  for (let cy = 0; cy < FL_H; cy++) for (let cx = 0; cx < FL_W; cx++) {
+    const px = cx * 2 + 1, py = cy * 2 + 1;
+    let xx = 0, xy = 0, yy = 0, xt = 0, yt = 0, tt = 0;
+    for (let y = Math.max(1, py - R); y <= Math.min(H - 2, py + R); y++) for (let x = Math.max(1, px - R); x <= Math.min(W - 2, px + R); x++) {
+      const i = y * W + x;
+      const ix = ((I0[i + 1] - I0[i - 1]) + (I1[i + 1] - I1[i - 1])) * 0.25, iy = ((I0[i + W] - I0[i - W]) + (I1[i + W] - I1[i - W])) * 0.25, it = I1[i] - I0[i];
+      xx += ix * ix; xy += ix * iy; yy += iy * iy; xt += ix * it; yt += iy * it; tt += it * it;
+    }
+    const det = xx * yy - xy * xy, o = (cy * FL_W + cx) * 2;
+    if (det < 1e-5 || tt < 0.002) { out[o] = 0; out[o + 1] = 0; continue; }
+    let u = (-yy * xt + xy * yt) / det, v = (xy * xt - xx * yt) / det;
+    const m = Math.hypot(u, v); if (m > 4) { u *= 4 / m; v *= 4 / m; }
+    out[o] = u; out[o + 1] = v;
+  }
+}
 function camTick(dt) {
-  if (!CAM.on || !CAM.video || CAM.video.readyState < 2 || !CAM.video.videoWidth) { A.motion = follow(A.motion, 0, dt, 0.2, 0.6); return; }
-  if (CAM.video.currentTime === CAM.last) return;
+  // the push field fades every frame, camera or not
+  const keep = Math.exp(-dt / Math.max(0.05, S.flowHold));
+  let mx = 0;
+  for (let i = 0; i < FL_W * FL_H; i++) { flowField[i * 4] *= keep; flowField[i * 4 + 1] *= keep; mx = Math.max(mx, Math.abs(flowField[i * 4]) + Math.abs(flowField[i * 4 + 1])); }
+  flowLive = mx > 1e-4 ? 1 : 0;
+  if (!CAM.on || !CAM.video || CAM.video.readyState < 2 || !CAM.video.videoWidth) { A.motion = follow(A.motion, 0, dt, 0.2, 0.6); if (flowLive) uploadData(flowTex, FL_W, FL_H, flowField, gl.RGBA16F); return; }
+  if (CAM.video.currentTime === CAM.last) { if (flowLive) uploadData(flowTex, FL_W, FL_H, flowField, gl.RGBA16F); return; }
+  const fdt = clamp(CAM.video.currentTime - CAM.last, 0.01, 0.2);
   CAM.last = CAM.video.currentTime;
   gl.bindTexture(gl.TEXTURE_2D, camTex); gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, false);
   gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA8, gl.RGBA, gl.UNSIGNED_BYTE, CAM.video);
   CAM.aspect = CAM.video.videoWidth / CAM.video.videoHeight;
-  if (!CAM.cnv) { CAM.cnv = document.createElement('canvas'); CAM.cnv.width = 48; CAM.cnv.height = 36; CAM.ctx = CAM.cnv.getContext('2d', { willReadFrequently: true }); }
-  CAM.ctx.drawImage(CAM.video, 0, 0, 48, 36);
-  const d = CAM.ctx.getImageData(0, 0, 48, 36).data, cur = new Float32Array(48 * 36);
-  for (let i = 0; i < cur.length; i++) cur[i] = (d[i * 4] * 0.3 + d[i * 4 + 1] * 0.59 + d[i * 4 + 2] * 0.11) / 255;
+  if (!CAM.cnv) { CAM.cnv = document.createElement('canvas'); CAM.cnv.width = FW_W; CAM.cnv.height = FW_H; CAM.ctx = CAM.cnv.getContext('2d', { willReadFrequently: true }); }
+  CAM.ctx.drawImage(CAM.video, 0, 0, FW_W, FW_H);
+  const d = CAM.ctx.getImageData(0, 0, FW_W, FW_H).data, raw = new Float32Array(FW_W * FW_H), cur = new Float32Array(FW_W * FW_H);
+  for (let i = 0; i < raw.length; i++) raw[i] = (d[i * 4] * 0.3 + d[i * 4 + 1] * 0.59 + d[i * 4 + 2] * 0.11) / 255;
+  for (let y = 0; y < FW_H; y++) for (let x = 0; x < FW_W; x++) {   // light blur so the gradients are stable
+    let s2 = 0, n = 0;
+    for (let b = -1; b <= 1; b++) for (let a = -1; a <= 1; a++) { const xx = x + a, yy = y + b; if (xx >= 0 && yy >= 0 && xx < FW_W && yy < FW_H) { s2 += raw[yy * FW_W + xx]; n++; } }
+    cur[y * FW_W + x] = s2 / n;
+  }
   if (CAM.prev) {
+    lucasKanade(CAM.prev, cur, flowTmp);
+    // into screen space: mirror for the selfie camera, flip y (image rows run down); pixels per frame to screen widths per second
+    const gain = S.flowAmt * 0.6 / FW_W / fdt * Math.min(fdt * 30, 1);
     let e = 0, sx = 0, sy = 0;
-    for (let y = 0; y < 36; y++) for (let x = 0; x < 48; x++) { const i = y * 48 + x, df = Math.abs(cur[i] - CAM.prev[i]); if (df > 0.08) { e += df; sx += x * df; sy += y * df; } }
-    const en = clamp(e / 60, 0, 1);
+    for (let cy = 0; cy < FL_H; cy++) for (let cx = 0; cx < FL_W; cx++) {
+      const src = (cy * FL_W + cx) * 2, sxc = CAM.mirror ? FL_W - 1 - cx : cx, dst = ((FL_H - 1 - cy) * FL_W + sxc) * 4;
+      const u = flowTmp[src] * (CAM.mirror ? -1 : 1), v = -flowTmp[src + 1], m = Math.hypot(u, v);
+      if (S.flow) { flowField[dst] += u * gain * fdt * 2; flowField[dst + 1] += v * gain * fdt * 2; }
+      e += m; sx += sxc * m; sy += (FL_H - 1 - cy) * m;
+    }
+    const en = clamp(e / 220, 0, 1);
     A.motion = follow(A.motion, en, dt, 0.05, 0.4);
     CAM.cool -= dt;
-    if (S.camMotion && en > 0.12 && en > CAM.energy * 1.6 && CAM.cool <= 0 && e > 0) {
-      let u = sx / e / 47, v = sy / e / 35; if (CAM.mirror) u = 1 - u;
-      screenHit(u, 1 - v, clamp(0.3 + en * 1.2, 0.3, 1), true);
-      CAM.cool = 0.25;
-    }
+    if (S.camMotion && en > 0.15 && en > CAM.energy * 1.6 && CAM.cool <= 0 && e > 0) { screenHit(sx / e / (FL_W - 1), sy / e / (FL_H - 1), clamp(0.3 + en * 1.2, 0.3, 1), true); CAM.cool = 0.25; }
     CAM.energy = follow(CAM.energy, en, dt, 0.3, 0.3);
   }
   CAM.prev = cur;
+  uploadData(flowTex, FL_W, FL_H, flowField, gl.RGBA16F); flowLive = 1;
 }
 
 /* ================================================================== */

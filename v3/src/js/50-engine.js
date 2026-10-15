@@ -134,6 +134,17 @@ uniform float uB[16];
 uniform vec4 uRip[14]; uniform vec2 uRipS[14];
 uniform float uLW, uLSz, uLY0, uLZ0, uLFollow, uLAy, uLAx, uLTipF; uniform vec3 uLTip;
 uniform vec4 uWisp[3]; uniform vec3 uWispC[3];
+uniform sampler2D uFlow; uniform mat4 uVP; uniform vec3 uCR, uCU; uniform float uFlowOn, uTanH, uAsp, uScI;
+vec3 flowPush(vec3 p, inout float e){
+  vec4 c = uVP * vec4(p, 1.0);
+  if (c.w < 0.2) return p;
+  vec2 uv = c.xy / c.w * 0.5 + 0.5;
+  if (uv.x < -0.1 || uv.x > 1.1 || uv.y < -0.1 || uv.y > 1.1) return p;
+  vec2 f = texture(uFlow, clamp(uv, 0.0, 1.0)).xy;
+  float m = length(f); if (m < 1e-4) return p;
+  e += min(m * 6.0, 1.5);
+  return p + (uCR * f.x * uAsp + uCU * f.y) * 2.0 * uTanH * c.w * uScI;
+}
 float band(float u){ return uB[clamp(int(u * 15.0 + 0.5), 0, 15)]; }
 void main(){
   int idx = int(gl_FragCoord.y) * TW + int(gl_FragCoord.x);
@@ -155,6 +166,7 @@ void main(){
     vec3 col = g5(C_cyan, C_azure, C_violet, C_magenta, C_pink, L.z);
     float tip = uLTipF > 0.0 ? uLTipF * exp(-length(vec2(lx, ly) - uLTip.xy) * 1.6) * 1.3 : 0.0;
     float r = (0.0062 + 0.0042 * s.y) * (sz / 2.6) * (1.0 + b * 0.4) * w;
+    float le = 0.0; if (uFlowOn > 0.5) p = flowPush(p, le);
     oP = vec4(p, r); oC = vec4(col, 0.14 + b * 0.5 + uLevel * 0.2 + tw(s, uT) * 0.35 + uFlash * 0.3 + tip);
     return;
   }
@@ -196,6 +208,7 @@ void main(){
       push += wv; g += d / dl * wv;
     }
     if (push > 0.001) { P.xyz += g * 0.11; P.w *= 1.0 + min(push, 1.5) * 0.45; C.a += push * 1.1; }
+    if (uFlowOn > 0.5) { float fe = 0.0; P.xyz = flowPush(P.xyz, fe); C.a += fe; }
   }
   oP = P; oC = C;
 }`;

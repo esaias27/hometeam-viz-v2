@@ -42,7 +42,7 @@ function curl3(x, y, z) { cv[0] = noise3(x, y, z); cv[1] = noise3(x + 31.4, y - 
 /* ================================================================== */
 /* Settings                                                            */
 /* ================================================================== */
-const DEF = { world: 0, auto: true, grade: 0, cycle: true, logo: false, logoSize: 0.4, camAmt: 0.55, camMotion: true, sens: 1.1,
+const DEF = { world: 0, auto: true, grade: 0, cycle: true, logo: false, logoSize: 0.4, camAmt: 0.55, camMotion: false, flow: true, flowAmt: 1, flowHold: 0.8, sens: 1.1,
   glow: 0.6, trail: 0.3, dof: 0.5, quality: 1, stats: false, kaleido: 0, echo: 0.2,
   exposure: 0.95, rolloff: 0.6, white: 4, sat: 1.05, contrast: 1.0, hot: 0.4, thr: 0.12, limiter: 0.45,
   lens: 0, lensSize: 0.55, lensAmt: 0.7, lensPulse: 0.5, lensPos: 0, lensSpin: false,
