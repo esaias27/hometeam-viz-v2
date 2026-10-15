@@ -1188,6 +1188,8 @@ const WP = {}, WT = {};
 S.wp = S.wp || {};
 for (const name in SCHEMA) {
   WT[name] = Object.assign({}, WORLD_DEF[name], S.wp[name] || {});
+  // saved values always stay inside their slider's range
+  for (const d of schemaOf(name)) { const v = +WT[name][d.k]; WT[name][d.k] = Number.isFinite(v) ? clamp(v, d.min, d.max) : d.d; }
   WP[name] = Object.assign({}, WT[name]);
   S.wp[name] = WT[name];
 }
@@ -1350,7 +1352,7 @@ function makeTower(P) {
 function makeLot(P) {
   const NL = cnt(650, P, P.lanterns), NCROWD = cnt(2300, P, P.crowd), NH = 300, NSTAR = 150, FWN = 2200;
   const C0 = NL, H0 = C0 + NCROWD, ST0 = H0 + NH, FW0 = ST0 + NSTAR;
-  const N = Math.min(NMAX, FW0 + FWN), FWC = N - FW0;
+  const N = Math.min(NMAX, FW0 + FWN), FWC = Math.max(0, N - FW0);
   const col = new Float32Array(N * 3), kinds = new Float32Array(N);
   for (let i = 0; i < NL; i++) { setCol(col, i, sD[i] < 0.45 ? PAL.gold : sD[i] < 0.8 ? PAL.amber : PAL.rose); kinds[i] = sA[i] < 0.55 ? 1 : 0; }
   const cr = new Float32Array(N), ca = new Float32Array(N);
@@ -1988,7 +1990,14 @@ function setWorld(s, t, quiet) {
 }
 function buildWorld(i) {
   const name = NAMES[i], P = WP[name];
-  const w = FACTORIES[i](P); w.P = P; w.tl = 0; w.spinAng = 0;
+  let w;
+  // a saved setting that breaks a world must never stop the show: fall back to that world's defaults
+  try { w = FACTORIES[i](P); } catch (e) {
+    console.warn('world ' + name + ' failed with saved settings, using defaults', e);
+    Object.assign(WT[name], WORLD_DEF[name]); Object.assign(P, WORLD_DEF[name]); save();
+    w = FACTORIES[i](P);
+  }
+  w.P = P; w.tl = 0; w.spinAng = 0;
   return w;
 }
 // structural parameters (counts, divisions) rebuild the world; the new one morphs out of the old one's light

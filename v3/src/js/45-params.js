@@ -128,6 +128,8 @@ S.wp = S.wp || {};
 for (const name in SCHEMA) {
   WT[name] = Object.assign({}, WORLD_DEF[name], S.wp[name] || {});
   for (const k in WT[name]) if (!(k in WORLD_DEF[name])) delete WT[name][k];
+  // saved values always stay inside their slider's range
+  for (const d of schemaOf(name)) { const v = +WT[name][d.k]; WT[name][d.k] = Number.isFinite(v) ? clamp(v, d.min, d.max) : d.d; }
   WP[name] = Object.assign({}, WT[name]);
   S.wp[name] = WT[name];
 }

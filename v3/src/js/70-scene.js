@@ -24,7 +24,14 @@ function setWorld(s, t, quiet) {
 }
 function buildWorld(i) {
   const name = NAMES[i], P = WP[name];
-  const w = FACTORIES[i](P); w.P = P; w.tl = 0;
+  let w;
+  // a saved setting that breaks a world must never stop the show: fall back to that world's defaults
+  try { w = FACTORIES[i](P); } catch (e) {
+    console.warn('world ' + name + ' failed with saved settings, using defaults', e);
+    Object.assign(WT[name], WORLD_DEF[name]); Object.assign(P, WORLD_DEF[name]); save();
+    w = FACTORIES[i](P);
+  }
+  w.P = P; w.tl = 0;
   return w;
 }
 // structural parameters (counts, divisions) rebuild the world; the new one morphs out of the old one's light

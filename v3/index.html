@@ -1110,6 +1110,8 @@ S.wp = S.wp || {};
 for (const name in SCHEMA) {
   WT[name] = Object.assign({}, WORLD_DEF[name], S.wp[name] || {});
   for (const k in WT[name]) if (!(k in WORLD_DEF[name])) delete WT[name][k];
+  // saved values always stay inside their slider's range
+  for (const d of schemaOf(name)) { const v = +WT[name][d.k]; WT[name][d.k] = Number.isFinite(v) ? clamp(v, d.min, d.max) : d.d; }
   WP[name] = Object.assign({}, WT[name]);
   S.wp[name] = WT[name];
 }
@@ -2680,7 +2682,14 @@ function setWorld(s, t, quiet) {
 }
 function buildWorld(i) {
   const name = NAMES[i], P = WP[name];
-  const w = FACTORIES[i](P); w.P = P; w.tl = 0;
+  let w;
+  // a saved setting that breaks a world must never stop the show: fall back to that world's defaults
+  try { w = FACTORIES[i](P); } catch (e) {
+    console.warn('world ' + name + ' failed with saved settings, using defaults', e);
+    Object.assign(WT[name], WORLD_DEF[name]); Object.assign(P, WORLD_DEF[name]); save();
+    w = FACTORIES[i](P);
+  }
+  w.P = P; w.tl = 0;
   return w;
 }
 // structural parameters (counts, divisions) rebuild the world; the new one morphs out of the old one's light
