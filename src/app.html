@@ -94,6 +94,25 @@ input[type=range]::-moz-range-thumb{width:12px;height:12px;border:0;border-radiu
 .hint{font-size:10.5px;line-height:1.6;color:var(--dim);margin-top:8px;letter-spacing:.02em}
 .keys{font-size:10px;line-height:1.9;letter-spacing:.12em;text-transform:uppercase;color:var(--dim);margin-top:6px}
 .keys b{font-weight:500;color:var(--ink)}
+details.sec{padding:0}
+details.sec>summary{list-style:none;cursor:pointer;display:flex;justify-content:space-between;align-items:center;padding:13px 0 12px;font-size:10px;font-weight:500;letter-spacing:.24em;text-transform:uppercase;color:var(--acc)}
+details.sec>summary::-webkit-details-marker,details.grp>summary::-webkit-details-marker{display:none}
+details.sec>summary::after,details.grp>summary::after{content:'+';font-size:13px;letter-spacing:0;color:var(--dim);font-weight:400}
+details[open]>summary::after{content:'\2013'}
+details.sec>.body{padding:0 0 14px}
+details.grp{border-top:1px dashed var(--line);margin-top:2px}
+details.grp>summary{list-style:none;cursor:pointer;display:flex;justify-content:space-between;align-items:center;padding:10px 0 8px;font-size:9.5px;letter-spacing:.2em;text-transform:uppercase;color:var(--ink)}
+details.grp>.body{padding-bottom:8px}
+.sub{font-size:9.5px;letter-spacing:.2em;text-transform:uppercase;color:var(--dim);margin:12px 0 6px}
+em.rb,.ctl label em{font-style:normal;font-size:8.5px;letter-spacing:.12em;color:var(--acc2);border:1px solid rgba(111,240,255,.3);padding:0 4px;margin-left:5px;border-radius:2px;text-transform:uppercase}
+.plist{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:8px}
+.plist .pill{padding:6px 9px;min-height:30px;font-size:9.5px}
+.plist .pill small{font-family:var(--serif);font-style:italic;font-size:13px;letter-spacing:0;text-transform:none;color:var(--dim)}
+.plist .pill .x{margin-left:2px;color:var(--dim);padding:0 2px}
+.plist .pill .x:hover{color:var(--acc)}
+.plist .lab{flex-basis:100%;font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:var(--dim);margin:6px 0 1px}
+input[type=text]{flex:1;min-width:0;font:inherit;font-size:11px;letter-spacing:.06em;color:var(--ink);background:rgba(255,255,255,.04);border:1px solid var(--line);border-radius:2px;padding:8px 10px;min-height:34px;-webkit-user-select:text;user-select:text}
+input[type=text]::placeholder{color:var(--dim)}
 
 #toast{position:fixed;z-index:30;left:50%;top:max(16px,env(safe-area-inset-top));transform:translate(-50%,-160%);transition:transform .35s;padding:10px 16px;
   font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;max-width:90vw;text-align:center}
@@ -138,32 +157,58 @@ input[type=range]::-moz-range-thumb{width:12px;height:12px;border:0;border-radiu
     <div class="mark"><span class="word">HOME TEAM<i>fm</i></span><span class="msub">Live visuals · v2</span></div>
     <div class="status"><span class="dot" id="dot"></span><span id="status">Idle</span></div>
   </div>
-  <div class="sec"><h3>World</h3><div class="grid" id="worlds"></div>
+  <details class="sec" open><summary>World</summary><div class="body"><div class="grid" id="worlds"></div>
     <div class="row"><button class="pill" id="autoBtn">Auto travel</button></div>
-    <div class="hint">Every world is the same light in a different shape, so they morph into each other.</div></div>
-  <div class="sec"><h3>Lens</h3>
+    <div class="hint">Every world is the same light in a different shape, so they morph into each other.</div></div></details>
+  <details class="sec" open id="wsetSec"><summary><span><span id="wsetTitle">World</span> settings</span></summary><div class="body"><div id="wset"></div>
+    <div class="row"><button class="pill" id="mutateBtn">Mutate</button><button class="pill" id="resetBtn">Reset world</button></div>
+    <div class="hint">Every change glides into place. Settings marked <em class="rb">rebuild</em> regrow the world, and it morphs out of the old one.</div></div></details>
+  <details class="sec"><summary>Presets</summary><div class="body"><div class="plist" id="presets"></div>
+    <div class="row"><input type="text" id="presetName" placeholder="Name this look" maxlength="40" autocomplete="off"><button class="pill" id="savePreset">Save</button></div>
+    <div class="row"><button class="pill" id="shareBtn">Share link</button><button class="pill" id="exportBtn">Export</button><button class="pill" id="importBtn">Import</button><input type="file" id="importFile" accept="application/json,.json" hidden></div>
+    <div class="hint">A preset keeps the world and its settings plus the lens, logo and color. A share link opens straight into the look.</div></div></details>
+  <details class="sec"><summary>Lens</summary><div class="body">
     <div class="row" id="kaleidos"></div>
     <div class="ctl"><label for="s_echo">Echo</label><output></output><input type="range" id="s_echo" data-k="echo" min="0" max="1" step="0.01"></div>
     <div class="ctl"><label for="s_glow">Glow</label><output></output><input type="range" id="s_glow" data-k="glow" min="0" max="1" step="0.01"></div>
     <div class="ctl"><label for="s_trail">Trails</label><output></output><input type="range" id="s_trail" data-k="trail" min="0" max="1" step="0.01"></div>
     <div class="ctl"><label for="s_dof">Focus blur</label><output></output><input type="range" id="s_dof" data-k="dof" min="0" max="1" step="0.01"></div>
-    <div class="hint">Kaleidoscope folds the frame into mirrored wedges. Echo feeds each frame back into the next, so the light recedes forever.</div></div>
-  <div class="sec"><h3>Color</h3><div class="row" id="grades"></div>
-    <div class="row"><button class="pill" id="cycleBtn">Color drift</button></div></div>
-  <div class="sec"><h3>Logo</h3><div class="row"><button class="pill" id="logoBtn">HOME TEAM logo</button></div>
+    <div class="hint">Kaleidoscope folds the frame into mirrored wedges. Echo feeds each frame back into the next, so the light recedes forever.</div></div></details>
+  <details class="sec"><summary>Logo</summary><div class="body">
+    <div class="sub">Overlay</div>
+    <div class="row" id="lenses"></div>
+    <div class="ctl"><label for="s_lsz">Size</label><output></output><input type="range" id="s_lsz" data-k="lensSize" min="0.2" max="1.1" step="0.01"></div>
+    <div class="ctl"><label for="s_lam">Strength</label><output></output><input type="range" id="s_lam" data-k="lensAmt" min="0" max="1" step="0.01"></div>
+    <div class="ctl"><label for="s_lpu">Kick pulse</label><output></output><input type="range" id="s_lpu" data-k="lensPulse" min="0" max="2" step="0.01"></div>
+    <div class="row" id="lensPos"></div>
+    <div class="row"><button class="pill" id="lensSpinBtn">Turn with kaleidoscope</button></div>
+    <div class="sub">Particles</div>
+    <div class="row"><button class="pill" id="logoBtn">Logo from light</button></div>
     <div class="ctl"><label for="s_logo">Size</label><output></output><input type="range" id="s_logo" data-k="logoSize" min="0.25" max="1" step="0.01"></div>
-    <div class="hint">The logo flies out of the world's light. In Tower the whole world is the logo.</div></div>
-  <div class="sec"><h3>Camera</h3><div class="row" id="cams"></div>
+    <div class="hint">The overlay sits on top of everything, kaleidoscope included. The particle logo flies out of the world's own light; in Tower the whole world is the logo.</div></div></details>
+  <details class="sec"><summary>Color</summary><div class="body"><div class="row" id="grades"></div>
+    <div class="row"><button class="pill" id="cycleBtn">Color drift</button></div>
+    <div class="ctl"><label for="c_ex">Exposure</label><output></output><input type="range" id="c_ex" data-k="exposure" min="0.3" max="2" step="0.01"></div>
+    <div class="ctl"><label for="c_ro">Highlight roll-off</label><output></output><input type="range" id="c_ro" data-k="rolloff" min="0" max="1" step="0.01"></div>
+    <div class="ctl"><label for="c_wh">White point</label><output></output><input type="range" id="c_wh" data-k="white" min="1" max="12" step="0.1"></div>
+    <div class="ctl"><label for="c_ho">Hot cores</label><output></output><input type="range" id="c_ho" data-k="hot" min="0" max="1" step="0.01"></div>
+    <div class="ctl"><label for="c_th">Glow threshold</label><output></output><input type="range" id="c_th" data-k="thr" min="0" max="1" step="0.01"></div>
+    <div class="ctl"><label for="c_li">Flash limiter</label><output></output><input type="range" id="c_li" data-k="limiter" min="0" max="1.5" step="0.01"></div>
+    <div class="ctl"><label for="c_sa">Saturation</label><output></output><input type="range" id="c_sa" data-k="sat" min="0" max="2" step="0.01"></div>
+    <div class="ctl"><label for="c_co">Contrast</label><output></output><input type="range" id="c_co" data-k="contrast" min="0.6" max="1.6" step="0.01"></div>
+    <div class="row"><button class="pill" id="colorReset">Reset color</button></div>
+    <div class="hint">Whites running hot? Raise roll-off so bright cores keep their colour, lower hot cores, or let the limiter pull exposure down on big hits.</div></div></details>
+  <details class="sec"><summary>Camera input</summary><div class="body"><div class="row" id="cams"></div>
     <div class="ctl"><label for="s_cam">Backdrop</label><output></output><input type="range" id="s_cam" data-k="camAmt" min="0" max="1.5" step="0.01"></div>
-    <div class="row"><button class="pill" id="motionBtn">Motion shockwaves</button></div></div>
-  <div class="sec"><h3>Audio</h3>
+    <div class="row"><button class="pill" id="motionBtn">Motion shockwaves</button></div></div></details>
+  <details class="sec"><summary>Audio</summary><div class="body">
     <div class="row"><canvas id="meter" width="352" height="60"></canvas><span id="micStat">—</span></div>
     <div class="row"><button class="pill" id="demoBtn">Demo groove</button><button class="pill" id="micBtn">Reconnect mic</button></div>
-    <div class="ctl"><label for="s_sens">Sensitivity</label><output></output><input type="range" id="s_sens" data-k="sens" min="0.4" max="2.6" step="0.01"></div></div>
-  <div class="sec"><h3>Performance</h3>
+    <div class="ctl"><label for="s_sens">Sensitivity</label><output></output><input type="range" id="s_sens" data-k="sens" min="0.4" max="2.6" step="0.01"></div></div></details>
+  <details class="sec"><summary>Performance</summary><div class="body">
     <div class="ctl"><label for="s_q">Quality</label><output></output><input type="range" id="s_q" data-k="quality" min="0.5" max="1" step="0.05"></div>
     <div class="row"><button class="pill" id="statsBtn">Stats</button><button class="pill" id="fsBtn">Full screen</button></div>
-    <div class="keys"><b>1–7</b> worlds · <b>←/→</b> travel · <b>A</b> auto · <b>K</b> kaleido · <b>E</b> echo · <b>L</b> logo · <b>G</b> color · <b>C</b> camera · <b>D</b> demo · <b>Space</b> kick · <b>H</b> hide · <b>F</b> full screen · <b>P</b> stats</div></div>
+    <div class="keys"><b>1–7</b> worlds · <b>←/→</b> travel · <b>A</b> auto · <b>M</b> mutate · <b>K</b> kaleido · <b>E</b> echo · <b>O</b> logo overlay · <b>L</b> particle logo · <b>G</b> color · <b>C</b> camera · <b>D</b> demo · <b>Space</b> kick · <b>H</b> hide · <b>F</b> full screen · <b>P</b> stats</div></div></details>
 </div>
 
 <div id="help"><div class="card glass"><h2 id="helpTitle">MIC NOT AVAILABLE</h2><div id="helpBody"></div>
@@ -216,7 +261,13 @@ function curl3(x, y, z) { cv[0] = noise3(x, y, z); cv[1] = noise3(x + 31.4, y - 
 /* Settings                                                            */
 /* ================================================================== */
 const DEF = { world: 0, auto: true, grade: 0, cycle: true, logo: false, logoSize: 0.4, camAmt: 0.55, camMotion: true, sens: 1.1,
-  glow: 0.6, trail: 0.3, dof: 0.5, quality: 1, stats: false, kaleido: 0, echo: 0.2 };
+  glow: 0.6, trail: 0.3, dof: 0.5, quality: 1, stats: false, kaleido: 0, echo: 0.2,
+  exposure: 0.95, rolloff: 0.6, white: 4, sat: 1.05, contrast: 1.0, hot: 0.4, thr: 0.12, limiter: 0.45,
+  lens: 0, lensSize: 0.55, lensAmt: 0.7, lensPulse: 0.5, lensPos: 0, lensSpin: false };
+// keys that travel with a preset or share link, besides the world's own parameters
+const LOOK_KEYS = ['kaleido', 'echo', 'glow', 'trail', 'dof', 'grade', 'cycle', 'exposure', 'rolloff', 'white', 'sat', 'contrast', 'hot', 'thr', 'limiter',
+  'logo', 'logoSize', 'lens', 'lensSize', 'lensAmt', 'lensPulse', 'lensPos', 'lensSpin'];
+const COLOR_KEYS = ['exposure', 'rolloff', 'white', 'sat', 'contrast', 'hot', 'thr', 'limiter'];
 const S = Object.assign({}, DEF);
 try { Object.assign(S, JSON.parse(localStorage.getItem('htv2') || '{}')); } catch (e) {}
 S.cam = 'off'; S.demo = false;
@@ -262,7 +313,7 @@ void main(){ vec2 p = vec2((gl_VertexID << 1) & 2, gl_VertexID & 2); vUv = p; gl
 const BG_FRAG = `#version 300 es
 precision highp float;
 in vec2 vUv; out vec4 o;
-uniform vec2 uRes, uCenter; uniform float uTime, uLevel, uCamAmt, uCamAsp, uCamMirror, uMotion; uniform vec3 uTint; uniform sampler2D uCam;
+uniform vec2 uRes, uCenter; uniform float uTime, uLevel, uCamAmt, uCamAsp, uCamMirror, uMotion, uFogAmt; uniform vec3 uTint, uFogC; uniform sampler2D uCam;
 float h(vec2 p){ p = fract(p * vec2(123.34, 456.21)); p += dot(p, p + 45.32); return fract(p.x * p.y); }
 float vn(vec2 p){ vec2 i = floor(p), f = fract(p); vec2 u = f * f * (3.0 - 2.0 * f);
   return mix(mix(h(i), h(i + vec2(1, 0)), u.x), mix(h(i + vec2(0, 1)), h(i + vec2(1, 1)), u.x), u.y); }
@@ -279,6 +330,8 @@ void main(){
   float d = length(p - c);
   col += uTint * (0.012 + 0.05 * uLevel) * exp(-d * d * 3.0);
   col += vec3(0.30, 0.20, 0.55) * 0.008 * exp(-d * d * 0.7);
+  // water / haze: the far distance glows faintly in the fog's colour, brighter toward the surface
+  col += uFogC * uFogAmt * (0.08 + 0.22 * smoothstep(0.1, 1.0, vUv.y)) * (0.75 + 0.25 * n);
   if (uCamAmt > 0.001) {
     vec2 uv = vUv; float r = asp / uCamAsp;
     if (r > 1.0) uv.y = (uv.y - 0.5) / r + 0.5; else uv.x = (uv.x - 0.5) * r + 0.5;
@@ -318,7 +371,7 @@ void main(){
 const P_FRAG = `#version 300 es
 precision highp float;
 in vec2 vUv; in float vR0, vAA, vFocus, vRad; in vec4 vCol, vMisc; in vec3 vC;
-uniform vec3 uL; uniform float uTime, uHue; uniform vec4 uLp[4]; uniform vec3 uLc[4];
+uniform vec3 uL; uniform float uTime, uHue, uHot, uFogD, uFogS; uniform vec4 uLp[4]; uniform vec3 uLc[4]; uniform vec3 uFogC;
 out vec4 o;
 ${HUE}
 vec3 foil(float t){ return 0.55 + 0.45 * cos(6.2831853 * (vec3(0.0, 0.33, 0.67) + t)); }
@@ -327,10 +380,12 @@ void main(){
   if (d > 1.0) discard;
   vec3 base = hueRot(vCol.rgb, uHue); float e = vCol.a;
   float edge = 1.0 - smoothstep(vR0 - vAA, 1.0, d);
+  float fg = 1.0 - exp(-max(-vC.z - uFogS, 0.0) * uFogD);
   if (vMisc.y > 0.5) {
     float a = edge * vMisc.w * mix(0.08, 1.0, vFocus * vFocus);
-    float hot = exp(-d * d / (vR0 * vR0 + 1e-4) * 2.5) * vFocus * vMisc.w;
-    o = vec4(base * (0.2 + 0.55 * e) * (a + hot * 0.8), 0.0);
+    float hot = exp(-d * d / (vR0 * vR0 + 1e-4) * 2.5) * vFocus * vMisc.w * (0.4 + 0.6 * uHot);
+    vec3 c = base * (0.2 + 0.55 * e) * (a + hot * 0.8);
+    o = vec4(c * (1.0 - fg * 0.9) + uFogC * (a + hot) * fg * 0.25, 0.0);
     return;
   }
   vec2 pl = vUv / max(vR0, 1e-4);
@@ -343,8 +398,8 @@ void main(){
   vec3 rimC = mix(base, base * sheen * 1.9, 0.4);
   vec3 col = base * (0.014 + 0.05 * diff)
            + rimC * fres * (0.3 + 1.2 * e)
-           + base * e * e * (0.08 + 0.9 * z * z) * 0.8
-           + vec3(1.0, 0.97, 0.94) * spec * (0.4 + 0.8 * e);
+           + base * e * e * (0.08 + 0.9 * z * z) * 0.8 * (0.45 + 0.55 * uHot)
+           + vec3(1.0, 0.97, 0.94) * spec * (0.4 + 0.8 * e) * uHot;
   vec3 P = vC + n * vRad, lit = vec3(0.0);
   for (int k = 0; k < 4; k++) {
     vec3 Lv = uLp[k].xyz - P; float d2 = dot(Lv, Lv) + 0.03;
@@ -353,12 +408,14 @@ void main(){
     float wrapd = max((nl + 0.45) / 1.45, 0.0);
     float sp = pow(max(dot(n, normalize(l + vec3(0.0, 0.0, 1.0))), 0.0), 56.0);
     float trans = pow(max(-nl, 0.0), 1.5) * (0.35 + fres);
-    lit += uLc[k] * att * (base * wrapd * 0.55 + sp * 0.9 + base * trans * 0.9);
+    lit += uLc[k] * att * (base * wrapd * 0.55 + sp * 0.9 * uHot + base * trans * 0.9);
   }
   col += lit;
   vec3 flatC = base * (0.05 + 0.28 * e + 0.35 * e * e) + lit * 0.25;
   col = mix(flatC, col, smoothstep(0.12, 0.8, vFocus));
   float a = edge * mix(0.26, 1.0, vFocus) * vMisc.w;
+  col = mix(col, uFogC * (0.25 + 0.5 * e), fg);
+  a *= 1.0 - fg * 0.55;
   o = vec4(col * a, a);
 }`;
 
@@ -373,14 +430,14 @@ layout(location=2) in vec4 iB;
 layout(location=3) in vec4 iCA;
 layout(location=4) in vec4 iCB;
 uniform mat4 uProj; uniform float uPx, uFocus, uAp;
-out vec2 vQ; out float vHalf, vCap, vW, vI; out vec3 vCol;
+out vec2 vQ; out float vHalf, vCap, vW, vI, vD; out vec3 vCol;
 void main(){
   vec3 A = iA.xyz, B = iB.xyz;
   float t = aCorner.x, s = t * 2.0 - 1.0;
   vec3 P = mix(A, B, t);
   float dA = max(-A.z, 0.05), dB = max(-B.z, 0.05), depth = mix(dA, dB, t);
   float w = mix(iA.w, iB.w, t);
-  float pix = uPx * depth;
+  float pix = uPx * depth; vD = depth;
   float core = max(w, pix * 0.55);
   float coc = min(uAp * abs(depth - uFocus), 0.05 * depth);
   float wc = core + coc, ext = wc * 3.2 + pix, cap = wc * 1.8;
@@ -397,8 +454,8 @@ void main(){
 }`;
 const F_FRAG = `#version 300 es
 precision highp float;
-in vec2 vQ; in float vHalf, vCap, vW, vI; in vec3 vCol;
-uniform float uHue;
+in vec2 vQ; in float vHalf, vCap, vW, vI, vD; in vec3 vCol;
+uniform float uHue, uHot, uFogD, uFogS; uniform vec3 uFogC;
 out vec4 o;
 ${HUE}
 void main(){
@@ -408,7 +465,9 @@ void main(){
   float core = exp(-d * d * 1.8);
   float halo = exp(-d * 1.2) * 0.2 * (1.0 - smoothstep(vW * 0.55, vW, d));
   float a = (core + halo) * vI * wa;
-  o = vec4(hueRot(vCol, uHue) * a + vec3(1.0, 0.95, 0.9) * core * core * vI * vI * wa * 0.16, 0.0);
+  float fg = 1.0 - exp(-max(vD - uFogS, 0.0) * uFogD);
+  vec3 c = hueRot(vCol, uHue) * a + vec3(1.0, 0.95, 0.9) * core * core * vI * vI * wa * 0.16 * uHot;
+  o = vec4(c * (1.0 - fg * 0.9) + uFogC * a * fg * 0.2, 0.0);
 }`;
 
 // Trails and echo: the last frame is fed back slightly zoomed and turned, so light recedes into an endless tunnel
@@ -429,7 +488,7 @@ void main(){
 const DOWN_FRAG = `#version 300 es
 precision highp float;
 in vec2 vUv; out vec4 o;
-uniform sampler2D uTex; uniform vec2 uTexel; uniform float uFirst;
+uniform sampler2D uTex; uniform vec2 uTexel; uniform float uFirst, uThr;
 vec3 s(vec2 off){ return texture(uTex, vUv + uTexel * off).rgb; }
 float kw(vec3 c){ return 1.0 / (1.0 + dot(c, vec3(0.2126, 0.7152, 0.0722))); }
 void main(){
@@ -440,6 +499,8 @@ void main(){
     vec3 g0 = (j + k + l + m) * 0.25, g1 = (a + b + d + e) * 0.25, g2 = (b + c + e + f) * 0.25, g3 = (d + e + g + h) * 0.25, g4 = (e + f + h + i) * 0.25;
     float w0 = kw(g0) * 0.5, w1 = kw(g1) * 0.125, w2 = kw(g2) * 0.125, w3 = kw(g3) * 0.125, w4 = kw(g4) * 0.125;
     col = (g0 * w0 + g1 * w1 + g2 * w2 + g3 * w3 + g4 * w4) / (w0 + w1 + w2 + w3 + w4);
+    float L = dot(col, vec3(0.2126, 0.7152, 0.0722)), kn = uThr * 0.5 + 1e-4, sq = clamp(L - uThr + kn, 0.0, 2.0 * kn);
+    col *= max(sq * sq / (4.0 * kn), L - uThr) / max(L, 1e-4);
   } else col = e * 0.125 + (a + c + g + i) * 0.03125 + (b + d + f + h) * 0.0625 + (j + k + l + m) * 0.125;
   o = vec4(max(col, 0.0), 1.0);
 }`;
@@ -453,13 +514,16 @@ void main(){
          + s(vec2(-1, -1)) + 2.0 * s(vec2(0, -1)) + s(vec2(1, -1));
   o = vec4(c / 16.0, 1.0);
 }`;
+// Composite: bloom, kaleidoscope, the HOME TEAM logo as a lens, then highlight roll-off, grade, saturation and contrast
 const COMP_FRAG = `#version 300 es
 precision highp float;
 in vec2 vUv; out vec4 o;
-uniform sampler2D uScene, uBloom; uniform vec2 uRes;
+uniform sampler2D uScene, uBloom, uLogo; uniform vec2 uRes, uLensOff;
 uniform float uBloomStr, uTime, uCA, uGrain, uGradeMix, uGradeHue, uFlash, uMirN, uMirMix, uMirRot;
+uniform float uExpo, uRoll, uWhite, uSat, uCon, uLens, uLensMix, uLensSize, uLensRot, uLevel, uKick;
 uniform vec3 uG0, uG1, uG2, uG3;
 ${HUE}
+const vec3 LW = vec3(0.2126, 0.7152, 0.0722);
 vec3 aces(vec3 x){ return clamp((x * (2.51 * x + 0.03)) / (x * (2.43 * x + 0.59) + 0.14), 0.0, 1.0); }
 float hash(vec2 p){ vec3 p3 = fract(vec3(p.xyx) * 0.1031); p3 += dot(p3, p3.yzx + 33.33); return fract((p3.x + p3.y) * p3.z); }
 vec3 gradeMap(float l){
@@ -483,17 +547,82 @@ vec2 mirrorUV(vec2 uv){
   p = length(p) * vec2(cos(a), sin(a));
   return clamp(p / vec2(asp, 1.0) + 0.5, 0.0, 1.0);
 }
+vec3 sceneK(vec2 uv){
+  uv = clamp(uv, 0.0, 1.0);
+  vec3 c = sceneAt(uv);
+  if (uMirN > 1.5 && uMirMix > 0.001) c = mix(c, sceneAt(mirrorUV(uv)), uMirMix);
+  return c;
+}
+// signed distance to the logo in logo-heights (negative inside), from the baked distance texture
+float sdf(vec2 lp){
+  vec2 tuv = vec2(lp.x / 0.913 + 0.5, lp.y + 0.5);
+  vec2 q = abs(tuv - 0.5) - 0.5;
+  return (texture(uLogo, clamp(tuv, 0.0, 1.0)).r - 0.5) * 0.25 + length(max(q, 0.0));
+}
+vec3 film(float x){ return 0.5 + 0.5 * cos(6.2831853 * (vec3(0.0, 0.33, 0.67) + x)); }
 void main(){
-  vec3 col = sceneAt(vUv);
-  if (uMirN > 1.5 && uMirMix > 0.001) col = mix(col, sceneAt(mirrorUV(vUv)), uMirMix);
-  vec2 cc = vUv - 0.5; float asp = uRes.x / uRes.y;
-  col *= 1.0 - 0.6 * smoothstep(0.25, 0.95, length(cc * vec2(asp * 0.75, 1.0)));
-  col = aces(col);
+  float asp = uRes.x / uRes.y;
+  vec3 base = sceneK(vUv), col = base;
+  if (uLens > 0.5 && uLensMix > 0.001) {
+    vec2 p = (vUv - 0.5) * vec2(asp, 1.0) - uLensOff;
+    float cs = cos(uLensRot), sn = sin(uLensRot);
+    vec2 lp = vec2(cs * p.x + sn * p.y, -sn * p.x + cs * p.y) / uLensSize;
+    float d = sdf(lp);
+    if (d < 0.12) {
+      vec2 e = vec2(0.003, 0.0);
+      vec2 g = vec2(sdf(lp + e.xy) - sdf(lp - e.xy), sdf(lp + e.yx) - sdf(lp - e.yx)); g /= length(g) + 1e-5;
+      vec2 gs = vec2(cs * g.x - sn * g.y, sn * g.x + cs * g.y); gs.x /= asp;
+      float inside = smoothstep(0.002, -0.002, d), rim = exp(-abs(d) / 0.004), m = uLensMix;
+      int mode = int(uLens + 0.5);
+      vec3 c = base;
+      if (mode == 1) {
+        // glass: a domed slab of crown glass that bends and splits the light behind it
+        float h = sqrt(clamp(-d / 0.03, 0.0, 1.0)), bend = (1.0 - h) * inside;
+        vec2 off = -gs * bend * uLensSize * (0.16 + uKick * 0.06);
+        vec3 r = vec3(sceneK(vUv + off * 0.78).r, sceneK(vUv + off).g, sceneK(vUv + off * 1.25).b);
+        vec3 n = normalize(vec3(-g * (1.0 - h) * 1.6, h + 0.25));
+        float sp = pow(max(dot(n, normalize(vec3(-0.45, 0.6, 1.0))), 0.0), 28.0);
+        float edgeBand = inside * pow(1.0 - h, 3.0);
+        c = mix(base, r * 1.12 + vec3(0.85, 0.92, 1.0) * (0.035 + sp * 0.5 * (0.6 + uLevel) + edgeBand * 0.18), inside)
+          + film(d * 26.0 + uTime * 0.04 + vUv.y) * rim * (0.18 + 0.4 * uLevel + 0.6 * uKick);
+      } else if (mode == 2) {
+        // holo foil: thin-film colour that shifts across the face and shimmers with the music
+        float L = dot(base, LW);
+        vec3 foil = film(d * 14.0 + dot(lp, vec2(1.1, 2.3)) + uTime * 0.07 + uLevel * 0.5);
+        float shim = pow(0.5 + 0.5 * sin(lp.x * 16.0 - lp.y * 11.0 + uTime * 1.2), 4.0) * (0.3 + uLevel + uKick);
+        vec3 inC = base * (0.3 + foil * 0.95) + foil * (0.09 + 0.2 * shim + 0.25 * L);
+        c = mix(base, inC, inside) + foil * rim * (0.2 + 0.4 * uKick);
+      } else if (mode == 3) {
+        // displace: the logo is an invisible weight that bends the scene around it and pulses on the kick
+        float fall = exp(-max(d, 0.0) / 0.06) * (1.0 - 0.4 * inside);
+        float wave = 0.55 + 0.45 * sin(d * 60.0 - uTime * 3.2);
+        vec2 off = gs * fall * wave * uLensSize * (0.1 + 0.2 * uKick + 0.06 * uLevel);
+        vec3 w2 = sceneK(vUv - off);
+        c = w2 * (1.0 + inside * 0.35) + film(d * 20.0 + uTime * 0.05) * rim * (0.07 + 0.3 * uKick);
+      } else if (mode == 4) {
+        // ghost: only the outline, breathing light
+        c = base + film(d * 10.0 + uTime * 0.06 + vUv.x) * (exp(-abs(d) / 0.005) * 0.8 + exp(-abs(d) / 0.025) * 0.25) * (0.22 + 0.5 * uLevel + 0.7 * uKick) + base * inside * 0.25;
+      } else {
+        // window: the world is only visible through the letters
+        c = base * mix(0.03, 1.15, inside) + film(d * 12.0 + uTime * 0.05) * rim * (0.05 + 0.25 * uKick);
+      }
+      col = mix(base, c, m);
+    } else if (int(uLens + 0.5) == 5) col = base * mix(1.0, 0.03, uLensMix);
+  }
+  col *= 1.0 - 0.6 * smoothstep(0.25, 0.95, length((vUv - 0.5) * vec2(asp * 0.75, 1.0)));
+  col *= uExpo;
+  // highlight roll-off: blend ACES with a hue-preserving curve so hot cores stay coloured instead of clipping to white
+  vec3 ta = aces(col);
+  float L = dot(col, LW), Lt = L * (1.0 + L / (uWhite * uWhite)) / (1.0 + L);
+  vec3 tr = col * (Lt / max(L, 1e-5)); float mx = max(tr.r, max(tr.g, tr.b)); if (mx > 1.0) tr /= mx;
+  col = mix(ta, tr * 1.25, uRoll);
   if (uGradeMix > 0.001) {
-    float l = dot(col, vec3(0.2126, 0.7152, 0.0722));
+    float l = dot(col, LW);
     col = mix(col, hueRot(gradeMap(pow(l, 0.85)), uGradeHue), uGradeMix);
   }
-  col = pow(col, vec3(1.0 / 2.2));
+  col = max(mix(vec3(dot(col, LW)), col, uSat), 0.0);
+  col = pow(min(col, 1.0), vec3(1.0 / 2.2));
+  col = clamp((col - 0.5) * uCon + 0.5, 0.0, 1.0);
   col += (hash(vUv * uRes + fract(uTime * 7.31) * 113.0) - 0.5) * uGrain;
   o = vec4(col, 1.0);
 }`;
@@ -505,9 +634,11 @@ const emptyVao = gl.createVertexArray();
 /* ================================================================== */
 /* Buffers                                                             */
 /* ================================================================== */
-const N = 3000, M = 600, WISP = 3, LGP = 2600, TOT = N + M + WISP + LGP, STRIDE = 12;
-const sA = new Float32Array(N), sB = new Float32Array(N), sC = new Float32Array(N), sD = new Float32Array(N);
-for (let i = 0; i < N; i++) { sA[i] = rng(); sB[i] = rng(); sC[i] = rng(); sD[i] = rng(); }
+// NMAX is the most particles any world may use; each world says how many it actually uses (W.n) and only those are drawn
+const NMAX = 6000, M = 600, WISP = 3, LGP = 2600, TOT = NMAX + M + WISP + LGP, STRIDE = 12;
+let NA = 0, naSnap = 0;
+const sA = new Float32Array(NMAX), sB = new Float32Array(NMAX), sC = new Float32Array(NMAX), sD = new Float32Array(NMAX);
+for (let i = 0; i < NMAX; i++) { sA[i] = rng(); sB[i] = rng(); sC[i] = rng(); sD[i] = rng(); }
 function instancedVao(corners, attribs, stride, maxInst) {
   const vao = gl.createVertexArray(); gl.bindVertexArray(vao);
   const cb = gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER, cb); gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(corners), gl.STATIC_DRAW);
@@ -519,7 +650,7 @@ function instancedVao(corners, attribs, stride, maxInst) {
 }
 const PV = instancedVao([-1, -1, 1, -1, -1, 1, 1, 1], 3, STRIDE, TOT);
 const inst = new Float32Array(TOT * STRIDE);
-const MAXSEG = 30000, FSTRIDE = 16;
+const MAXSEG = 42000, FSTRIDE = 16;
 const FV = instancedVao([0, -1, 1, -1, 0, 1, 1, 1], 4, FSTRIDE, MAXSEG);
 const finst = new Float32Array(MAXSEG * FSTRIDE);
 let fcount = 0;
@@ -684,7 +815,7 @@ function pushRipple(x, y, z, s, spd) {
 function applyRipples(out) {
   let any = false; for (let k = 0; k < RMAX; k++) if (rAge[k] < 3) { any = true; break; }
   if (!any) return;
-  for (let i = 0, o = 0; i < N; i++, o += 8) {
+  for (let i = 0, o = 0; i < NA; i++, o += 8) {
     if (out[o + 3] <= 0) continue;
     let x = out[o], y = out[o + 1], z = out[o + 2], push = 0, gx = 0, gy = 0, gz = 0;
     for (let k = 0; k < RMAX; k++) {
@@ -841,13 +972,52 @@ const tw = (i, t) => Math.pow(0.5 + 0.5 * Math.sin(t * (0.6 + sA[i] * 1.6) + sD[
 function put(out, i, x, y, z, r, col, e) { const o = i * 8, c = i * 3; out[o] = x; out[o + 1] = y; out[o + 2] = z; out[o + 3] = r; out[o + 4] = col[c]; out[o + 5] = col[c + 1]; out[o + 6] = col[c + 2]; out[o + 7] = e; }
 function putC(out, i, x, y, z, r, cr, cg, cb, e) { const o = i * 8; out[o] = x; out[o + 1] = y; out[o + 2] = z; out[o + 3] = r; out[o + 4] = cr; out[o + 5] = cg; out[o + 6] = cb; out[o + 7] = e; }
 function setCol(col, i, c) { col[i * 3] = c[0]; col[i * 3 + 1] = c[1]; col[i * 3 + 2] = c[2]; }
-function blank(out, from) { for (let i = from; i < N; i++) out[i * 8 + 3] = 0; }
+function blank(out, from, n) { for (let i = from; i < (n ?? NMAX); i++) out[i * 8 + 3] = 0; }
 const band = u => A.bands[clamp(Math.round(u * 15), 0, 15)];
 
 /* ================================================================== */
 /* The HOME TEAM logo, sampled into points                             */
 /* ================================================================== */
 const LOGO = { n: 0, x: null, y: null, minY: -0.5, maxY: 0.5 };
+// The logo as a signed distance field, so the compositor can use it as glass, foil, a weight that bends light, or a window
+const logoTex = gl.createTexture();
+gl.bindTexture(gl.TEXTURE_2D, logoTex);
+gl.texImage2D(gl.TEXTURE_2D, 0, gl.R8, 1, 1, 0, gl.RED, gl.UNSIGNED_BYTE, new Uint8Array([255]));
+gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR); gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE); gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+let logoSdfOK = false;
+function edt1(f, n, d, v, z) {
+  let k = 0; v[0] = 0; z[0] = -1e20; z[1] = 1e20;
+  for (let q = 1; q < n; q++) {
+    let s = ((f[q] + q * q) - (f[v[k]] + v[k] * v[k])) / (2 * q - 2 * v[k]);
+    while (s <= z[k]) { k--; s = ((f[q] + q * q) - (f[v[k]] + v[k] * v[k])) / (2 * q - 2 * v[k]); }
+    k++; v[k] = q; z[k] = s; z[k + 1] = 1e20;
+  }
+  k = 0;
+  for (let q = 0; q < n; q++) { while (z[k + 1] < q) k++; d[q] = (q - v[k]) * (q - v[k]) + f[v[k]]; }
+}
+function edt2(g, w, h) {
+  const n = Math.max(w, h), f = new Float64Array(n), d = new Float64Array(n), v = new Int32Array(n), z = new Float64Array(n + 1);
+  for (let x = 0; x < w; x++) { for (let y = 0; y < h; y++) f[y] = g[y * w + x]; edt1(f, h, d, v, z); for (let y = 0; y < h; y++) g[y * w + x] = d[y]; }
+  for (let y = 0; y < h; y++) { for (let x = 0; x < w; x++) f[x] = g[y * w + x]; edt1(f, w, d, v, z); for (let x = 0; x < w; x++) g[y * w + x] = Math.sqrt(d[x]); }
+  return g;
+}
+function bakeLogoSDF(data, CW, CH) {
+  const GW = 320, GH = Math.round(320 * CH / CW), inn = new Uint8Array(GW * GH);
+  for (let y = 0; y < GH; y++) for (let x = 0; x < GW; x++) { const sx = Math.min(CW - 1, Math.round((x + 0.5) * CW / GW)), sy = Math.min(CH - 1, Math.round((y + 0.5) * CH / GH)); inn[y * GW + x] = data[(sy * CW + sx) * 4 + 3] > 110 ? 1 : 0; }
+  const dOut = new Float64Array(GW * GH), dIn = new Float64Array(GW * GH);
+  for (let i = 0; i < GW * GH; i++) { dOut[i] = inn[i] ? 0 : 1e20; dIn[i] = inn[i] ? 1e20 : 0; }
+  edt2(dOut, GW, GH); edt2(dIn, GW, GH);
+  const px = new Uint8Array(GW * GH);
+  for (let r = 0; r < GH; r++) for (let x = 0; x < GW; x++) {
+    const i = (GH - 1 - r) * GW + x, sd = (inn[i] ? -(dIn[i] - 0.5) : dOut[i] - 0.5) / GH;
+    px[r * GW + x] = Math.round(clamp(0.5 + sd * 4, 0, 1) * 255);
+  }
+  gl.bindTexture(gl.TEXTURE_2D, logoTex); gl.pixelStorei(gl.UNPACK_ALIGNMENT, 1);
+  gl.texImage2D(gl.TEXTURE_2D, 0, gl.R8, GW, GH, 0, gl.RED, gl.UNSIGNED_BYTE, px);
+  gl.pixelStorei(gl.UNPACK_ALIGNMENT, 4);
+  logoSdfOK = true;
+}
 const svgToE = (sx, sy) => [(sx - 460) / 920, -(sy - 500) / 920];
 async function loadLogo() {
   const TARGET = 4000;
@@ -864,6 +1034,7 @@ async function loadLogo() {
     const cx = cnv.getContext('2d'); cx.drawImage(img, 0, 0, CW, CH);
     URL.revokeObjectURL(url);
     const data = cx.getImageData(0, 0, CW, CH).data, filled = [];
+    try { bakeLogoSDF(data, CW, CH); } catch (e) { console.warn('logo field failed', e); }
     for (let y = 0; y < CH; y++) for (let x = 0; x < CW; x++) if (data[(y * CW + x) * 4 + 3] > 110) filled.push(x, y);
     const nf = filled.length / 2;
     if (nf < 200) throw new Error('empty');
@@ -895,66 +1066,219 @@ async function loadLogo() {
 const holoCol = (y, x) => grad(HOLO, clamp((y - LOGO.minY) / (LOGO.maxY - LOGO.minY) + x * 0.15, 0, 1));
 
 /* ================================================================== */
+/* Parameters                                                          */
+/* ================================================================== */
+// Every world shares this backbone; each adds its own controls below. `rb` means the world is rebuilt (cross-faded) on change.
+const COMMON = [
+  { k: 'density', l: 'Density', min: 0.4, max: 2, st: 0.05, d: 1, rb: 1, g: 'Look' },
+  { k: 'size', l: 'Particle size', min: 0.3, max: 2.5, st: 0.01, d: 1, g: 'Look' },
+  { k: 'bright', l: 'Brightness', min: 0.2, max: 2, st: 0.01, d: 1, g: 'Look' },
+  { k: 'turb', l: 'Turbulence', min: 0, max: 1.5, st: 0.01, d: 0, g: 'Look' },
+  { k: 'speed', l: 'Speed', min: 0, max: 3, st: 0.01, d: 1, g: 'Look' },
+  { k: 'gLow', l: 'Bass response', min: 0, max: 2.5, st: 0.01, d: 1, g: 'Audio' },
+  { k: 'gMid', l: 'Mid response', min: 0, max: 2.5, st: 0.01, d: 1, g: 'Audio' },
+  { k: 'gHigh', l: 'Treble response', min: 0, max: 2.5, st: 0.01, d: 1, g: 'Audio' },
+  { k: 'camDist', l: 'Distance', min: 0.5, max: 2, st: 0.01, d: 1, g: 'Camera' },
+  { k: 'camHeight', l: 'Height', min: -1, max: 1, st: 0.01, d: 0, g: 'Camera' },
+  { k: 'camOrbit', l: 'Sway', min: 0, max: 3, st: 0.01, d: 1, g: 'Camera' },
+  { k: 'camSpin', l: 'Auto orbit', min: -1, max: 1, st: 0.01, d: 0, g: 'Camera' },
+  { k: 'camDrift', l: 'Drift', min: 0, max: 2, st: 0.01, d: 1, g: 'Camera' },
+  { k: 'camRoll', l: 'Roll', min: -1, max: 1, st: 0.01, d: 0, g: 'Camera' },
+  { k: 'focus', l: 'Focus blur', min: 0, max: 2, st: 0.01, d: 1, g: 'Camera' }
+];
+const SCHEMA = {
+  TOWER: [
+    { k: 'pulseRate', l: 'Pulse rate', min: 0, max: 3, st: 0.01, d: 1, g: 'Pulses' },
+    { k: 'expand', l: 'Expansion speed', min: 0.3, max: 4, st: 0.01, d: 1.4, g: 'Pulses' },
+    { k: 'toward', l: 'Toward camera', min: 0, max: 2.5, st: 0.01, d: 1.3, g: 'Pulses' },
+    { k: 'thick', l: 'Ring thickness', min: 0, max: 1, st: 0.01, d: 0.18, g: 'Pulses' },
+    { k: 'tilt', l: 'Ring tilt', min: 0, max: 1, st: 0.01, d: 0.3, g: 'Pulses' },
+    { k: 'life', l: 'Pulse life', min: 1, max: 8, st: 0.1, d: 4, g: 'Pulses' },
+    { k: 'shell', l: 'Kick shells', min: 0, max: 2, st: 0.01, d: 1, g: 'Pulses' },
+    { k: 'rings', l: 'Rings alive', min: 8, max: 40, st: 1, d: 24, rb: 1, g: 'Pulses' },
+    { k: 'ringPts', l: 'Points per ring', min: 40, max: 200, st: 1, d: 110, rb: 1, g: 'Pulses' },
+    { k: 'bolts', l: 'Lightning', min: 0, max: 2, st: 0.01, d: 1, g: 'Tower' }
+  ],
+  LOT: [
+    { k: 'fwRate', l: 'Fireworks', min: 0, max: 3, st: 0.01, d: 1, g: 'Fireworks' },
+    { k: 'fwSize', l: 'Burst size', min: 0.3, max: 2, st: 0.01, d: 1, g: 'Fireworks' },
+    { k: 'gravity', l: 'Gravity', min: 0, max: 2, st: 0.01, d: 1, g: 'Fireworks' },
+    { k: 'trail', l: 'Spark trails', min: 0, max: 1, st: 0.01, d: 0.55, g: 'Fireworks' },
+    { k: 'finale', l: 'Drop sensitivity', min: 0, max: 1, st: 0.01, d: 0.5, g: 'Fireworks' },
+    { k: 'lanterns', l: 'Lanterns', min: 0, max: 2, st: 0.05, d: 1, rb: 1, g: 'Lot' },
+    { k: 'crowd', l: 'Crowd', min: 0.2, max: 2, st: 0.05, d: 1, rb: 1, g: 'Lot' },
+    { k: 'beams', l: 'Searchlights', min: 0, max: 14, st: 1, d: 8, rb: 1, g: 'Searchlights' },
+    { k: 'sweep', l: 'Sweep speed', min: 0, max: 3, st: 0.01, d: 1, g: 'Searchlights' },
+    { k: 'strobe', l: 'Kick strobe', min: 0, max: 2, st: 0.01, d: 1, g: 'Searchlights' },
+    { k: 'crane', l: 'Crane move', min: 0, max: 2, st: 0.01, d: 1, g: 'Camera' }
+  ],
+  STORM: [
+    { k: 'funnel', l: 'Funnel particles', min: 0.3, max: 2, st: 0.05, d: 1, rb: 1, g: 'Funnel' },
+    { k: 'psize', l: 'Funnel grain', min: 0.3, max: 2.5, st: 0.01, d: 1, g: 'Funnel' },
+    { k: 'noiseAmt', l: 'Snake', min: 0, max: 2.5, st: 0.01, d: 1, g: 'Funnel' },
+    { k: 'noiseScale', l: 'Snake scale', min: 0.2, max: 3, st: 0.01, d: 1, g: 'Funnel' },
+    { k: 'climb', l: 'Climb speed', min: 0, max: 3, st: 0.01, d: 1, g: 'Funnel' },
+    { k: 'stir', l: 'Bass stir', min: 0, max: 3, st: 0.01, d: 1, g: 'Funnel' },
+    { k: 'baseWidth', l: 'Base twist', min: 0.3, max: 3, st: 0.01, d: 1.5, g: 'Funnel' },
+    { k: 'subVort', l: 'Sub-vortices', min: 0, max: 5, st: 1, d: 3, rb: 1, g: 'Funnel' },
+    { k: 'deck', l: 'Cloud deck', min: 0.3, max: 2, st: 0.05, d: 1, rb: 1, g: 'Storm' },
+    { k: 'lightning', l: 'Lightning', min: 0, max: 3, st: 0.01, d: 1, g: 'Storm' },
+    { k: 'worm', l: "Worm's-eye", min: 0, max: 1, st: 0.01, d: 1, g: 'Camera' }
+  ],
+  REEF: [
+    { k: 'travel', l: 'Travel speed', min: 0, max: 3, st: 0.01, d: 1, g: 'Reef' },
+    { k: 'variation', l: 'Density variation', min: 0, max: 1, st: 0.01, d: 0.7, g: 'Reef' },
+    { k: 'height', l: 'Stalk height', min: 0.4, max: 2, st: 0.01, d: 1, g: 'Reef' },
+    { k: 'current', l: 'Current', min: 0, max: 2.5, st: 0.01, d: 1, g: 'Reef' },
+    { k: 'polyp', l: 'Polyp size', min: 0.3, max: 2.5, st: 0.01, d: 1, g: 'Reef' },
+    { k: 'stalks', l: 'Stalks', min: 16, max: 90, st: 1, d: 64, rb: 1, g: 'Reef' },
+    { k: 'fog', l: 'Fog', min: 0, max: 2.5, st: 0.01, d: 1, g: 'Water' },
+    { k: 'fogHue', l: 'Water hue', min: 0, max: 1, st: 0.01, d: 0.5, g: 'Water' },
+    { k: 'snow', l: 'Marine snow', min: 0, max: 2, st: 0.05, d: 1, rb: 1, g: 'Water' }
+  ],
+  BLOOM: [
+    { k: 'petals', l: 'Divisions (0 = cycle)', min: 0, max: 16, st: 1, d: 0, g: 'Flower' },
+    { k: 'foldSync', l: 'Lock to kaleidoscope', min: 0, max: 1, st: 1, d: 0, g: 'Flower' },
+    { k: 'sharp', l: 'Petal sharpness', min: 0.2, max: 3, st: 0.01, d: 1, g: 'Flower' },
+    { k: 'depth', l: 'Petal depth', min: 0, max: 2, st: 0.01, d: 1, g: 'Flower' },
+    { k: 'ruffle', l: 'Ruffle', min: 0, max: 3, st: 0.01, d: 1, g: 'Flower' },
+    { k: 'twist', l: 'Twist', min: 0, max: 3, st: 0.01, d: 1, g: 'Flower' },
+    { k: 'spin', l: 'Spin', min: 0, max: 3, st: 0.01, d: 1, g: 'Flower' },
+    { k: 'cup', l: 'Cup depth', min: 0, max: 3, st: 0.01, d: 1, g: 'Flower' },
+    { k: 'palette', l: 'Palette (0 = cycle)', min: 0, max: 6, st: 1, d: 0, g: 'Flower' },
+    { k: 'bloomSpeed', l: 'Blossom speed', min: 0, max: 4, st: 0.01, d: 1, g: 'Blossom' },
+    { k: 'span', l: 'Zoom span', min: 6, max: 200, st: 1, d: 48, g: 'Blossom' },
+    { k: 'pulse', l: 'Kick pulse', min: 0, max: 3, st: 0.01, d: 1, g: 'Blossom' },
+    { k: 'gens', l: 'Flowers alive', min: 3, max: 10, st: 1, d: 6, rb: 1, g: 'Blossom' },
+    { k: 'per', l: 'Points per flower', min: 150, max: 900, st: 10, d: 440, rb: 1, g: 'Blossom' }
+  ],
+  TIDE: [
+    { k: 'cols', l: 'Columns', min: 30, max: 200, st: 1, d: 75, rb: 1, g: 'Divisions' },
+    { k: 'rows', l: 'Rows', min: 20, max: 150, st: 1, d: 40, rb: 1, g: 'Divisions' },
+    { k: 'length', l: 'Ocean length', min: 0.5, max: 2.5, st: 0.01, d: 1, g: 'Ocean' },
+    { k: 'height', l: 'Wave height', min: 0.2, max: 3, st: 0.01, d: 1, g: 'Ocean' },
+    { k: 'roll', l: 'Roll speed', min: 0.1, max: 3, st: 0.01, d: 1, g: 'Ocean' },
+    { k: 'smoothing', l: 'Smoothing', min: 0, max: 0.95, st: 0.01, d: 0.3, g: 'Ocean' },
+    { k: 'swell', l: 'Swell noise', min: 0, max: 2, st: 0.01, d: 0.5, g: 'Ocean' },
+    { k: 'layout', l: 'Layout (0 mirror, 1 linear)', min: 0, max: 1, st: 1, d: 0, g: 'Ocean' },
+    { k: 'lines', l: 'Ridgelines', min: 0, max: 2, st: 0.01, d: 1, g: 'Ocean' },
+    { k: 'pearls', l: 'Pearls', min: 0, max: 2, st: 0.01, d: 1, g: 'Ocean' },
+    { k: 'fog', l: 'Horizon fog', min: 0, max: 2, st: 0.01, d: 0.5, g: 'Ocean' }
+  ],
+  HIGHWAY: [
+    { k: 'drive', l: 'Speed', min: 0, max: 4, st: 0.01, d: 1, g: 'Drive' },
+    { k: 'variance', l: 'Speed variance', min: 0, max: 1, st: 0.01, d: 0.4, g: 'Drive' },
+    { k: 'varRate', l: 'Variance rate', min: 0.02, max: 1, st: 0.01, d: 0.25, g: 'Drive' },
+    { k: 'curve', l: 'Road curve', min: 0, max: 2.5, st: 0.01, d: 1, g: 'Drive' },
+    { k: 'roll', l: 'Tunnel roll', min: -1, max: 1, st: 0.01, d: 0.25, g: 'Drive' },
+    { k: 'ripple', l: 'Bass ripple', min: 0, max: 2.5, st: 0.01, d: 1, g: 'Ripple' },
+    { k: 'wavelen', l: 'Ripple wavelength', min: 0.5, max: 6, st: 0.01, d: 2, g: 'Ripple' },
+    { k: 'rspeed', l: 'Ripple speed', min: 2, max: 40, st: 0.1, d: 12, g: 'Ripple' },
+    { k: 'rdecay', l: 'Ripple decay', min: 0.1, max: 3, st: 0.01, d: 0.8, g: 'Ripple' },
+    { k: 'radius', l: 'Tunnel radius', min: 0.6, max: 3, st: 0.01, d: 1.6, g: 'Tunnel' },
+    { k: 'rings', l: 'Rings', min: 20, max: 90, st: 1, d: 48, rb: 1, g: 'Tunnel' },
+    { k: 'ringPts', l: 'Points per ring', min: 16, max: 80, st: 1, d: 44, rb: 1, g: 'Tunnel' }
+  ]
+};
+const WORLD_DEF = {};
+for (const name in SCHEMA) { WORLD_DEF[name] = {}; for (const d of COMMON.concat(SCHEMA[name])) WORLD_DEF[name][d.k] = d.d; }
+const schemaOf = name => COMMON.concat(SCHEMA[name]);
+// live values (P) tween toward targets (T); targets are what gets saved
+const WP = {}, WT = {};
+S.wp = S.wp || {};
+for (const name in SCHEMA) {
+  WT[name] = Object.assign({}, WORLD_DEF[name], S.wp[name] || {});
+  WP[name] = Object.assign({}, WT[name]);
+  S.wp[name] = WT[name];
+}
+const cnt = (base, P, extra) => Math.max(0, Math.round(base * P.density * (extra ?? 1)));
+
+/* ================================================================== */
 /* Worlds                                                              */
 /* ================================================================== */
-// Every world writes N particles as 8 floats (x y z radius r g b energy), keeps its own filaments, and decides what each kind of hit does.
+// Every world writes its particles as 8 floats (x y z radius r g b energy), keeps its own filaments, decides what each hit does,
+// and may steer the camera through `cam` (added on top of the shared camera controls).
 
-/* I. TOWER — The station, built from light.
-   The tower and lettering are thousands of holographic pearls strung on a faint lattice. Every kick throws a signal ring
-   across a plain of receivers, snares send radio arcs off the antenna, and hats crack branching lightning off the bolts. */
-function makeTower() {
-  const Hh = 3.2, Y0 = 0.1, LN = clamp(LOGO.n - LG, 0, 1300);
+/* I. TOWER — The transmitter.
+   The tower is the HOME TEAM logo in thousands of holographic pearls. Every height of the spine is a band of the spectrum:
+   bass pulses leave the base, treble leaves the antenna. Each pulse is a ring of light that expands outward and toward you,
+   sweeping past the lens. Kicks fire a full spherical shell from the antenna that passes through the camera. */
+function makeTower(P) {
+  const Hh = 3.2, Y0 = 0.1, LN = clamp(cnt(1300, P), 0, Math.max(0, LOGO.n - LG));
+  const RK = Math.round(P.rings), RPn = Math.round(P.ringPts), NRING = RK * RPn;
+  const NREC = cnt(900, P), NSH = cnt(700, P), NSP = 220, NST = 100;
+  const L0 = 0, RI0 = LN, SH0 = RI0 + NRING, R0 = SH0 + NSH, SP0 = R0 + NREC, ST0 = SP0 + NSP;
+  const N = Math.min(NMAX, ST0 + NST);
   const lx = new Float32Array(LN), ly = new Float32Array(LN);
   for (let j = 0; j < LN; j++) { lx[j] = LOGO.x[LG + j] * Hh; ly[j] = LOGO.y[LG + j] * Hh + Y0; }
   const tipE = svgToE(451, 158), tip = [tipE[0] * Hh, tipE[1] * Hh + Y0, 0];
-  const minY = LOGO.minY * Hh + Y0, maxY = LOGO.maxY * Hh + Y0;
+  const minY = LOGO.minY * Hh + Y0, maxY = LOGO.maxY * Hh + Y0, baseY = svgToE(451, 600)[1] * Hh + Y0;
   const col = new Float32Array(N * 3), kinds = new Float32Array(N);
   for (let j = 0; j < LN; j++) setCol(col, j, holoCol(LOGO.y[LG + j], LOGO.x[LG + j]));
-  const R0 = LN, NREC = 1500, SP0 = R0 + NREC, NSP = 260, ST0 = SP0 + NSP;
+  const ringCol = g => grad([PAL.pink, PAL.magenta, PAL.violet, PAL.azure, PAL.cyan], 1 - g / 7);
+  for (let i = SH0; i < R0; i++) setCol(col, i, mixC(PAL.pearl, PAL.cyan, sA[i] * 0.5));
   const rr = new Float32Array(N), ra = new Float32Array(N);
-  for (let i = R0; i < SP0; i++) { rr[i] = 0.9 + 4.2 * Math.sqrt(sA[i]); ra[i] = sB[i] * TAU; setCol(col, i, sC[i] > 0.95 ? PAL.gold : mixC(PAL.azure, PAL.pearl, sC[i] * 0.5)); }
+  for (let i = R0; i < SP0; i++) { rr[i] = 0.9 + 4.4 * Math.sqrt(sA[i]); ra[i] = sB[i] * TAU; setCol(col, i, sC[i] > 0.95 ? PAL.gold : mixC(PAL.azure, PAL.pearl, sC[i] * 0.5)); }
   for (let i = SP0; i < ST0; i++) { setCol(col, i, sC[i] < 0.5 ? PAL.cyan : PAL.pink); kinds[i] = 1; }
   for (let i = ST0; i < N; i++) { setCol(col, i, PAL.pearl); kinds[i] = 1; }
-  const RS = 7, RP = 160, AS = 6, AP = 40;
+  // ground signal rings and antenna radio arcs
+  const RS = 6, RP = 140, AS = 6, AP = 40;
   const F = new Fil(RS * RP + AS * 2 * AP);
   for (let k = 0; k < RS; k++) F.poly(RP, k / RS, 0.0035, true);
   const A0 = F.n; for (let k = 0; k < AS * 2; k++) F.poly(AP, k / AS, 0.005, false);
   for (let i = 0; i < F.n; i++) setCol(F.col, i, i < A0 ? mixC(PAL.cyan, PAL.pearl, 0.4) : mixC(PAL.pink, PAL.pearl, 0.3));
   const BS = 4, bolts = [], bAge = new Float32Array(BS).fill(99), bStr = new Float32Array(BS);
   for (let k = 0; k < BS; k++) { const b = new Fil(700); b.grow = 0; bolts.push(b); }
-  const ringAge = new Float32Array(RS).fill(99), ringStr = new Float32Array(RS), arcAge = new Float32Array(AS).fill(99), arcStr = new Float32Array(AS);
+  const gAge = new Float32Array(RS).fill(99), gStr = new Float32Array(RS), arcAge = new Float32Array(AS).fill(99), arcStr = new Float32Array(AS);
+  // pulse rings
+  const pAge = new Float32Array(RK).fill(99), pY = new Float32Array(RK), pStr = new Float32Array(RK), pG = new Float32Array(RK), pPh = new Float32Array(RK), pTl = new Float32Array(RK);
+  const acc = new Float32Array(8);
+  const shAge = [99, 99], shStr = [0, 0];
   const br = rngFrom(606);
   let flash = 0;
   const oldest = a => { let k = 0; for (let j = 1; j < a.length; j++) if (a[j] > a[k]) k = j; return k; };
+  function ring(g, s) {
+    if (!RK) return;
+    const k = oldest(pAge); pAge[k] = 0; pStr[k] = s; pG[k] = g;
+    pY[k] = lerp(baseY, tip[1], (g + 0.5) / 8) + (Math.random() - 0.5) * 0.12; pPh[k] = Math.random() * TAU; pTl[k] = (Math.random() - 0.5) * 2;
+  }
   function bolt(s) {
     const k = oldest(bAge); bAge[k] = 0; bStr[k] = s;
-    const side = Math.random() < 0.5 ? -1 : 1, ang = side < 0 ? Math.PI - 0.15 - Math.random() * 0.9 : 0.15 + Math.random() * 0.9;
-    const L = 1.3 + Math.random() * 1.2;
-    makeBolt(bolts[k], [tip[0] + side * 0.12, tip[1] + 0.05, 0], [tip[0] + Math.cos(ang) * L, tip[1] + Math.sin(ang) * L * 0.55 - 0.2, (Math.random() - 0.5) * 0.8],
-      0.009, br, { rough: 0.24, branch: 0.16, levels: 2 });
+    const side = Math.random() < 0.5 ? -1 : 1, ang = side < 0 ? Math.PI - 0.15 - Math.random() * 0.9 : 0.15 + Math.random() * 0.9, L = 1.3 + Math.random() * 1.2;
+    makeBolt(bolts[k], [tip[0] + side * 0.12, tip[1] + 0.05, 0], [tip[0] + Math.cos(ang) * L, tip[1] + Math.sin(ang) * L * 0.55 - 0.2, (Math.random() - 0.5) * 0.8], 0.009, br, { rough: 0.24, branch: 0.16, levels: 2 });
     bolts[k].paint(() => mixC(PAL.white, PAL.cyan, 0.25));
     flash = Math.max(flash, s);
   }
   const W = {
-    name: 'TOWER', blurb: 'The station, built from light', tint: PAL.violet, flash: PAL.white, coreLight: PAL.pink, coreGain: 1.1, coreLocal: tip,
+    n: N, name: 'TOWER', blurb: 'The transmitter', tint: PAL.violet, flash: PAL.white, coreLight: PAL.pink, coreGain: 1.1, coreLocal: tip,
     wisps: [PAL.cyan, PAL.pink, PAL.gold], fils: [F, ...bolts], kinds, ay: 0, ax: 0,
     logoXf: { sz: Hh, y0: Y0, z0: 0, follow: true, tip, links: true },
     get tipFlash() { return flash; },
     onset(kind, s) {
-      if (kind === 'kick' || kind === 'touch' || kind === 'idle') { const k = oldest(ringAge); ringAge[k] = 0; ringStr[k] = kind === 'idle' ? 0.35 : s; flash = Math.max(flash, s * 0.5); }
-      else if (kind === 'snare') { const k = oldest(arcAge); arcAge[k] = 0; arcStr[k] = s; }
-      else if (kind === 'hat' && Math.random() < 0.4) bolt(s);
-      if (kind === 'kick' && s > 0.95) bolt(s);
+      if (kind === 'kick' || kind === 'touch' || kind === 'idle') {
+        const k = oldest(gAge); gAge[k] = 0; gStr[k] = kind === 'idle' ? 0.35 : s; flash = Math.max(flash, s * 0.5);
+        ring(0, s); ring(1, s * 0.8);
+        if (kind !== 'idle' && P.shell > 0.01) { const j = shAge[0] > shAge[1] ? 0 : 1; shAge[j] = 0; shStr[j] = s * P.shell; }
+      } else if (kind === 'snare') { const k = oldest(arcAge); arcAge[k] = 0; arcStr[k] = s; ring(3 + (Math.random() * 2 | 0), s); }
+      else if (kind === 'hat') { ring(6 + (Math.random() * 2 | 0), s * 0.8); if (Math.random() < 0.4 * P.bolts) bolt(s); }
+      if (kind === 'kick' && s > 0.95 && Math.random() < P.bolts) bolt(s);
     },
     update(dt) {
-      for (let k = 0; k < RS; k++) ringAge[k] += dt;
+      for (let k = 0; k < RS; k++) gAge[k] += dt;
       for (let k = 0; k < AS; k++) arcAge[k] += dt;
+      for (let k = 0; k < RK; k++) pAge[k] += dt;
+      shAge[0] += dt; shAge[1] += dt;
       flash *= Math.exp(-dt * 3);
+      for (let g = 0; g < 8; g++) {
+        const bv = (A.bands[g * 2] + A.bands[g * 2 + 1]) * 0.5;
+        acc[g] += dt * P.pulseRate * (0.12 + bv * bv * 3.2);
+        if (acc[g] >= 1) { acc[g] = 0; ring(g, 0.35 + bv * 0.9); }
+      }
       for (let k = 0; k < BS; k++) {
-        bAge[k] += dt; const F2 = bolts[k], age = bAge[k];
+        bAge[k] += dt; const B = bolts[k], age = bAge[k];
         const env = age > 1 ? 0 : (age < 0.05 ? 1.7 : 1.7 * Math.exp(-(age - 0.05) * 6.5)) * (age < 0.35 && Math.random() < 0.25 ? 0.3 : 1) * bStr[k];
-        for (let i = 0; i < F2.n; i++) F2.I[i] = env * (F2.lv[i] === 0 ? 1 : F2.lv[i] === 1 ? 0.6 : 0.35);
-        F2.grow = clamp(age / 0.07, 0, 1);
+        for (let i = 0; i < B.n; i++) B.I[i] = env * (B.lv[i] === 0 ? 1 : B.lv[i] === 1 ? 0.6 : 0.35);
+        B.grow = clamp(age / 0.07, 0, 1);
       }
     },
     write(t, out) {
@@ -962,23 +1286,45 @@ function makeTower() {
       for (let j = 0; j < LN; j++) {
         const u = (ly[j] - minY) / span, b = band(u);
         const z = (sC[j] - 0.5) * 0.16 + Math.sin(ly[j] * 2.6 - t * 1.8) * A.low * 0.07;
-        put(out, j, lx[j], ly[j], z, (0.007 + 0.006 * sB[j]) * (1 + b * 0.4), col, 0.1 + b * 0.6 + A.level * 0.2 + tw(j, t) * 0.4 + flash * Math.exp(-Math.hypot(lx[j] - tip[0], ly[j] - tip[1]) * 1.6) * 1.3);
+        put(out, L0 + j, lx[j], ly[j], z, (0.007 + 0.006 * sB[j]) * (1 + b * 0.4), col, 0.1 + b * 0.6 + A.level * 0.2 + tw(j, t) * 0.4 + flash * Math.exp(-Math.hypot(lx[j] - tip[0], ly[j] - tip[1]) * 1.6) * 1.3);
+      }
+      // pulse rings: they leave the spine, widen and drift toward the camera
+      const life = P.life;
+      for (let k = 0; k < RK; k++) {
+        const age = pAge[k], alive = age < life, rc = ringCol(pG[k]);
+        const fade = alive ? smooth(0, 0.08, age) * Math.pow(1 - age / life, 1.3) : 0;
+        const R = 0.18 + age * P.expand * (1 + pG[k] * 0.05), zc = age * P.toward * 0.9, e = pStr[k] * fade * Math.exp(-R * 0.1);
+        for (let j = 0; j < RPn; j++) {
+          const i = RI0 + k * RPn + j;
+          if (!alive) { out[i * 8 + 3] = 0; continue; }
+          const a = j / RPn * TAU + pPh[k] + (sA[i] - 0.5) * 0.04, rj = R * (0.92 + 0.16 * sB[i]);
+          const y = pY[k] + (sC[i] - 0.5) * P.thick * 0.3 * (1 + age * 0.6) + Math.sin(a + pPh[k]) * P.tilt * pTl[k] * R * 0.22;
+          putC(out, i, Math.cos(a) * rj, y, Math.sin(a) * rj + zc, (0.010 + 0.008 * sD[i]) * (1 + age * 0.25), rc[0], rc[1], rc[2], e * (0.8 + 1.8 * band((pG[k] + 0.5) / 8)) + e * tw(i, t) * 0.8);
+        }
+      }
+      // kick shells from the antenna
+      for (let s2 = 0; s2 < 2; s2++) {
+        const per = NSH >> 1, age = shAge[s2], alive = age < 3, R = age * 3.2 * P.expand * 0.7, e = alive ? shStr[s2] * Math.exp(-age * 0.7) * smooth(0, 0.05, age) : 0;
+        for (let j = 0; j < per; j++) {
+          const i = SH0 + s2 * per + j; if (!alive) { out[i * 8 + 3] = 0; continue; }
+          const y = 1 - (j + 0.5) / per * 2, r = Math.sqrt(1 - y * y), th = j * 2.39996 + s2;
+          put(out, i, tip[0] + Math.cos(th) * r * R, tip[1] + y * R * 0.8, Math.sin(th) * r * R + age * P.toward * 0.6, 0.009, col, e * (0.8 + tw(i, t)));
+        }
       }
       for (let i = R0; i < SP0; i++) {
         const r = rr[i], a = ra[i] + t * 0.01;
         let re = 0;
-        for (let k = 0; k < RS; k++) { if (ringAge[k] > 6) continue; const R = 0.45 + ringAge[k] * 2.3, x = (r - R) / 0.2; if (x > -3 && x < 3) re += ringStr[k] * Math.exp(-x * x) * Math.exp(-ringAge[k] * 0.5); }
+        for (let k = 0; k < RS; k++) { if (gAge[k] > 6) continue; const R = 0.45 + gAge[k] * 2.3, x = (r - R) / 0.2; if (x > -3 && x < 3) re += gStr[k] * Math.exp(-x * x) * Math.exp(-gAge[k] * 0.5); }
         const bv = A.bands[Math.floor((a / TAU % 1) * NB) % NB];
         put(out, i, Math.cos(a) * r, -1.8 + re * 0.13 + bv * 0.04, Math.sin(a) * r - 0.4, (0.008 + 0.006 * sD[i]) * (1 + re * 0.6), col, 0.04 + re * 1.6 + bv * 0.25 + tw(i, t) * 0.4);
       }
       for (let i = SP0; i < ST0; i++) {
-        const u = (sA[i] + t * (0.05 + 0.08 * sB[i]) * (1 + A.level)) % 1, a = sC[i] * TAU + t * (0.6 + sD[i]);
-        const r = 0.05 + u * 0.9;
+        const u = (sA[i] + t * (0.05 + 0.08 * sB[i]) * (1 + A.level)) % 1, a = sC[i] * TAU + t * (0.6 + sD[i]), r = 0.05 + u * 0.9;
         put(out, i, tip[0] + Math.cos(a) * r, tip[1] + u * 1.6 - 0.1, Math.sin(a) * r * 0.6, 0.008 * (1 - u), col, (1 - u) * (0.6 + A.high * 0.8 + flash));
       }
       for (let i = ST0; i < N; i++) put(out, i, (sA[i] - 0.5) * 11, 2.6 + sB[i] * 2, -5 + sC[i] * 2, 0.006, col, 0.05 + tw(i, t) * 0.8);
       for (let k = 0; k < RS; k++) {
-        const R = 0.45 + ringAge[k] * 2.3, I = ringAge[k] > 6 ? 0 : ringStr[k] * Math.exp(-ringAge[k] * 0.5) * 0.75;
+        const R = 0.45 + gAge[k] * 2.3, I = gAge[k] > 6 ? 0 : gStr[k] * Math.exp(-gAge[k] * 0.5) * 0.75;
         for (let j = 0; j < RP; j++) { const i = k * RP + j, q = i * 3, a = j / RP * TAU; F.c[q] = Math.cos(a) * R; F.c[q + 1] = -1.79; F.c[q + 2] = Math.sin(a) * R - 0.4; F.I[i] = I; }
       }
       for (let k = 0; k < AS; k++) for (let side = 0; side < 2; side++) {
@@ -989,7 +1335,7 @@ function makeTower() {
           F.I[i] = I * (0.55 + 0.45 * Math.cos(a * 1.9));
         }
       }
-      W.ay = 0.5 * Math.sin(t * 0.055); W.ax = 0.06 + 0.05 * Math.sin(t * 0.07);
+      W.ay = 0.45 * Math.sin(t * 0.055); W.ax = 0.06 + 0.05 * Math.sin(t * 0.07);
       rotPts(out, N, 8, W.ay, W.ax); rotPts(F.c, F.n, 3, W.ay, W.ax);
       for (const B of bolts) { B.c.set(B.p.subarray(0, B.n * 3)); rotPts(B.c, B.n, 3, W.ay, W.ax); }
     }
@@ -997,101 +1343,211 @@ function makeTower() {
   return W;
 }
 
-/* II. LOT — Dusk on the lot.
-   A thousand paper lanterns drift up over a sea of phone lights. Kicks roll through the crowd like a wave,
-   hats make lanterns flare, and the stage beams sweep and strobe with the drums. */
-function makeLot() {
-  const NL = 1000, NCROWD = 1700, C0 = NL, S0 = NL + NCROWD;
+/* II. LOT — The show the sky puts on.
+   Lanterns drift up over an endless crowd of phone lights while searchlights sweep the sky. Kicks launch shells, snares
+   crackle, hats sprinkle glitter, held bass sends up weeping willows. When the music builds and drops, the lot answers with
+   a finale: a barrage of shells, every lantern let go at once, the searchlights lock on and strobe, and the camera cranes up. */
+function makeLot(P) {
+  const NL = cnt(650, P, P.lanterns), NCROWD = cnt(2300, P, P.crowd), NH = 300, NSTAR = 150, FWN = 2200;
+  const C0 = NL, H0 = C0 + NCROWD, ST0 = H0 + NH, FW0 = ST0 + NSTAR;
+  const N = Math.min(NMAX, FW0 + FWN), FWC = N - FW0;
   const col = new Float32Array(N * 3), kinds = new Float32Array(N);
   for (let i = 0; i < NL; i++) { setCol(col, i, sD[i] < 0.45 ? PAL.gold : sD[i] < 0.8 ? PAL.amber : PAL.rose); kinds[i] = sA[i] < 0.55 ? 1 : 0; }
   const cr = new Float32Array(N), ca = new Float32Array(N);
-  for (let i = C0; i < S0; i++) { cr[i] = 0.4 + 9 * Math.pow(sA[i], 0.7); ca[i] = sB[i] * TAU; setCol(col, i, sC[i] < 0.4 ? PAL.azure : sC[i] < 0.7 ? PAL.violet : sC[i] < 0.9 ? PAL.cyan : PAL.pearl); }
-  for (let i = S0; i < N; i++) { setCol(col, i, PAL.pearl); kinds[i] = 1; }
+  for (let i = C0; i < H0; i++) { cr[i] = 0.4 + 9 * Math.pow(sA[i], 0.7); ca[i] = sB[i] * TAU; setCol(col, i, sC[i] < 0.4 ? PAL.azure : sC[i] < 0.7 ? PAL.violet : sC[i] < 0.9 ? PAL.cyan : PAL.pearl); }
+  for (let i = H0; i < ST0; i++) { setCol(col, i, sC[i] < 0.5 ? PAL.amber : PAL.pink); kinds[i] = 1; }
+  for (let i = ST0; i < FW0; i++) { setCol(col, i, PAL.pearl); kinds[i] = 1; }
+  // firework sparks: a ring buffer of simple physical particles
+  const fx = new Float32Array(FWC), fy = new Float32Array(FWC), fz = new Float32Array(FWC), vx = new Float32Array(FWC), vy = new Float32Array(FWC), vz = new Float32Array(FWC);
+  const age = new Float32Array(FWC).fill(99), life = new Float32Array(FWC), fr = new Float32Array(FWC), fg = new Float32Array(FWC), fb = new Float32Array(FWC);
+  const drag = new Float32Array(FWC), grav = new Float32Array(FWC), sz = new Float32Array(FWC), kind = new Uint8Array(FWC), gen = new Uint8Array(FWC);
+  let head = 0;
+  const SPARK = 0, WILLOW = 1, GLITTER = 2, CROSS = 3, CRACKLE = 4, TRAIL = 5, POP = 6;
+  function spawn(x, y, z, ux, uy, uz, l, c, k, d, g, s, gn) {
+    if (!FWC) return;
+    const i = head; head = (head + 1) % FWC;
+    fx[i] = x; fy[i] = y; fz[i] = z; vx[i] = ux; vy[i] = uy; vz[i] = uz; age[i] = 0; life[i] = l; fr[i] = c[0]; fg[i] = c[1]; fb[i] = c[2];
+    kind[i] = k; drag[i] = d; grav[i] = g; sz[i] = s; gen[i] = gn || 0;
+  }
+  const SHELL_COLS = [[PAL.pink, PAL.white], [PAL.cyan, PAL.azure], [PAL.gold, PAL.amber], [PAL.violet, PAL.pink], [PAL.lime, PAL.teal], [PAL.red, PAL.gold], [PAL.white, PAL.cyan]];
+  const shells = [];
+  const TYPES = ['peony', 'ring', 'crossette', 'peony', 'glitter', 'ring'];
+  let typeIdx = 0;
+  function launch(type, power) {
+    if (shells.length > 14) return;
+    const x = (Math.random() - 0.5) * 11, z = -7 - Math.random() * 7;
+    const h = 1.4 + Math.random() * 1.8 * Math.min(power, 1.3);
+    shells.push({ x, y: -1.6, z, vx: (Math.random() - 0.5) * 0.6, vy: Math.sqrt(2 * 3.2 * (h + 1.6)) * 0.95, vz: (Math.random() - 0.5) * 0.5, age: 0, type, power, cols: SHELL_COLS[Math.floor(Math.random() * SHELL_COLS.length)] });
+  }
+  function burst(sh) {
+    const s = P.fwSize * (0.75 + sh.power * 0.4), c1 = sh.cols[0], c2 = sh.cols[1], gv = P.gravity;
+    const sph = (n, v, l, k, d, g, size, c) => {
+      for (let j = 0; j < n; j++) {
+        const y = 1 - (j + 0.5) / n * 2, r = Math.sqrt(1 - y * y), th = j * 2.39996 + Math.random() * 0.3, vv = v * (0.86 + Math.random() * 0.22);
+        spawn(sh.x, sh.y, sh.z, Math.cos(th) * r * vv + sh.vx * 0.3, y * vv + sh.vy * 0.1, Math.sin(th) * r * vv, l * (0.85 + Math.random() * 0.3), j % 3 ? c : c2, k, d, g, size);
+      }
+    };
+    if (sh.type === 'peony') sph(Math.round(190 * s), 3.4 * s, 2.2, SPARK, 1.25, 0.9 * gv, 0.016, c1);
+    else if (sh.type === 'willow') sph(Math.round(150 * s), 2.6 * s, 4.4, WILLOW, 2.0, 0.55 * gv, 0.012, PAL.gold);
+    else if (sh.type === 'glitter') sph(Math.round(200 * s), 2.8 * s, 2.8, GLITTER, 1.4, 0.7 * gv, 0.011, PAL.white);
+    else if (sh.type === 'crossette') sph(Math.round(10 * s) + 5, 3.2 * s, 0.75, CROSS, 0.8, 0.8 * gv, 0.024, c1);
+    else if (sh.type === 'crackle') sph(Math.round(80 * s), 2.0 * s, 0.7, CRACKLE, 1.2, 0.7 * gv, 0.013, PAL.gold);
+    else if (sh.type === 'ring') {
+      const n = Math.round(130 * s), a1 = Math.random() * 1.2, a2 = Math.random() * TAU, v = 3.6 * s;
+      for (let j = 0; j < n; j++) {
+        const th = j / n * TAU; let dx = Math.cos(th), dy = Math.sin(th) * Math.cos(a1), dz = Math.sin(th) * Math.sin(a1);
+        const x2 = dx * Math.cos(a2) - dz * Math.sin(a2), z2 = dx * Math.sin(a2) + dz * Math.cos(a2);
+        spawn(sh.x, sh.y, sh.z, x2 * v, dy * v, z2 * v, 2.2, j % 2 ? c1 : c2, SPARK, 1.2, 0.8 * gv, 0.016);
+      }
+    }
+    flashAt = Math.max(flashAt, 0.6 * s); flashPos = [sh.x, sh.y, sh.z]; flashCol = c1;
+  }
+  let flashAt = 0, flashPos = [0, 3, -6], flashCol = PAL.gold;
   const flare = new Float32Array(NL), jumpAge = new Float32Array(10).fill(99), jumpStr = new Float32Array(10);
-  const NBM = 8, BP = 18, F = new Fil(NBM * BP), beamI = new Float32Array(NBM);
+  const NBM = Math.round(P.beams), BP = 18, F = new Fil(Math.max(1, NBM * BP)), beamI = new Float32Array(Math.max(1, NBM));
   for (let k = 0; k < NBM; k++) { let par = -1; for (let j = 0; j < BP; j++) par = F.add(0, 0, 0, j / (BP - 1) * 6, k / NBM, 0.01 + j * 0.006, par); }
   F.sMax = 6;
   for (let i = 0; i < F.n; i++) setCol(F.col, i, mixC(Math.floor(i / BP) % 2 ? PAL.pink : PAL.cyan, PAL.pearl, 0.35));
-  let beamAlt = 0;
+  let beamAlt = 0, kickCool = 0, willowT = 0, lowHold = 0, eFast = 0, eSlow = 0, finaleCool = 30, hero = 0, finaleQ = 0, finaleT = 0, lift = 0;
+  function finale() {
+    hero = 1; finaleQ = 11; finaleT = 0; finaleCool = 22; lift = 1;
+    for (let i = 0; i < NL; i++) flare[i] = 1.2;
+  }
   const W = {
-    dofMul: 0.35, name: 'LOT', blurb: 'Lanterns over the crowd at dusk', tint: PAL.amber, flash: PAL.gold, coreLight: PAL.amber, coreGain: 0.9, coreLocal: [0, 0.4, -0.5],
-    wisps: [PAL.gold, PAL.pink, PAL.cyan], fils: [F], kinds, ay: 0, ax: 0,
+    n: N, dofMul: 0.15, name: 'LOT', blurb: 'The show the sky puts on', tint: PAL.amber, flash: PAL.gold, coreLight: PAL.amber, coreGain: 0.9, coreLocal: [0, 2.5, -6],
+    wisps: [PAL.gold, PAL.pink, PAL.cyan], fils: [F], kinds, ay: 0, ax: 0, cam: { el: 0, az: 0, ty: 0, D: 1 },
+    get trailFloor() { return P.trail; },
     onset(kind, s) {
       if (kind === 'kick' || kind === 'touch') {
         let k = 0; for (let j = 1; j < 10; j++) if (jumpAge[j] > jumpAge[k]) k = j; jumpAge[k] = 0; jumpStr[k] = s;
-        beamI[beamAlt % NBM] = Math.max(beamI[beamAlt % NBM], s); beamI[(beamAlt + 4) % NBM] = Math.max(beamI[(beamAlt + 4) % NBM], s * 0.8); beamAlt++;
+        if (NBM) { beamI[beamAlt % NBM] = Math.max(beamI[beamAlt % NBM], s * P.strobe); beamI[(beamAlt + (NBM >> 1)) % NBM] = Math.max(beamI[(beamAlt + (NBM >> 1)) % NBM], s * 0.8 * P.strobe); beamAlt++; }
+        if (kickCool <= 0 && Math.random() < 0.35 * P.fwRate) { launch(TYPES[typeIdx++ % TYPES.length], s); kickCool = 0.35 / Math.max(0.2, P.fwRate); }
       }
-      if (kind === 'hat' || kind === 'snare') { const n = kind === 'hat' ? 50 : 110; for (let j = 0; j < n; j++) { const i = Math.floor(Math.random() * NL); flare[i] = Math.max(flare[i], s); } }
-      if (kind === 'idle') for (let j = 0; j < 20; j++) flare[Math.floor(Math.random() * NL)] = 0.5;
+      if (kind === 'snare') { for (let j = 0; j < 40; j++) { const i = Math.floor(Math.random() * NL); flare[i] = Math.max(flare[i], s); } if (Math.random() < 0.25 * P.fwRate) launch('crackle', s * 0.8); }
+      if (kind === 'hat') { for (let j = 0; j < 25; j++) { const i = Math.floor(Math.random() * NL); flare[i] = Math.max(flare[i], s * 0.8); } }
+      if (kind === 'idle') { for (let j = 0; j < 20; j++) flare[Math.floor(Math.random() * NL)] = 0.5; if (Math.random() < 0.3 * P.fwRate) launch('peony', 0.5); }
     },
-    update(dt) { for (let i = 0; i < NL; i++) flare[i] *= Math.exp(-dt * 2.4); for (let k = 0; k < 10; k++) jumpAge[k] += dt; for (let k = 0; k < NBM; k++) beamI[k] *= Math.exp(-dt * 2.2); },
+    update(dt) {
+      for (let i = 0; i < NL; i++) flare[i] *= Math.exp(-dt * 2.4);
+      for (let k = 0; k < 10; k++) jumpAge[k] += dt;
+      for (let k = 0; k < NBM; k++) beamI[k] *= Math.exp(-dt * 2.2);
+      kickCool -= dt; finaleCool -= dt; hero = Math.max(0, hero - dt / 7); lift *= Math.exp(-dt * 0.35); flashAt *= Math.exp(-dt * 3.5);
+      // build and drop: fast energy jumping well above the slow average after a quieter stretch
+      eFast = follow(eFast, A.level, dt, 0.15, 0.4); eSlow = follow(eSlow, A.level, dt, 5, 5);
+      if (finaleCool <= 0 && P.finale > 0 && eFast > 0.4 && eFast > eSlow * (2.1 - P.finale) + 0.06) finale();
+      if (finaleQ > 0) { finaleT -= dt; if (finaleT <= 0) { launch(['peony', 'ring', 'willow', 'crossette', 'glitter', 'peony'][finaleQ % 6], 1.2); finaleQ--; finaleT = 0.18 + Math.random() * 0.2; } }
+      lowHold = A.low > 0.55 ? lowHold + dt : 0; willowT -= dt;
+      if (lowHold > 1.4 && willowT <= 0 && P.fwRate > 0) { launch('willow', 1); willowT = 2.2 / P.fwRate; }
+      for (let s2 = shells.length - 1; s2 >= 0; s2--) {
+        const sh = shells[s2]; sh.age += dt; sh.vy -= 3.2 * dt; sh.x += sh.vx * dt; sh.y += sh.vy * dt; sh.z += sh.vz * dt;
+        if (Math.random() < 0.9) spawn(sh.x, sh.y, sh.z, (Math.random() - 0.5) * 0.2, -0.3, (Math.random() - 0.5) * 0.2, 0.45, PAL.amber, TRAIL, 2, 0.5, 0.007);
+        if (sh.vy < 0.4) { burst(sh); shells.splice(s2, 1); }
+      }
+      for (let i = 0; i < FWC; i++) {
+        if (age[i] > life[i]) continue;
+        age[i] += dt; const dk = Math.exp(-drag[i] * dt);
+        vx[i] *= dk; vy[i] = vy[i] * dk - grav[i] * dt; vz[i] *= dk;
+        fx[i] += vx[i] * dt; fy[i] += vy[i] * dt; fz[i] += vz[i] * dt;
+        if (age[i] > life[i]) {
+          if (kind[i] === CROSS && gen[i] === 0) for (let j = 0; j < 8; j++) { const a = j / 8 * TAU; spawn(fx[i], fy[i], fz[i], Math.cos(a) * 1.4 + vx[i] * 0.3, (Math.random() - 0.3) * 1.2, Math.sin(a) * 1.4, 1.2, [fr[i], fg[i], fb[i]], SPARK, 1.4, 0.9 * P.gravity, 0.009, 1); }
+          if (kind[i] === CRACKLE && gen[i] === 0) for (let j = 0; j < 3; j++) spawn(fx[i], fy[i], fz[i], (Math.random() - 0.5) * 1.6, (Math.random() - 0.5) * 1.6, (Math.random() - 0.5) * 1.6, 0.15 + Math.random() * 0.15, PAL.white, POP, 3, 0.5, 0.012, 1);
+        }
+      }
+      const cr2 = P.crane, hz = hero;
+      W.cam.el = (-0.02 + 0.1 * cr2 * (0.5 + 0.5 * Math.sin(tSim * 0.05)) + hz * 0.16);
+      W.cam.az = 0.4 * Math.sin(tSim * 0.03) * cr2;
+      W.cam.ty = 0.45 + (0.5 + 0.5 * Math.sin(tSim * 0.04)) * 0.4 * cr2 + hz * 0.7;
+      W.cam.D = 1 - 0.12 * Math.sin(tSim * 0.045) * cr2;
+      W.coreLocal = flashPos; W.coreLight = flashCol; W.coreGain = 0.5 + flashAt * 2.5;
+    },
     write(t, out) {
-      const rise = t * (1 + A.presence * 0.8);
+      const rise = t * (1 + A.presence * 0.8) + lift * 6;
       for (let i = 0; i < NL; i++) {
         const y = wrap(-1.5 + sC[i] * 5 + rise * (0.06 + 0.06 * sD[i]), -1.5, 3.5);
         const fade = smooth(-1.5, -0.9, y) * (1 - smooth(2.5, 3.5, y));
         const zd = Math.pow(sB[i], 0.6), z = 1.5 - zd * 22, spread = 7 + zd * 26;
         const x = (sA[i] - 0.5) * spread + Math.sin(t * 0.3 + sD[i] * 9) * 0.18 + noise3(sA[i] * 5, y * 0.4, t * 0.05) * 0.3;
-        const yy = y + zd * 1.5;
         const r = kinds[i] ? 0.02 + 0.02 * sC[i] : 0.009 + 0.008 * Math.pow(sC[i], 2);
-        put(out, i, x, yy, z, r * fade * (1 + flare[i] * 0.4) * (1 + zd * 1.5), col, 0.55 + flare[i] * 1.8 + A.level * 0.3 + tw(i, t) * 0.3 + A.low * 0.2);
+        put(out, i, x, y + zd * 1.5, z, r * fade * (1 + flare[i] * 0.4) * (1 + zd * 1.5), col, 0.5 + flare[i] * 1.6 + A.level * 0.3 + tw(i, t) * 0.3 + A.low * 0.2);
       }
-      for (let i = C0; i < S0; i++) {
+      for (let i = C0; i < H0; i++) {
         const r = cr[i], a = ca[i];
         let jmp = 0;
         for (let k = 0; k < 10; k++) { if (jumpAge[k] > 5) continue; const R = jumpAge[k] * 2.9, x = (r - R) / 0.35; if (x > -3 && x < 3) jmp += jumpStr[k] * Math.exp(-x * x) * Math.exp(-jumpAge[k] * 0.7); }
         const sway = Math.sin(t * 1.7 + sA[i] * 30) * 0.02 * (0.3 + A.mid);
-        put(out, i, Math.cos(a) * r * 1.3 + sway, -1.8 + jmp * 0.32 + (sD[i] - 0.5) * 0.14, -Math.abs(Math.sin(a)) * r * 1.6 + 1.8, 0.008 + 0.007 * sC[i], col, 0.06 + jmp * 1.4 + A.high * 0.25 * sD[i] + tw(i, t) * 0.45);
+        put(out, i, Math.cos(a) * r * 1.3 + sway, -1.8 + jmp * 0.32 + (sD[i] - 0.5) * 0.14 + hero * 0.15 * Math.max(0, Math.sin(t * 9 + sA[i] * 20)), -Math.abs(Math.sin(a)) * r * 1.6 + 1.8,
+          0.007 + 0.006 * sC[i], col, 0.06 + jmp * 1.4 + A.high * 0.25 * sD[i] + tw(i, t) * 0.45 + hero * 0.4 + flashAt * 0.15);
       }
-      for (let i = S0; i < N; i++) put(out, i, (sA[i] - 0.5) * 11, 3.0 + sB[i] * 1.8, -5.5 + sC[i] * 2.5, 0.006, col, 0.05 + tw(i, t) * 0.8);
+      for (let i = H0; i < ST0; i++) {
+        const x = (sA[i] - 0.5) * 18, z = 2 - sB[i] * 16;
+        put(out, i, x, -1.86 + sC[i] * 0.15, z, 0.03 + 0.03 * sD[i], col, 0.08 + flashAt * 0.4 + tw(i, t) * 0.2);
+      }
+      for (let i = ST0; i < FW0; i++) put(out, i, (sA[i] - 0.5) * 16, 3.6 + sB[i] * 2.2, -9 + sC[i] * 3, 0.006, col, 0.05 + tw(i, t) * 0.8);
+      for (let j = 0; j < FWC; j++) {
+        const i = FW0 + j;
+        if (age[j] > life[j]) { out[i * 8 + 3] = 0; continue; }
+        const u = age[j] / life[j]; let e = Math.pow(1 - u, 1.3) * 1.4;
+        if (kind[j] === GLITTER) e *= (Math.random() < 0.35 + A.high * 0.4 ? 1.8 : 0.15);
+        if (kind[j] === WILLOW) e = (1 - u) * 1.1;
+        if (kind[j] === POP) e = 2.4 * (1 - u);
+        if (kind[j] === TRAIL) e = 0.7 * (1 - u);
+        putC(out, i, fx[j], fy[j], fz[j], sz[j] * (kind[j] === TRAIL ? 1 - u : 1), fr[j], fg[j], fb[j], e * (1.1 + A.level * 0.9));
+      }
       for (let k = 0; k < NBM; k++) {
-        const bx = -3 + k * 0.86, sw = 0.45 * Math.sin(t * (0.25 + k * 0.05) + k * 1.7), ang = Math.PI / 2 + sw;
+        const bx = -3 + k * 6 / Math.max(1, NBM - 1), free = 0.45 * Math.sin(t * (0.25 + k * 0.05) * P.sweep + k * 1.7), lock = Math.atan2(4, -bx) - Math.PI / 2;
+        const ang = Math.PI / 2 + lerp(free, lock, hero);
+        const strobe = hero > 0.05 ? (Math.sin(t * 28 + k) > 0.3 ? 1 : 0.1) * hero : 0;
         for (let j = 0; j < BP; j++) {
           const i = k * BP + j, q = i * 3, d = j / (BP - 1) * 6.5;
           F.c[q] = bx + Math.cos(ang) * d; F.c[q + 1] = -1.7 + Math.sin(ang) * d * 0.95; F.c[q + 2] = -4.3 + d * 0.22;
-          F.I[i] = (0.03 + beamI[k] * 0.5 + A.level * 0.06) * (1 - j / BP);
+          F.I[i] = (0.03 + beamI[k] * 0.5 + A.level * 0.06 + strobe * 0.6) * (1 - j / BP);
         }
       }
-      W.ay = 0.22 * Math.sin(t * 0.035); W.ax = 0.1 + 0.04 * Math.sin(t * 0.05);
+      W.ay = 0.18 * Math.sin(t * 0.035); W.ax = 0.06 + 0.03 * Math.sin(t * 0.05);
       rotPts(out, N, 8, W.ay, W.ax); rotPts(F.c, F.n, 3, W.ay, W.ax);
+      { const fp = rot1(flashPos, W.ay, W.ax); W.coreLocal = fp; }
     }
   };
   return W;
 }
 
-/* III. STORM — A supercell.
-   A rotating spiral deck of cloud feeds a roping tornado that touches down in a ring of debris. Bass widens the funnel,
-   kicks send a pulse climbing the vortex and fire branching lightning out of the deck, hats fling the debris. */
-function makeStorm() {
-  const ND = 1300, NF = 900, NDB = 300, NR = 300, D0 = 0, F0 = ND, B0 = F0 + NF, RA0 = B0 + NDB, G0 = RA0 + NR;
+/* III. STORM — The supercell.
+   A rotating spiral deck feeds a tornado whose trunk is pushed around by big, slow 3D noise climbing from the ground into the
+   cloud, so it never bends the same way twice. The base is a wide twisting skirt with satellite vortices orbiting it.
+   Bass stirs the noise and widens the funnel, kicks pulse up the trunk and fire lightning, hats fling debris.
+   The camera lies in the grass and looks up. */
+function makeStorm(P) {
+  const ND = cnt(1250, P, P.deck), NF = cnt(3000, P, P.funnel), NSV = Math.round(P.subVort) * cnt(220, P), NDB = cnt(500, P), NR = cnt(300, P), NG = 200;
+  const D0 = 0, F0 = ND, SV0 = F0 + NF, B0 = SV0 + NSV, RA0 = B0 + NDB, G0 = RA0 + NR;
+  const N = Math.min(NMAX, G0 + NG);
   const col = new Float32Array(N * 3), kinds = new Float32Array(N);
   const dr = new Float32Array(N), da = new Float32Array(N), dy = new Float32Array(N);
   const sr = rngFrom(1919), gr = () => (sr() + sr() + sr() - 1.5) / 1.5;
   for (let i = D0; i < F0; i++) {
-    const r = 0.35 + 3.4 * Math.pow(sr(), 0.75), inArm = sr() < 0.5;
-    const arm = sr() < 0.5 ? 0 : Math.PI;
+    const r = 0.35 + 3.4 * Math.pow(sr(), 0.75), inArm = sr() < 0.5, arm = sr() < 0.5 ? 0 : Math.PI;
     dr[i] = r; da[i] = inArm ? arm + Math.log(r) * 2.3 + gr() * 0.35 : sr() * TAU;
-    dy[i] = gr() * 0.32 * (1.15 - r / 4) - r * r * 0.03;
-    kinds[i] = sr() < 0.62 ? 1 : 0;
-    setCol(col, i, inArm ? (sr() < 0.45 ? PAL.pearl : sr() < 0.6 ? PAL.azure : PAL.violet) : (sr() < 0.6 ? PAL.indigo : PAL.azure));
+    dy[i] = gr() * 0.32 * (1.15 - r / 4) - r * r * 0.03; kinds[i] = sr() < 0.62 ? 1 : 0;
+    setCol(col, i, inArm ? (sr() < 0.28 ? PAL.pearl : sr() < 0.55 ? PAL.azure : PAL.violet) : (sr() < 0.6 ? PAL.indigo : PAL.azure));
   }
-  for (let i = F0; i < B0; i++) { kinds[i] = sB[i] < 0.45 ? 1 : 0; setCol(col, i, sC[i] < 0.5 ? PAL.pearl : sC[i] < 0.8 ? PAL.violet : PAL.azure); }
-  for (let i = B0; i < RA0; i++) { dr[i] = 0.25 + 0.9 * sA[i]; da[i] = sB[i] * TAU; setCol(col, i, sC[i] < 0.6 ? PAL.amber : PAL.gold); }
+  for (let i = F0; i < SV0; i++) { kinds[i] = sB[i] < 0.3 ? 1 : 0; setCol(col, i, sC[i] < 0.55 ? PAL.pearl : sC[i] < 0.8 ? PAL.violet : PAL.azure); }
+  for (let i = SV0; i < B0; i++) setCol(col, i, sC[i] < 0.6 ? PAL.pearl : PAL.lilac || PAL.violet);
+  for (let i = B0; i < RA0; i++) { dr[i] = sA[i]; da[i] = sB[i] * TAU; setCol(col, i, sC[i] < 0.6 ? PAL.amber : PAL.gold); }
   for (let i = RA0; i < G0; i++) { kinds[i] = 1; setCol(col, i, mixC(PAL.azure, PAL.pearl, 0.5)); }
   for (let i = G0; i < N; i++) { dr[i] = 0.3 + 4.4 * Math.sqrt(sA[i]); da[i] = sB[i] * TAU; setCol(col, i, mixC(PAL.indigo, PAL.azure, sC[i])); }
-  const HL = 8, HP = 80, AR = 2, AP = 140;
+  const HL = 10, HP = 90, AR = 2, AP = 140;
   const F = new Fil(HL * HP + AR * AP);
-  for (let k = 0; k < HL; k++) F.poly(HP, k / HL, 0.0035, false);
+  for (let k = 0; k < HL; k++) F.poly(HP, k / HL, 0.003, false);
   const AR0 = F.n; for (let k = 0; k < AR; k++) F.poly(AP, k / AR, 0.004, false);
   for (let i = 0; i < F.n; i++) setCol(F.col, i, i < AR0 ? mixC(PAL.pearl, PAL.violet, 0.4) : mixC(PAL.violet, PAL.azure, 0.5));
   const BS = 5, bolts = [], bAge = new Float32Array(BS).fill(99), bStr = new Float32Array(BS), bPos = new Float32Array(BS * 3);
   for (let k = 0; k < BS; k++) { const b = new Fil(800); b.grow = 0; bolts.push(b); }
   const br = rngFrom(4242);
-  let spin = 0, last = 0, flashI = 0, wide = 0, waveAge = 9, waveStr = 0, fling = 0;
+  let spin = 0, last = 0, flashI = 0, wide = 0, waveAge = 9, waveStr = 0, fling = 0, climbT = 0, strikeAcc = 0;
+  const CLN = 64, clx = new Float32Array(CLN + 1), clz = new Float32Array(CLN + 1);
   const fy = u => -1.85 + u * 2.85;
-  const fr = u => 0.05 + (0.75 + wide * 0.35) * Math.pow(u, 2.3);
-  const fcx = (u, t) => Math.sin(t * 0.33 + u * 2.4) * 0.32 * Math.pow(1 - u, 1.2) + 0.08 * Math.sin(t * 1.1 + u * 7) * (1 - u);
-  const fcz = (u, t) => Math.cos(t * 0.27 + u * 1.9) * 0.18 * Math.pow(1 - u, 1.2);
+  const fr = u => 0.035 + (0.7 + wide * 0.35) * Math.pow(u, 2.3) + P.baseWidth * 0.3 * Math.exp(-u * 9) * (1 + A.low * 0.4);
+  const cl = (u, o) => { const f = clamp(u, 0, 1) * CLN, i = Math.min(CLN - 1, Math.floor(f)), a = f - i; o[0] = lerp(clx[i], clx[i + 1], a); o[1] = lerp(clz[i], clz[i + 1], a); return o; };
+  const c2 = [0, 0];
   function strike(s) {
     let k = 0; for (let j = 1; j < BS; j++) if (bAge[j] > bAge[k]) k = j;
     const a = Math.random() * TAU, rr = 0.6 + Math.random() * 2.2, x = Math.cos(a) * rr, z = Math.sin(a) * rr * 0.8, y = 0.9;
@@ -1102,21 +1558,28 @@ function makeStorm() {
     bAge[k] = 0; bStr[k] = s; bPos[k * 3] = x; bPos[k * 3 + 1] = y; bPos[k * 3 + 2] = z; last = k; flashI = Math.max(flashI, s);
   }
   const W = {
-    name: 'STORM', blurb: 'The supercell touches down', tint: PAL.indigo, flash: PAL.white, coreLight: PAL.cyan, coreGain: 0.6, coreLocal: [0, 0.8, 0],
-    wisps: [PAL.cyan, PAL.violet, PAL.pearl], fils: [F, ...bolts], kinds, ay: 0, ax: 0,
+    n: N, dofMul: 0.45, name: 'STORM', blurb: 'The supercell touches down', tint: PAL.indigo, flash: PAL.white, coreLight: PAL.cyan, coreGain: 0.6, coreLocal: [0, 0.8, 0],
+    wisps: [PAL.cyan, PAL.violet, PAL.pearl], fils: [F, ...bolts], kinds, ay: 0, ax: 0, cam: { el: 0, az: 0, ty: 0, D: 1 },
     onset(kind, s) {
-      if (kind === 'kick' || kind === 'touch') { waveAge = 0; waveStr = s; if (s > 0.32) strike(Math.max(s, 0.6)); }
-      else if (kind === 'snare' && Math.random() < 0.55) strike(s * 0.8);
+      if (kind === 'kick' || kind === 'touch') { waveAge = 0; waveStr = s; strikeAcc += s * P.lightning; if (strikeAcc > 0.6) { strikeAcc = 0; strike(Math.max(s, 0.6)); } }
+      else if (kind === 'snare' && Math.random() < 0.45 * P.lightning) strike(s * 0.8);
       else if (kind === 'hat') fling = Math.max(fling, s);
-      else if (kind === 'idle' && Math.random() < 0.4) strike(0.4);
+      else if (kind === 'idle' && Math.random() < 0.4 * P.lightning) strike(0.4);
     },
     update(dt) {
       const sp = 1 + A.level * 1.6 + A.presence * 0.5;
       spin += dt * sp;
+      climbT += dt * 0.32 * P.climb * (1 + A.level * 0.8);
       wide = lerp(wide, A.low * 0.9 + A.presence * 0.3, 1 - Math.exp(-dt * 2));
       for (let i = D0; i < F0; i++) da[i] += dt * 0.3 / (dr[i] + 0.4) * sp;
-      for (let i = B0; i < RA0; i++) da[i] += dt * 2.6 / (dr[i] + 0.2) * sp;
       waveAge += dt; fling *= Math.exp(-dt * 2); flashI *= Math.exp(-dt * 4);
+      // centreline: two octaves of 3D noise scrolled up the trunk, pinned at the ground
+      const amp = P.noiseAmt * (1 + A.low * 0.7 * P.stir), sc = P.noiseScale;
+      for (let j = 0; j <= CLN; j++) {
+        const u = j / CLN, ph = u * 2.1 * sc - climbT, env = smooth(0, 0.25, u) * (1 - 0.2 * u) * amp;
+        clx[j] = (noise3(ph, 1.7, 3.1) * 0.95 + noise3(ph * 2.3, 5.2, 7.7 + climbT * 0.2) * 0.4) * env;
+        clz[j] = (noise3(ph, 11.3, 2.2) * 0.95 + noise3(ph * 2.3, 13.7, 4.4 - climbT * 0.2) * 0.4) * env;
+      }
       for (let k = 0; k < BS; k++) {
         bAge[k] += dt; const B = bolts[k], age = bAge[k];
         const env = age > 1.2 ? 0 : (age < 0.06 ? 1.9 : 1.9 * Math.exp(-(age - 0.06) * 5)) * (age < 0.45 && Math.random() < 0.22 ? 0.25 : 1) * bStr[k];
@@ -1125,11 +1588,13 @@ function makeStorm() {
       }
       W.coreLocal = [bPos[last * 3], bPos[last * 3 + 1] - 0.3, bPos[last * 3 + 2]];
       W.coreGain = 0.4 + flashI * 3.5;
+      const wm = P.worm;
+      W.cam.el = lerp(0.05, -0.2, wm); W.cam.D = lerp(1, 0.86, wm); W.cam.ty = lerp(0, 0.3, wm); W.cam.az = 0; W.cam.fov = lerp(1, 1.75, wm);
     },
     write(t, out) {
       const sx = [], sy = [], sz = [], si = [];
       for (let k = 0; k < BS; k++) if (bAge[k] < 1) { sx.push(bPos[k * 3]); sy.push(bPos[k * 3 + 1]); sz.push(bPos[k * 3 + 2]); si.push(bStr[k] * Math.exp(-bAge[k] * 3.5)); }
-      const wf = waveAge * 1.6;
+      const wf = waveAge * 1.6, wenv = waveStr * Math.exp(-waveAge * 0.5);
       for (let i = D0; i < F0; i++) {
         const r = dr[i], a = da[i], x = Math.cos(a) * r, z = Math.sin(a) * r * 0.85;
         const y = 1.12 + dy[i] + noise3(x * 0.7, z * 0.7, t * 0.07) * 0.18 - Math.exp(-r * 1.6) * 0.25;
@@ -1137,21 +1602,36 @@ function makeStorm() {
         const ps = kinds[i] ? 0.04 + 0.05 * sB[i] : 0.009 + 0.01 * Math.pow(sB[i], 2);
         put(out, i, x, y, z, ps * (1 + L * 0.3), col, 0.05 + L * 2.4 + A.low * 0.15 + (1 - r / 3.8) * 0.12 + tw(i, t) * 0.18);
       }
-      for (let i = F0; i < B0; i++) {
-        const u = (sA[i] + t * (0.04 + 0.05 * sD[i]) * (1 + A.level)) % 1, y = fy(u), R = fr(u) * (0.75 + 0.5 * sC[i]);
+      const g = P.psize;
+      for (let i = F0; i < SV0; i++) {
+        const u = (sA[i] + t * (0.04 + 0.05 * sD[i]) * (1 + A.level)) % 1, y = fy(u), R = fr(u) * (0.7 + 0.55 * sC[i]);
         const a = sB[i] * TAU + spin * (2.2 / (fr(u) + 0.18)) * 0.35;
-        const cx = fcx(u, t), cz = fcz(u, t), wv = Math.exp(-(((u - wf) / 0.08) ** 2)) * waveStr * Math.exp(-waveAge * 0.5);
-        const ps = kinds[i] ? 0.02 + 0.02 * sC[i] : 0.006 + 0.007 * sC[i];
-        put(out, i, cx + Math.cos(a) * R, y, cz + Math.sin(a) * R, ps * (0.6 + u * 0.8), col, 0.12 + (1 - u) * 0.35 + wv * 1.8 + A.mid * 0.25 + tw(i, t) * 0.25);
+        cl(u, c2);
+        const wv = Math.exp(-(((u - wf) / 0.08) ** 2)) * wenv;
+        const ps = (kinds[i] ? 0.008 + 0.009 * sC[i] : 0.0024 + 0.0032 * sC[i]) * g;
+        put(out, i, c2[0] + Math.cos(a) * R, y, c2[1] + Math.sin(a) * R, ps * (0.7 + u * 0.6), col, 0.14 + (1 - u) * 0.4 + wv * 1.8 + A.mid * 0.25 + tw(i, t) * 0.25);
       }
+      // satellite vortices orbiting the base
+      const nsv = Math.round(P.subVort), per = nsv ? Math.floor(NSV / nsv) : 0;
+      cl(0, c2); const bx = c2[0], bz = c2[1], orbR = P.baseWidth * 0.42;
+      for (let v2 = 0; v2 < nsv; v2++) {
+        const oa = spin * 0.9 + v2 / nsv * TAU, ox = bx + Math.cos(oa) * orbR, oz = bz + Math.sin(oa) * orbR;
+        for (let j = 0; j < per; j++) {
+          const i = SV0 + v2 * per + j, u = (sA[i] + t * 0.25) % 1, R = 0.02 + 0.13 * u * (1 + A.low * 0.5), a = sB[i] * TAU + spin * 6;
+          put(out, i, ox + Math.cos(a) * R, -1.85 + u * (0.55 + 0.25 * Math.sin(v2 + t)), oz + Math.sin(a) * R, 0.004 * g + 0.002, col, 0.2 + (1 - u) * 0.6 + fling * 0.5);
+        }
+      }
+      for (let i = SV0 + nsv * per; i < B0; i++) out[i * 8 + 3] = 0;
+      // dust skirt: debris spirals out and up from the base
       for (let i = B0; i < RA0; i++) {
-        const r = dr[i] * (1 + fling * 0.9 * sC[i]), a = da[i], cx = fcx(0, t), cz = fcz(0, t);
-        put(out, i, cx + Math.cos(a) * r, -1.85 + sD[i] * 0.35 * (1 - dr[i]) + fling * 0.3 * sB[i], cz + Math.sin(a) * r, 0.007 + 0.008 * sB[i], col, 0.2 + fling * 1.4 + A.high * 0.4 + tw(i, t) * 0.3);
+        const u = (dr[i] + t * (0.12 + 0.1 * sD[i]) * (1 + A.level)) % 1, r = P.baseWidth * 0.25 * (0.6 + u * 1.8) * (1 + fling * 0.6 * sC[i]);
+        const a = da[i] + spin * 2.4 / (r + 0.3);
+        put(out, i, bx + Math.cos(a) * r, -1.87 + u * (0.45 + fling * 0.3) * (0.4 + sB[i]), bz + Math.sin(a) * r, (0.005 + 0.006 * sB[i]) * g, col, (0.18 + fling * 1.3 + A.high * 0.35) * (1 - u * 0.6) + tw(i, t) * 0.3);
       }
       for (let i = RA0; i < G0; i++) {
         const sector = sB[i] * 1.6 + spin * 0.05, r = 1.4 + 1.3 * sA[i], y = wrap(1.0 - (sC[i] * 3 + t * (2.4 + A.level * 2) * (0.8 + 0.4 * sD[i])), -1.85, 1.0);
         const a = sector + (1 - (y + 1.85) / 2.85) * 0.5;
-        put(out, i, Math.cos(a) * r, y, Math.sin(a) * r * 0.85, 0.006, col, 0.2 + A.high * 0.3 + flashI * 0.6);
+        put(out, i, Math.cos(a) * r, y, Math.sin(a) * r * 0.85, 0.005, col, 0.2 + A.high * 0.3 + flashI * 0.6);
       }
       for (let i = G0; i < N; i++) {
         const r = dr[i], a = da[i], x = Math.cos(a) * r, z = Math.sin(a) * r * 0.8;
@@ -1160,15 +1640,16 @@ function makeStorm() {
       }
       for (let k = 0; k < HL; k++) for (let j = 0; j < HP; j++) {
         const i = k * HP + j, q = i * 3, u = j / (HP - 1), R = fr(u) * 0.95, a = k / HL * TAU + spin * (2.2 / (fr(u) + 0.18)) * 0.35 + u * 4;
-        F.c[q] = fcx(u, t) + Math.cos(a) * R; F.c[q + 1] = fy(u); F.c[q + 2] = fcz(u, t) + Math.sin(a) * R;
-        F.I[i] = 0.05 + 0.12 * (1 - u) + Math.exp(-(((u - wf) / 0.07) ** 2)) * waveStr * Math.exp(-waveAge * 0.5) * 1.1;
+        cl(u, c2);
+        F.c[q] = c2[0] + Math.cos(a) * R; F.c[q + 1] = fy(u); F.c[q + 2] = c2[1] + Math.sin(a) * R;
+        F.I[i] = 0.04 + 0.1 * (1 - u) + Math.exp(-(((u - wf) / 0.07) ** 2)) * wenv * 1.1;
       }
       for (let k = 0; k < AR; k++) for (let j = 0; j < AP; j++) {
         const i = AR0 + k * AP + j, q = i * 3, r = 0.35 + j / (AP - 1) * 3.3, a = k * Math.PI + Math.log(r) * 2.3 + spin * 0.3 / (r + 0.4);
         F.c[q] = Math.cos(a) * r; F.c[q + 1] = 1.1 - r * r * 0.025; F.c[q + 2] = Math.sin(a) * r * 0.85;
         F.I[i] = (0.05 + A.low * 0.08) * (1 - j / AP) + flashI * 0.15;
       }
-      W.ay = t * 0.025; W.ax = 0.4 + 0.05 * Math.sin(t * 0.05);
+      W.ay = t * 0.025; W.ax = lerp(0.4, 0.04, P.worm) + 0.04 * Math.sin(t * 0.05);
       rotPts(out, N, 8, W.ay, W.ax); rotPts(F.c, F.n, 3, W.ay, W.ax);
       for (const B of bolts) { B.c.set(B.p.subarray(0, B.n * 3)); rotPts(B.c, B.n, 3, W.ay, W.ax); }
     }
@@ -1176,57 +1657,99 @@ function makeStorm() {
   return W;
 }
 
-/* IV. REEF — A kelp forest at night.
-   Forty stalks sway in a current that the bass pushes; kicks send light running up every stalk to the polyps,
-   hats make polyps sparkle, and plankton glitter in the water when a shockwave passes. */
-function makeReef() {
-  const F = new Fil(10000), r = rngFrom(808);
-  for (let k = 0; k < 40; k++) {
-    const x = (r() - 0.5) * 6.4, z = -3 + r() * 3.8;
-    growTree(F, { rng: r, root: [x, -1.88, z], dir: [(r() - 0.5) * 0.3, 1, (r() - 0.5) * 0.3], len: 2.3 + r() * 1.8, step: 0.06, branch: 0.06, spread: 0.5,
-      maxDepth: 3, child: 0.6, curl: 0.2, cf: 0.9, w0: 0.012, taper: 0.995, peel: 10, bias: () => [0, 0.05, 0] });
+/* IV. REEF — The endless reef.
+   You glide forward forever through a kelp forest rising out of murky water. The forest thickens into dense groves, thins
+   into clearings, grows tall then low, as a slow density field rolls past. Bass is the current, kicks run light up every
+   stalk to the polyps, and marine snow drifts past the lens. */
+function makeReef(P) {
+  const SL = Math.round(P.stalks), ZF = -40, ZN = 7.5, LEN = ZN - ZF, r = rngFrom(808);
+  const fils = [], slotX = new Float32Array(SL), slotZ = new Float32Array(SL), slotS = new Float32Array(SL), slotVis = new Float32Array(SL), slotRot = new Float32Array(SL), slotPrev = new Float32Array(SL);
+  const pal = [[PAL.indigo, PAL.teal, PAL.biolum, PAL.cyan], [PAL.indigo, PAL.violet, PAL.magenta, PAL.pink], [PAL.azure, PAL.teal, PAL.lime, PAL.biolum]];
+  for (let k = 0; k < SL; k++) {
+    const F = new Fil(320);
+    growTree(F, { rng: r, root: [0, 0, 0], dir: [(r() - 0.5) * 0.25, 1, (r() - 0.5) * 0.25], len: 2.4 + r() * 1.8, step: 0.07, branch: 0.06, spread: 0.5,
+      maxDepth: 2, child: 0.6, curl: 0.09, cf: 0.7, w0: 0.013, taper: 0.995, peel: 10, bias: () => [0, 0.11, 0] });
+    const pk = pal[k % 3]; F.paint(u => grad(pk, u));
+    fils.push(F); slotZ[k] = ZF + (k + r()) / SL * LEN; slotPrev[k] = slotZ[k];
   }
-  F.paint(u => grad([PAL.indigo, PAL.teal, PAL.biolum, PAL.cyan], u));
-  const col = new Float32Array(N * 3), kinds = new Float32Array(N), pIdx = new Int32Array(N).fill(-1), pR = new Float32Array(N), pTip = new Uint8Array(N);
-  let k = 0;
-  for (const id of F.leaves) { if (k >= N) break; pIdx[k] = id; pR[k] = 0.03 + 0.022 * sA[k]; pTip[k] = 1; setCol(col, k, sB[k] < 0.4 ? PAL.pink : sB[k] < 0.75 ? PAL.magenta : PAL.gold); k++; }
-  for (let i = 3; i < F.n && k < 2000; i += 3) { if (F.par[i] < 0) continue; pIdx[k] = i; pR[k] = 0.006 + 0.006 * sA[k]; setCol(col, k, mixC([F.col[i * 3], F.col[i * 3 + 1], F.col[i * 3 + 2]], PAL.pearl, 0.25)); k++; }
-  const P0 = k;
-  for (let i = P0; i < N; i++) { kinds[i] = sD[i] < 0.7 ? 1 : 0; setCol(col, i, sC[i] < 0.6 ? PAL.biolum : sC[i] < 0.85 ? PAL.cyan : PAL.pink); }
-  const P = new Pulses(), sparkle = new Float32Array(N);
-  let current = 0;
+  const dens = d => clamp(0.55 + P.variation * (noise3(d * 0.045, 3.3, 1.1) * 1.3 + noise3(d * 0.13, 7.1, 2.2) * 0.5), 0.02, 1);
+  let travel = 0, distIdx = 0;
+  function place(k, d) {
+    const de = dens(d);
+    slotVis[k] = Math.random() < 0.25 + de * 0.9 ? 1 : 0;
+    let x = (Math.random() - 0.5) * 13; if (Math.abs(x) < 0.7) x += Math.sign(x || 1) * 0.9;
+    slotX[k] = x; slotS[k] = (0.5 + de * 0.9) * (0.75 + Math.random() * 0.5); slotRot[k] = Math.random() * TAU;
+  }
+  for (let k = 0; k < SL; k++) place(k, slotZ[k]);
+  // particles: polyps and beads riding each stalk, marine snow, sand glints
+  const PPS = 34, NSTALKP = SL * PPS, NSNOW = cnt(1600, P, P.snow), NSAND = cnt(500, P);
+  const SN0 = NSTALKP, SA0 = SN0 + NSNOW, N = Math.min(NMAX, SA0 + NSAND);
+  const col = new Float32Array(N * 3), kinds = new Float32Array(N), pIdx = new Int32Array(NSTALKP).fill(-1), pTip = new Uint8Array(NSTALKP), pR = new Float32Array(NSTALKP);
+  for (let k = 0; k < SL; k++) {
+    const F = fils[k]; let m = 0;
+    for (const id of F.leaves) { if (m >= 8) break; const i = k * PPS + m++; pIdx[i] = id; pTip[i] = 1; pR[i] = 0.026 + 0.02 * sA[i]; setCol(col, i, sB[i] < 0.4 ? PAL.pink : sB[i] < 0.75 ? PAL.magenta : PAL.gold); }
+    for (let j = 4; j < F.n && m < PPS; j += Math.max(2, Math.floor(F.n / (PPS - 8)))) { const i = k * PPS + m++; pIdx[i] = j; pR[i] = 0.006 + 0.005 * sA[i]; setCol(col, i, mixC([F.col[j * 3], F.col[j * 3 + 1], F.col[j * 3 + 2]], PAL.pearl, 0.25)); }
+  }
+  for (let i = SN0; i < SA0; i++) { kinds[i] = sD[i] < 0.75 ? 1 : 0; setCol(col, i, sC[i] < 0.6 ? PAL.biolum : sC[i] < 0.85 ? PAL.pearl : PAL.pink); }
+  for (let i = SA0; i < N; i++) setCol(col, i, mixC(PAL.gold, PAL.pearl, sC[i]));
+  const Pz = new Pulses(), sparkle = new Float32Array(NSTALKP);
+  let current = 0, kick = 0;
+  const fogCol = () => { const h = P.fogHue; return grad([PAL.indigo, PAL.azure, PAL.teal, PAL.biolum, PAL.violet, PAL.indigo], h).map(c => c * 0.1); };
   const W = {
-    name: 'REEF', blurb: 'Bass is the current', tint: PAL.teal, flash: PAL.biolum, coreLight: PAL.biolum, coreGain: 0.9, coreLocal: [0, 0.4, -0.8],
-    wisps: [PAL.biolum, PAL.pink, PAL.cyan], fils: [F], kinds, ay: 0, ax: 0,
+    n: N, name: 'REEF', blurb: 'The endless reef', tint: PAL.teal, flash: PAL.biolum, coreLight: PAL.biolum, coreGain: 0.8, coreLocal: [0, 0.6, -3],
+    wisps: [PAL.biolum, PAL.pink, PAL.cyan], fils, kinds, ay: 0, ax: 0, swayMul: 0.35, driftMul: 0.4, cam: { el: 0.02, az: 0, ty: -0.25, D: 1 },
+    get fog() { return { d: 0.05 * P.fog, col: fogCol() }; },
+    get tint2() { return fogCol(); },
     onset(kind, s) {
-      if (kind === 'kick' || kind === 'touch') P.push(1, 0.7 + s, clamp(0.35 + s * 0.5, 0, 1), 2.4);
-      else if (kind === 'hat') { for (let j = 0; j < 14; j++) sparkle[Math.floor(Math.random() * F.leaves.length)] = s; }
-      else if (kind === 'snare') P.push(1, 0.5 + s * 0.5, 0.3, 3.2);
-      else if (kind === 'idle') P.push(1, 0.5, 0.25, 1.6);
+      if (kind === 'kick' || kind === 'touch') { Pz.push(1, 0.7 + s, clamp(0.35 + s * 0.5, 0, 1), 2.4); kick = Math.max(kick, s); }
+      else if (kind === 'hat') { for (let j = 0; j < 20; j++) sparkle[Math.floor(Math.random() * NSTALKP)] = s; }
+      else if (kind === 'snare') Pz.push(1, 0.5 + s * 0.5, 0.3, 3.2);
+      else if (kind === 'idle') Pz.push(1, 0.5, 0.25, 1.6);
     },
-    update(dt) { P.step(dt, F.sMax); current = lerp(current, 0.12 + A.low * 0.45 + A.presence * 0.1, 1 - Math.exp(-dt * 2)); for (let i = 0; i < N; i++) sparkle[i] *= Math.exp(-dt * 3); },
+    update(dt) {
+      Pz.step(dt, 4.5); kick *= Math.exp(-dt * 2);
+      current = lerp(current, P.current * (0.12 + A.low * 0.45 + A.presence * 0.1), 1 - Math.exp(-dt * 2));
+      for (let i = 0; i < NSTALKP; i++) sparkle[i] *= Math.exp(-dt * 3);
+      const v = P.travel * (0.9 + A.level * 1.2 + kick * 1.5);
+      travel += dt * v; distIdx += dt * v;
+    },
     write(t, out) {
-      for (let i = 0; i < F.n; i++) {
-        const q = i * 3, x0 = F.p[q], y0 = F.p[q + 1], z0 = F.p[q + 2], u = clamp((y0 + 1.88) / 3.8, 0, 1), h = F.h[i] * 6.28;
-        const amp = current * Math.pow(u, 1.5);
-        F.c[q] = x0 + (Math.sin(t * 0.55 + x0 * 0.7 + h * 0.2) * 0.7 + Math.sin(t * 1.3 + y0 * 1.6 + h) * 0.6) * amp;
-        F.c[q + 1] = y0 - amp * amp * 0.4;
-        F.c[q + 2] = z0 + Math.sin(t * 0.43 + z0 + y0 * 1.1 + h) * amp * 0.6;
-        F.I[i] = 0.045 + 0.07 * A.level + P.eval(F.s[i], F.h[i], F.sMax) * 1.3 + 0.05 * Math.pow(Math.max(0, Math.sin(F.s[i] * 3 - t * 1.4 + h)), 6);
+      for (let k = 0; k < SL; k++) {
+        const z = wrap(slotZ[k] + travel, ZF, ZN);
+        if (z < slotPrev[k] - LEN * 0.5) place(k, distIdx + LEN);
+        slotPrev[k] = z;
+        const F = fils[k], s = slotS[k] * P.height, vis = slotVis[k] * smooth(ZF, ZF + 10, z) * (1 - smooth(ZN - 1.5, ZN, z));
+        const cr = Math.cos(slotRot[k]), sn = Math.sin(slotRot[k]);
+        for (let i = 0; i < F.n; i++) {
+          const q = i * 3, x0 = F.p[q] * s, y0 = F.p[q + 1] * s, z0 = F.p[q + 2] * s, u = clamp(y0 / 4, 0, 1), h = F.h[i] * 6.28;
+          const amp = current * Math.pow(u, 1.5);
+          const xr = x0 * cr - z0 * sn, zr = x0 * sn + z0 * cr;
+          F.c[q] = slotX[k] + xr + (Math.sin(t * 0.55 + slotX[k] * 0.7 + h * 0.2) * 0.7 + Math.sin(t * 1.3 + y0 * 1.6 + h) * 0.6) * amp;
+          F.c[q + 1] = -1.9 + y0 - amp * amp * 0.4;
+          F.c[q + 2] = z + zr + Math.sin(t * 0.43 + z + y0 * 1.1 + h) * amp * 0.6;
+          F.I[i] = vis * (0.045 + 0.07 * A.level + Pz.eval(F.s[i], F.h[i], 4.5) * 1.3 + 0.05 * Math.pow(Math.max(0, Math.sin(F.s[i] * 3 - t * 1.4 + h)), 6));
+        }
+        for (let m = 0; m < PPS; m++) {
+          const i = k * PPS + m, id = pIdx[i];
+          if (id < 0 || !vis) { out[i * 8 + 3] = 0; continue; }
+          const q = id * 3, I = F.I[id];
+          put(out, i, F.c[q], F.c[q + 1], F.c[q + 2], pR[i] * P.polyp * (1 + I * 0.5 + (pTip[i] ? A.high * 0.3 : 0)) * vis, col,
+            0.06 + I * 1.2 + (pTip[i] ? (0.25 + 0.2 * Math.sin(t * 1.2 + sD[i] * 20) + sparkle[i] * 1.6) * vis : 0));
+        }
       }
-      for (let i = 0; i < P0; i++) {
-        const id = pIdx[i], q = id * 3, I = F.I[id];
-        put(out, i, F.c[q], F.c[q + 1], F.c[q + 2], pR[i] * (1 + I * 0.5 + (pTip[i] ? A.high * 0.3 : 0)), col,
-          0.06 + I * 1.2 + (pTip[i] ? 0.25 + 0.2 * Math.sin(t * 1.2 + sD[i] * 20) + sparkle[i] * 1.6 : 0));
+      for (let i = SN0; i < SA0; i++) {
+        const z = wrap(ZF + sB[i] * LEN + travel * (0.85 + 0.3 * sC[i]), ZF, ZN);
+        const y = -1.8 + ((sC[i] * 4.8 - t * (0.02 + 0.03 * sD[i])) % 4.8 + 4.8) % 4.8;
+        const x = (sA[i] - 0.5) * 14 + noise3(sA[i] * 9, y * 0.5, t * 0.06) * 0.6 + Math.sin(t * 0.55 + y) * current * 0.5;
+        const near = 1 - smooth(ZN - 2.5, ZN, z);
+        put(out, i, x, y, z, (0.004 + 0.006 * sB[i]) * near, col, 0.08 + tw(i, t) * 0.9 + A.high * 0.3 * sC[i]);
       }
-      for (let i = P0; i < N; i++) {
-        const y = wrap(-1.85 + sC[i] * 4.6 + t * (0.03 + 0.04 * sD[i]), -1.85, 2.75);
-        const x = (sA[i] - 0.5) * 8 + noise3(sA[i] * 9, y * 0.5, t * 0.06) * 0.6 + Math.sin(t * 0.55 + y) * current * 0.5;
-        const z = -3.6 + sB[i] * 5 + noise3(sB[i] * 9, y * 0.5 + 4, t * 0.06) * 0.6;
-        put(out, i, x, y, z, 0.005 + 0.006 * sB[i], col, 0.08 + tw(i, t) * 0.9 + A.high * 0.3 * sC[i]);
+      for (let i = SA0; i < N; i++) {
+        const z = wrap(ZF + sB[i] * LEN + travel, ZF, ZN);
+        put(out, i, (sA[i] - 0.5) * 16, -1.92, z, 0.006 * (1 - smooth(ZN - 2, ZN, z)), col, 0.04 + tw(i, t) * 0.6 + kick * 0.2);
       }
-      W.ay = 0.3 * Math.sin(t * 0.04); W.ax = 0.08 + 0.04 * Math.sin(t * 0.06);
-      rotPts(out, N, 8, W.ay, W.ax); rotPts(F.c, F.n, 3, W.ay, W.ax);
+      W.ay = 0.08 * Math.sin(t * 0.04); W.ax = 0.02 * Math.sin(t * 0.06);
+      rotPts(out, N, 8, W.ay, W.ax); for (const F of fils) rotPts(F.c, F.n, 3, W.ay, W.ax);
     }
   };
   return W;
@@ -1236,21 +1759,25 @@ function makeReef() {
    Flowers are born as buds at the heart and open outward forever, each generation a new species: three petals, then
    thirteen, then a star, then a ruffled rose. You are always falling into the next one. The music sets the speed of
    blossoming, kicks pulse the newest heart, hats flash the petal rims, and the spectrum runs around every flower. */
-function makeBloom() {
-  const G = 6, PER = 440, NP = G * PER, NS = 34, SB = 8, ST0 = NP, PO0 = NP + NS * SB, GA = Math.PI * (3 - Math.sqrt(5));
+function makeBloom(P) {
+  const G = Math.round(P.gens), PER = Math.round(P.per), NP = G * PER, NS = 34, SB = 8, ST0 = NP, PO0 = NP + NS * SB, GA = Math.PI * (3 - Math.sqrt(5));
+  const N = Math.min(NMAX, PO0 + cnt(120, P));
   const col = new Float32Array(N * 3), kinds = new Float32Array(N);
   const PALS = [
     [PAL.gold, PAL.amber, PAL.pink, PAL.magenta, PAL.violet], [PAL.white, PAL.cyan, PAL.azure, PAL.violet, PAL.indigo],
     [PAL.gold, PAL.rose, PAL.pink, PAL.magenta, PAL.cyan], [PAL.biolum, PAL.teal, PAL.azure, PAL.violet, PAL.pink],
     [PAL.amber, PAL.ember, PAL.rose, PAL.violet, PAL.indigo], [PAL.pearl, PAL.lime, PAL.teal, PAL.cyan, PAL.azure]];
   const SPECIES = [3, 5, 6, 8, 13, 5, 7, 4];
-  const r = rngFrom(1313);
-  const gen = [];
+  const r = rngFrom(1313), gen = [];
+  function petalCount() {
+    let k = P.petals >= 1 ? Math.round(P.petals) : SPECIES[Math.floor(r() * SPECIES.length)];
+    const folds = MIRRORS[S.kaleido] || 0;
+    if (P.foldSync >= 0.5 && folds) k = folds * (r() < 0.5 ? 1 : 2);
+    return k;
+  }
   function species(g, init) {
-    const sp = {
-      k: SPECIES[Math.floor(r() * SPECIES.length)], sharp: 0.4 + r() * 2.2, depth: 0.3 + r() * 0.55, ruffle: r() < 0.4 ? 0.04 + r() * 0.08 : 0,
-      twist: (r() - 0.5) * 1.6, pal: Math.floor(r() * PALS.length), dir: r() < 0.5 ? -1 : 1, cup: 0.2 + r() * 0.5, phase: r() * TAU
-    };
+    const sp = { k: petalCount(), sharp: 0.4 + r() * 2.2, depth: 0.3 + r() * 0.55, ruffle: r() < 0.4 ? 0.04 + r() * 0.08 : 0,
+      twist: (r() - 0.5) * 1.6, pal: P.palette >= 1 ? Math.round(P.palette) - 1 : Math.floor(r() * PALS.length), dir: r() < 0.5 ? -1 : 1, cup: 0.2 + r() * 0.5, phase: r() * TAU };
     const G0 = gen[g] || {};
     gen[g] = Object.assign(G0, { a: init ? Object.assign({}, sp) : (G0.b || sp), b: sp });
     for (let j = 0; j < PER; j++) { const i = g * PER + j, u = Math.sqrt(j / PER); setCol(col, i, grad(PALS[sp.pal], u)); }
@@ -1264,43 +1791,43 @@ function makeBloom() {
   const SP = 24, F = new Fil(NS * SP);
   for (let k = 0; k < NS; k++) F.poly(SP, k / NS, 0.0024, false);
   for (let i = 0; i < F.n; i++) setCol(F.col, i, mixC(PAL.gold, PAL.pearl, (i % SP) / SP));
-  const LOGR = Math.log(48), lastP = new Float32Array(G).fill(-1);
+  const lastP = new Float32Array(G).fill(-1);
   let clock = 0, heart = 0, rim = 0, spin = 0;
   const petal = (sp, th, u) => {
-    const c = Math.pow(Math.abs(Math.cos(sp.k * 0.5 * th + sp.phase)), sp.sharp);
-    return (1 - sp.depth) + sp.depth * c + sp.ruffle * Math.cos(sp.k * 2 * th + u * 9);
+    const c = Math.pow(Math.abs(Math.cos(sp.k * 0.5 * th + sp.phase)), sp.sharp * P.sharp);
+    const dpt = clamp(sp.depth * P.depth, 0, 0.95);
+    return (1 - dpt) + dpt * c + sp.ruffle * P.ruffle * Math.cos(sp.k * 2 * th + u * 9);
   };
   const lerpSp = (A1, B1, m) => ({ k: A1.k, sharp: lerp(A1.sharp, B1.sharp, m), depth: lerp(A1.depth, B1.depth, m), ruffle: lerp(A1.ruffle, B1.ruffle, m),
     twist: lerp(A1.twist, B1.twist, m), dir: A1.dir, cup: lerp(A1.cup, B1.cup, m), phase: A1.phase });
   const o3 = [0, 0, 0];
   const stamen = (k, u, t, sc, o) => {
-    const a = k * GA * 3 + spin * 0.6, h = (0.35 + 0.25 * ((k * 7) % 5) / 5) * sc * 2.2;
-    const rr = Math.sin(u * 1.4) * 0.22 * sc + 0.01;
+    const a = k * GA * 3 + spin * 0.6, h = (0.35 + 0.25 * ((k * 7) % 5) / 5) * sc * 2.2, rr = Math.sin(u * 1.4) * 0.22 * sc + 0.01;
     o[0] = Math.cos(a) * rr; o[1] = Math.sin(a) * rr; o[2] = u * h + 0.03 * Math.sin(t * 1.3 + k);
   };
   const W = {
-    name: 'BLOOM', blurb: 'An endless blossom', tint: PAL.pink, flash: PAL.gold, coreLight: PAL.gold, coreGain: 1.2, coreLocal: [0, 0, 0.2],
+    n: N, name: 'BLOOM', blurb: 'An endless blossom', tint: PAL.pink, flash: PAL.gold, coreLight: PAL.gold, coreGain: 1.2, coreLocal: [0, 0, 0.2],
     wisps: [PAL.gold, PAL.pink, PAL.violet], fils: [F], links, kinds, ay: 0, ax: 0,
-    onset(kind, s) { if (kind === 'kick' || kind === 'touch') { heart = Math.max(heart, s); clock += 0.012 * s; } if (kind === 'hat' || kind === 'snare') rim = Math.max(rim, s * 0.8); },
+    onset(kind, s) { if (kind === 'kick' || kind === 'touch') { heart = Math.max(heart, s * P.pulse); clock += 0.012 * s * P.pulse; } if (kind === 'hat' || kind === 'snare') rim = Math.max(rim, s * 0.8); },
     update(dt) {
-      clock += dt * (0.028 + A.level * 0.06 + A.presence * 0.025);
-      spin += dt * (0.04 + A.level * 0.15);
+      clock += dt * (0.028 + A.level * 0.06 + A.presence * 0.025) * P.bloomSpeed;
+      spin += dt * (0.04 + A.level * 0.15) * P.spin;
       heart *= Math.exp(-dt * 3); rim *= Math.exp(-dt * 3.5);
       for (let g = 0; g < G; g++) { const p = (clock + g / G) % 1; if (p < lastP[g]) species(g, false); lastP[g] = p; }
     },
     write(t, out) {
+      const LOGR = Math.log(Math.max(2, P.span));
       let youngest = 0, yp = 2;
       for (let g = 0; g < G; g++) {
         const p = (clock + g / G) % 1; if (p < yp) { yp = p; youngest = g; }
         const sc = 0.07 * Math.exp(p * LOGR), alpha = smooth(0, 0.1, p) * (1 - smooth(0.78, 1, p));
-        const sp = lerpSp(gen[g].a, gen[g].b, smooth(0.15, 0.85, p));
-        const open = smooth(0, 0.35, p);
+        const sp = lerpSp(gen[g].a, gen[g].b, smooth(0.15, 0.85, p)), open = smooth(0, 0.35, p);
         for (let j = 0; j < PER; j++) {
           const i = g * PER + j, u = Math.sqrt(j / PER);
-          const th = j * GA + spin * sp.dir * (1 - u * 0.4) + sp.twist * u + g * 1.3;
+          const th = j * GA + spin * sp.dir * (1 - u * 0.4) + sp.twist * P.twist * u + g * 1.3;
           const b = A.bands[Math.floor(((th / TAU) % 1 + 1) % 1 * NB) % NB];
           const rr = sc * u * petal(sp, th, u) * (0.45 + 0.55 * open) * (1 + b * 0.07 * u);
-          const z = sp.cup * sc * 0.35 * Math.pow(u, 1.6) * (1.4 - open) - p * 0.6;
+          const z = sp.cup * P.cup * sc * 0.35 * Math.pow(u, 1.6) * (1.4 - open) - p * 0.6;
           const isHeart = g === youngest ? heart * (1 - u) : 0;
           put(out, i, Math.cos(th) * rr, Math.sin(th) * rr, z, (0.006 + 0.016 * u) * (0.25 + sc * 1.15) * alpha * (1 + b * 0.4 + isHeart * 0.8), col,
             (0.08 + (1 - u) * (0.35 + A.level * 0.4) + isHeart * 1.6 + b * 0.45 * u + rim * Math.pow(u, 6) * 2 + tw(i, t) * 0.25) * (0.4 + 0.6 * alpha));
@@ -1323,42 +1850,50 @@ function makeBloom() {
 }
 
 /* VI. TIDE — The sound as an ocean.
-   Every moment of the spectrum becomes a ridgeline that rolls toward you; bass builds the swell in the middle,
-   treble froths at the edges, and kicks heave the next wave higher. */
-function makeTide() {
-  const COLS = 75, ROWS = 40, Z0 = -11, Z1 = 2.4;
-  const hist = new Float32Array(ROWS * COLS), col = new Float32Array(N * 3);
-  const F = new Fil(ROWS * COLS);
-  for (let r = 0; r < ROWS; r++) F.poly(COLS, r / ROWS, 0.0035, false);
+   Every moment of the spectrum becomes a ridgeline that rolls toward you; bass builds the swell, treble froths at the
+   edges, kicks heave the next wave higher, and the ocean runs on into haze. */
+function makeTide(P) {
+  let COLS = Math.round(P.cols), ROWS = Math.round(P.rows);
+  while (COLS * ROWS > 16000) ROWS--;
+  const NODES = COLS * ROWS, STRIDEP = Math.max(1, Math.ceil(NODES / NMAX)), N = Math.min(NMAX, Math.ceil(NODES / STRIDEP));
+  const hist = new Float32Array(ROWS * COLS), prevRow = new Float32Array(COLS), col = new Float32Array(N * 3);
+  const F = new Fil(NODES);
+  for (let r = 0; r < ROWS; r++) F.poly(COLS, r / ROWS, 0.0035 * Math.sqrt(75 / COLS), false);
   let rowT = 0, head = 0, lift = 0;
-  const sample = c => { const u = Math.abs(c / (COLS - 1) - 0.5) * 2, f = u * 15, i0 = Math.floor(f), fr = f - i0; return lerp(A.bands[i0], A.bands[Math.min(15, i0 + 1)], fr); };
+  const sample = c => {
+    const x = c / (COLS - 1), u = P.layout >= 0.5 ? x : Math.abs(x - 0.5) * 2, f = u * 15, i0 = Math.min(15, Math.floor(f)), fr = f - i0;
+    return lerp(A.bands[i0], A.bands[Math.min(15, i0 + 1)], fr);
+  };
   const heightCol = h => grad([PAL.azure, PAL.teal, PAL.cyan, PAL.gold, PAL.white], h * 1.15);
   const W = {
-    dofMul: 0.4, name: 'TIDE', blurb: 'The sound, rolling in as an ocean', tint: PAL.azure, flash: PAL.cyan, coreLight: PAL.teal, coreGain: 0.8, coreLocal: [0, 0.6, -2],
+    n: N, dofMul: 0.4, name: 'TIDE', blurb: 'The sound, rolling in as an ocean', tint: PAL.azure, flash: PAL.cyan, coreLight: PAL.teal, coreGain: 0.8, coreLocal: [0, 0.6, -2],
     wisps: [PAL.cyan, PAL.gold, PAL.violet], fils: [F], ay: 0, ax: 0,
+    get fog() { return { d: 0.05 * P.fog, col: [0.004, 0.01, 0.03] }; },
     onset(kind, s) { if (kind === 'kick' || kind === 'touch') lift = Math.max(lift, s); },
     update(dt) {
       lift *= Math.exp(-dt * 4);
-      rowT += dt * (10 + A.level * 8);
+      rowT += dt * (10 + A.level * 8) * P.roll;
       while (rowT >= 1) {
         rowT -= 1; head = (head + 1) % ROWS;
-        for (let c = 0; c < COLS; c++) hist[head * COLS + c] = clamp(sample(c) * (0.85 + lift * 0.5) + noise3(c * 0.15, head * 0.3, 0) * 0.04, 0, 1.3);
+        for (let c = 0; c < COLS; c++) {
+          const v = clamp(sample(c) * (0.85 + lift * 0.5) + noise3(c * 0.15 * 75 / COLS, head * 0.3, 0) * 0.08 * P.swell, 0, 1.3);
+          prevRow[c] = lerp(v, prevRow[c], P.smoothing); hist[head * COLS + c] = prevRow[c];
+        }
       }
     },
     write(t, out) {
-      const rowSp = (Z1 - Z0) / ROWS;
+      const Z0 = -11 * P.length, Z1 = 2.4, rowSp = (Z1 - Z0) / ROWS;
       for (let r = 0; r < ROWS; r++) {
         const row = ((head - r) % ROWS + ROWS) % ROWS, z = Z1 - (r + rowT) * rowSp, fade = smooth(Z0, Z0 + 2.5, z) * (1 - smooth(Z1 - 0.6, Z1, z));
         for (let c = 0; c < COLS; c++) {
           const i = r * COLS + c, h = hist[row * COLS + c], x = (c / (COLS - 1) - 0.5) * (8 + (Z1 - z) * 0.45);
-          const y = -1.5 + h * 1.6 + 0.05 * Math.sin(x * 1.3 + t * 0.9 + z * 0.6);
+          const y = -1.5 + h * 1.6 * P.height + 0.05 * Math.sin(x * 1.3 + t * 0.9 + z * 0.6);
           const hc = heightCol(h * 0.9);
-          if (i < N) putC(out, i, x, y, z, (0.011 + h * 0.016) * fade, hc[0], hc[1], hc[2], (0.14 + h * 1.3 + tw(i, t) * 0.25) * fade);
-          const q = i * 3; F.c[q] = x; F.c[q + 1] = y; F.c[q + 2] = z; F.I[i] = (0.08 + h * 0.7) * fade;
+          if (i % STRIDEP === 0) { const pi = i / STRIDEP; if (pi < N) putC(out, pi, x, y, z, (0.011 + h * 0.016) * fade * P.pearls * Math.sqrt(75 / COLS), hc[0], hc[1], hc[2], (0.14 + h * 1.3 + tw(pi, t) * 0.25) * fade); }
+          const q = i * 3; F.c[q] = x; F.c[q + 1] = y; F.c[q + 2] = z; F.I[i] = (0.08 + h * 0.7) * fade * P.lines;
           F.col[q] = hc[0]; F.col[q + 1] = hc[1]; F.col[q + 2] = hc[2];
         }
       }
-      blank(out, ROWS * COLS);
       W.ay = 0.12 * Math.sin(t * 0.04); W.ax = 0.4 + 0.04 * Math.sin(t * 0.05);
       rotPts(out, N, 8, W.ay, W.ax); rotPts(F.c, F.n, 3, W.ay, W.ax);
     }
@@ -1367,52 +1902,65 @@ function makeTide() {
 }
 
 /* VII. HIGHWAY — The drive home.
-   A tunnel of light rings rushes past; speed rises with the energy, kicks flash the ring ahead and punch the throttle,
-   and tail lights drift in the dark at the end of the road. */
-function makeHighway() {
-  const NR = 48, RP = 44, ZMIN = -32, ZMAX = 7.8, LEN = ZMAX - ZMIN, RG = NR * RP, LANE0 = RG, NLANE = 400, TL0 = LANE0 + NLANE, NTL = 160;
+   A tunnel of light rings rushing past. The car surges and coasts on its own; the music pushes the throttle, and every bass
+   hit sends a bulge of displacement rolling down the tunnel through the rings. */
+function makeHighway(P) {
+  const NR = Math.round(P.rings), RP = Math.round(P.ringPts), ZMIN = -32, ZMAX = 7.8, LEN = ZMAX - ZMIN, RG = NR * RP;
+  const NLANE = cnt(400, P), NTL = 160, NSTREAK = cnt(500, P);
+  const LANE0 = RG, TL0 = LANE0 + NLANE, SK0 = TL0 + NTL, N = Math.min(NMAX, SK0 + NSTREAK);
   const col = new Float32Array(N * 3), kinds = new Float32Array(N);
   for (let k = 0; k < NR; k++) for (let j = 0; j < RP; j++) setCol(col, k * RP + j, grad([PAL.violet, PAL.pink, PAL.cyan, PAL.azure], (k * 0.137) % 1));
   for (let i = LANE0; i < TL0; i++) setCol(col, i, PAL.gold);
-  for (let i = TL0; i < TL0 + NTL; i++) setCol(col, i, PAL.red);
-  for (let i = TL0 + NTL; i < N; i++) { setCol(col, i, sC[i] < 0.5 ? PAL.pearl : PAL.cyan); kinds[i] = 1; }
-  const F = new Fil(NR * RP);
+  for (let i = TL0; i < SK0; i++) setCol(col, i, PAL.red);
+  for (let i = SK0; i < N; i++) { setCol(col, i, sC[i] < 0.5 ? PAL.pearl : PAL.cyan); kinds[i] = 1; }
+  const F = new Fil(RG);
   for (let k = 0; k < NR; k++) F.poly(RP, k / NR, 0.0035, true);
   for (let i = 0; i < F.n; i++) { F.col[i * 3] = col[i * 3]; F.col[i * 3 + 1] = col[i * 3 + 1]; F.col[i * 3 + 2] = col[i * 3 + 2]; }
-  const flash = new Float32Array(NR);
-  let zoff = 0, boost = 0;
+  const flash = new Float32Array(NR), RIP = 10, ripAge = new Float32Array(RIP).fill(99), ripStr = new Float32Array(RIP);
+  let zoff = 0, boost = 0, roll = 0, lowPrev = 0, ripCool = 0, spd = 1;
   const rz = k => wrap(ZMIN + k * (LEN / NR) + zoff, ZMIN, ZMAX);
   const fadeZ = z => smooth(ZMIN, ZMIN + 8, z) * (1 - smooth(5.6, ZMAX, z));
-  const center = (z, t) => { const k = smooth(-8, 6, z); return [(Math.sin(z * 0.11 + t * 0.18) - Math.sin(0.66 + t * 0.18)) * 1.2 * (1 - k * 0.85), (Math.cos(z * 0.08 + t * 0.13) - Math.cos(0.48 + t * 0.13)) * 0.6 * (1 - k * 0.85)]; };
+  const center = (z, t) => { const k = smooth(-8, 6, z), cv = P.curve; return [(Math.sin(z * 0.11 + t * 0.18) - Math.sin(0.66 + t * 0.18)) * 1.2 * cv * (1 - k * 0.85), (Math.cos(z * 0.08 + t * 0.13) - Math.cos(0.48 + t * 0.13)) * 0.6 * cv * (1 - k * 0.85)]; };
+  function ripple(s) { let k = 0; for (let j = 1; j < RIP; j++) if (ripAge[j] > ripAge[k]) k = j; ripAge[k] = 0; ripStr[k] = s; }
+  const bulge = z => { let b = 0; for (let k = 0; k < RIP; k++) { if (ripAge[k] > 6) continue; const zr = ZMAX - 2 - ripAge[k] * P.rspeed, x = (z - zr) / P.wavelen; if (x > -3 && x < 3) b += ripStr[k] * Math.exp(-x * x) * Math.exp(-ripAge[k] * P.rdecay); } return b * P.ripple; };
   const W = {
-    dofMul: 0.2, swayMul: 0.05, driftMul: 0.15, name: 'HIGHWAY', blurb: 'The drive home', tint: PAL.violet, flash: PAL.white, coreLight: PAL.cyan, coreGain: 1.1, coreLocal: [0, 0, -3],
+    n: N, dofMul: 0.2, swayMul: 0.05, driftMul: 0.15, name: 'HIGHWAY', blurb: 'The drive home', tint: PAL.violet, flash: PAL.white, coreLight: PAL.cyan, coreGain: 1.1, coreLocal: [0, 0, -3],
     wisps: [PAL.cyan, PAL.pink, PAL.gold], fils: [F], kinds, ay: 0, ax: 0,
     onset(kind, s) {
-      if (kind === 'kick' || kind === 'touch') boost = Math.min(2, boost + s * 0.6);
+      if (kind === 'kick' || kind === 'touch') { boost = Math.min(2, boost + s * 0.6); ripple(s); }
       let best = 0, bd = 99; for (let k = 0; k < NR; k++) { const d = Math.abs(rz(k) + 7); if (d < bd) { bd = d; best = k; } }
       flash[best] = Math.max(flash[best], kind === 'hat' ? s * 0.5 : s);
     },
-    update(dt) { boost *= Math.exp(-dt * 1.8); zoff += dt * (1.8 + A.level * 6 + boost * 4); for (let k = 0; k < NR; k++) flash[k] *= Math.exp(-dt * 2.2); },
+    update(dt) {
+      boost *= Math.exp(-dt * 1.8); ripCool -= dt;
+      if (A.low - lowPrev > 0.12 && A.low > 0.45 && ripCool <= 0) { ripple(A.low); ripCool = 0.18; }
+      lowPrev = follow(lowPrev, A.low, dt, 0.08, 0.08);
+      for (let k = 0; k < RIP; k++) ripAge[k] += dt;
+      const vary = 1 + P.variance * 1.4 * noise3(tSim * P.varRate, 0.5, 9.1);
+      spd = Math.max(0.05, P.drive * vary) * (1.8 + A.level * 6 + boost * 4);
+      zoff += dt * spd; roll += dt * P.roll * 0.5;
+      for (let k = 0; k < NR; k++) flash[k] *= Math.exp(-dt * 2.2);
+    },
     write(t, out) {
       for (let k = 0; k < NR; k++) {
-        const z = rz(k), fz = fadeZ(z), b = A.bands[k % NB], [cx, cy] = center(z, t);
-        const R = 1.6 + 0.3 * Math.sin(z * 0.25 + t * 0.5) + b * 0.55 + flash[k] * 0.25, I = (0.12 + b * 0.8 + flash[k] * 1.3) * fz;
+        const z = rz(k), fz = fadeZ(z), b = A.bands[k % NB], [cx, cy] = center(z, t), bg = bulge(z);
+        const R = P.radius + 0.3 * Math.sin(z * 0.25 + t * 0.5) + b * 0.55 + flash[k] * 0.25 + bg * 0.8, I = (0.12 + b * 0.8 + flash[k] * 1.3 + bg * 1.2) * fz;
         for (let j = 0; j < RP; j++) {
-          const i = k * RP + j, q = i * 3, a = j / RP * TAU + k * 0.21 + t * 0.25, x = cx + Math.cos(a) * R, y = cy + Math.sin(a) * R * 0.8;
-          put(out, i, x, y, z, fz > 0.02 ? 0.018 * (1 + b * 0.4) : 0, col, I + tw(i, t) * 0.2 * fz);
-          F.c[q] = x; F.c[q + 1] = y; F.c[q + 2] = z; F.I[i] = (0.07 + b * 0.45 + flash[k]) * fz;
+          const i = k * RP + j, q = i * 3, a = j / RP * TAU + k * 0.21 + roll, x = cx + Math.cos(a) * R, y = cy + Math.sin(a) * R * 0.8;
+          put(out, i, x, y, z, fz > 0.02 ? 0.018 * (1 + b * 0.4 + bg * 0.6) : 0, col, I + tw(i, t) * 0.2 * fz);
+          F.c[q] = x; F.c[q + 1] = y; F.c[q + 2] = z; F.I[i] = (0.07 + b * 0.45 + flash[k] + bg * 0.8) * fz;
         }
       }
       for (let i = LANE0; i < TL0; i++) {
         const j = i - LANE0, side = j % 2 ? 1 : -1, z = wrap(ZMIN + (Math.floor(j / 2) / (NLANE / 2)) * LEN + zoff, ZMIN, ZMAX), fz = fadeZ(z), [cx, cy] = center(z, t);
-        put(out, i, cx + side * 0.7, cy - 1.15, z, 0.012 * fz * ((Math.floor(j / 2) % 4) < 2 ? 1 : 0), col, 0.6 * fz + A.low * 0.3);
+        put(out, i, cx + side * 0.7, cy - 1.15 + bulge(z) * 0.2, z, 0.012 * fz * ((Math.floor(j / 2) % 4) < 2 ? 1 : 0), col, 0.6 * fz + A.low * 0.3);
       }
-      for (let i = TL0; i < TL0 + NTL; i++) {
+      for (let i = TL0; i < SK0; i++) {
         const j = i - TL0, car = Math.floor(j / 2), side = j % 2 ? 0.1 : -0.1, z = -24 + (car % 20) * 0.9 + Math.sin(t * 0.2 + car) * 1.2, [cx, cy] = center(z, t), lane = car < 40 ? -0.35 : 0.35;
         put(out, i, cx + lane + side, cy - 1.0, z, 0.022 * fadeZ(z), col, 0.9 + A.low * 0.6);
       }
-      for (let i = TL0 + NTL; i < N; i++) {
-        const z = wrap(ZMIN + sA[i] * LEN + zoff * 1.8, ZMIN, ZMAX), fz = fadeZ(z), [cx, cy] = center(z, t), a = sB[i] * TAU, r = 0.6 + 0.8 * sC[i];
+      for (let i = SK0; i < N; i++) {
+        const z = wrap(ZMIN + sA[i] * LEN + zoff * 1.8, ZMIN, ZMAX), fz = fadeZ(z), [cx, cy] = center(z, t), a = sB[i] * TAU, r = (0.6 + 0.8 * sC[i]) * P.radius / 1.6 + bulge(z) * 0.4;
         put(out, i, cx + Math.cos(a) * r, cy + Math.sin(a) * r, z, fz > 0.02 ? 0.008 : 0, col, (0.35 + A.level * 0.8) * fz);
       }
       W.ay = 0.06 * Math.sin(t * 0.03); W.ax = 0.04 * Math.sin(t * 0.04);
@@ -1422,18 +1970,49 @@ function makeHighway() {
   return W;
 }
 
+const FACTORIES = [makeTower, makeLot, makeStorm, makeReef, makeBloom, makeTide, makeHighway];
+const NAMES = ['TOWER', 'LOT', 'STORM', 'REEF', 'BLOOM', 'TIDE', 'HIGHWAY'];
+
 let WORLDS = [], outs = [];
-const fin = new Float32Array(N * 8), snap = new Float32Array(N * 8);
+const fin = new Float32Array(NMAX * 8), snap = new Float32Array(NMAX * 8);
 let cur = 0, prev = -1, trStart = -99, snapMode = false, TR_DUR = 2.6, autoT = 0, kicksSince = 0;
 let tint = PAL.violet.slice(), tintFrom = PAL.violet.slice();
 
 function setWorld(s, t, quiet) {
   if (s === cur || s < 0 || s >= WORLDS.length) return;
   const inTr = t - trStart < TR_DUR;
-  snapMode = inTr; if (inTr) snap.set(fin);
+  snapMode = inTr; if (inTr) { snap.set(fin); naSnap = NA; }
   tintFrom = tint.slice(); prev = cur; cur = s; trStart = t;
   S.world = s; save(); autoT = 0; kicksSince = 0;
   updateUI(); if (!quiet) showLookName();
+}
+function buildWorld(i) {
+  const name = NAMES[i], P = WP[name];
+  const w = FACTORIES[i](P); w.P = P; w.tl = 0; w.spinAng = 0;
+  return w;
+}
+// structural parameters (counts, divisions) rebuild the world; the new one morphs out of the old one's light
+const rebuildAt = {};
+function scheduleRebuild(name) { rebuildAt[name] = tSim + 0.35; }
+function checkRebuilds(t) {
+  for (const name in rebuildAt) {
+    if (t < rebuildAt[name]) continue;
+    delete rebuildAt[name];
+    const i = NAMES.indexOf(name), P = WP[name];
+    for (const d of schemaOf(name)) if (d.rb) P[d.k] = WT[name][d.k];
+    const old = WORLDS[i], w = buildWorld(i); w.tl = old.tl; w.spinAng = old.spinAng;
+    if (i === cur) { snap.set(fin); naSnap = NA; snapMode = true; prev = cur; trStart = t; tintFrom = tint.slice(); }
+    else if (i === prev) prev = -1;
+    WORLDS[i] = w; outs[i] = new Float32Array(NMAX * 8);
+  }
+}
+// live values glide toward their targets so every slider move, preset and mutation is a morph
+function tweenParams(dt) {
+  const kf = 1 - Math.exp(-dt * 2.4);
+  for (const name of NAMES) {
+    const P = WP[name], T = WT[name];
+    for (const d of schemaOf(name)) { if (d.rb) continue; if (d.st >= 1) P[d.k] = T[d.k]; else P[d.k] += (T[d.k] - P[d.k]) * kf; }
+  }
 }
 function autoNext(t) {
   let n; do { n = Math.floor(Math.random() * WORLDS.length); } while (n === cur && WORLDS.length > 1);
@@ -1443,9 +2022,9 @@ function autoNext(t) {
 /* ================================================================== */
 /* Wisps: three orbiting lights with comet trails that light the scene */
 /* ================================================================== */
-const WT = 46, wispPh = new Float32Array([0, 2.1, 4.2]), wispFlash = new Float32Array(WISP), wispPos = new Float32Array(WISP * 3);
-const wispFil = new Fil(WISP * WT);
-for (let k = 0; k < WISP; k++) { let par = -1; for (let j = 0; j < WT; j++) par = wispFil.add(0, 0, 0, j * 0.05, k / 3, 0.007 * (1 - j / WT) + 0.0012, par); }
+const WTRL = 46, wispPh = new Float32Array([0, 2.1, 4.2]), wispFlash = new Float32Array(WISP), wispPos = new Float32Array(WISP * 3);
+const wispFil = new Fil(WISP * WTRL);
+for (let k = 0; k < WISP; k++) { let par = -1; for (let j = 0; j < WTRL; j++) par = wispFil.add(0, 0, 0, j * 0.05, k / 3, 0.007 * (1 - j / WTRL) + 0.0012, par); }
 let wispCols = [PAL.cyan, PAL.pink, PAL.gold].map(c => c.slice()), coreFlash = 0;
 function updateWisps(dt, t) {
   const INC = [0.45, -0.8, 1.1];
@@ -1454,15 +2033,15 @@ function updateWisps(dt, t) {
     wispPh[k] += dt * (0.32 + 0.11 * k) * dir * (1 + A.level * 1.3);
     wispFlash[k] *= Math.exp(-dt * 3.2);
     const R = 2.1 + 0.3 * k, node = t * 0.04 + k * 2.1, cn = Math.cos(node), sn = Math.sin(node), si = Math.sin(INC[k]), ci = Math.cos(INC[k]);
-    for (let j = 0; j < WT; j++) {
-      const i = k * WT + j, q = i * 3, ph = wispPh[k] - j * 0.04 * dir, rr = R + 0.06 * Math.sin(t * 0.9 + k);
+    for (let j = 0; j < WTRL; j++) {
+      const i = k * WTRL + j, q = i * 3, ph = wispPh[k] - j * 0.04 * dir, rr = R + 0.06 * Math.sin(t * 0.9 + k);
       const x = Math.cos(ph) * rr, y = Math.sin(ph) * rr * si, z = Math.sin(ph) * rr * ci;
       wispFil.c[q] = x * cn + z * sn; wispFil.c[q + 1] = y + 0.1 * Math.sin(t * 0.7 + k); wispFil.c[q + 2] = -x * sn + z * cn;
-      const f = 1 - j / WT;
+      const f = 1 - j / WTRL;
       wispFil.I[i] = f * f * (0.5 + wispFlash[k] * 1.6 + A.level * 0.6);
       setCol(wispFil.col, i, wispCols[k]);
     }
-    wispPos[k * 3] = wispFil.c[k * WT * 3]; wispPos[k * 3 + 1] = wispFil.c[k * WT * 3 + 1]; wispPos[k * 3 + 2] = wispFil.c[k * WT * 3 + 2];
+    wispPos[k * 3] = wispFil.c[k * WTRL * 3]; wispPos[k * 3 + 1] = wispFil.c[k * WTRL * 3 + 1]; wispPos[k * 3 + 2] = wispFil.c[k * WTRL * 3 + 2];
   }
 }
 
@@ -1471,8 +2050,9 @@ function updateWisps(dt, t) {
 /* ================================================================== */
 function fire(kind, s) {
   if (!WORLDS.length) return;
-  WORLDS[cur].onset(kind, s);
-  if (prev >= 0 && tSim - trStart < TR_DUR && !snapMode) WORLDS[prev].onset(kind, s);
+  const hit = w => { const P = w.P, g = kind === 'kick' ? P.gLow : kind === 'snare' ? P.gMid : kind === 'hat' ? P.gHigh : 1; if (s * g > 0.04) withGains(P, () => w.onset(kind, Math.min(s * g, 1.6))); };
+  hit(WORLDS[cur]);
+  if (prev >= 0 && prev !== cur && tSim - trStart < TR_DUR && !snapMode) hit(WORLDS[prev]);
   if (kind === 'kick') { pushRipple(0, 0, 0, s * 0.8); kicksSince++; }
   coreFlash = Math.max(coreFlash, kind === 'idle' ? 0.25 : kind === 'hat' ? s * 0.4 : s);
   const k = Math.floor(Math.random() * WISP); wispFlash[k] = Math.max(wispFlash[k], kind === 'idle' ? 0.4 : s);
@@ -1484,8 +2064,8 @@ function fire(kind, s) {
 /* ================================================================== */
 function blend(t) {
   const target = outs[cur], from = snapMode ? snap : outs[prev], k = (t - trStart) / TR_DUR;
-  if (k >= 1 || prev < 0) { fin.set(target); return; }
-  for (let i = 0, o = 0; i < N; i++, o += 8) {
+  if (k >= 1 || prev < 0) { fin.set(target.subarray(0, NA * 8)); return; }
+  for (let i = 0, o = 0; i < NA; i++, o += 8) {
     const e = ease(clamp(k * 1.5 - sD[i] * 0.5, 0, 1)), arc = Math.sin(Math.PI * e);
     let x = lerp(from[o], target[o], e), y = lerp(from[o + 1], target[o + 1], e), z = lerp(from[o + 2], target[o + 2], e);
     const hl = Math.hypot(x, z) + 1e-4, sw = arc * (0.25 + 0.45 * sA[i]);
@@ -1501,8 +2081,8 @@ function blend(t) {
 /* ================================================================== */
 /* Logo: its own pool of pearls that fly out of the world to spell HOME TEAM */
 /* ================================================================== */
-const LG = LGP, logoPerm = Array.from({ length: N }, (_, i) => i);
-{ const r = rngFrom(31); for (let i = N - 1; i > 0; i--) { const j = Math.floor(r() * (i + 1)); const t = logoPerm[i]; logoPerm[i] = logoPerm[j]; logoPerm[j] = t; } }
+const LG = LGP, logoPerm = Array.from({ length: NMAX }, (_, i) => i);
+{ const r = rngFrom(31); for (let i = NMAX - 1; i > 0; i--) { const j = Math.floor(r() * (i + 1)); const t = logoPerm[i]; logoPerm[i] = logoPerm[j]; logoPerm[j] = t; } }
 let logoW = 0, logoCols = null, logoLinks = null;
 const LX = { sz: 2.0, y0: 0.05, z0: 0.5, follow: 0 };
 function buildLogoLinks(K) {
@@ -1529,7 +2109,7 @@ function writeLogo(dt, t, base, focus, ap) {
   const cy = Math.cos(ay), sy = Math.sin(ay), cx = Math.cos(ax), sx = Math.sin(ax), span = LOGO.maxY - LOGO.minY;
   const tip = xf && xf.tip, tf = tip ? wc.tipFlash || 0 : 0;
   for (let k = 0; k < LG; k++) {
-    const i = base + k, q = i * STRIDE, src = logoPerm[k], so = src * 8;
+    const i = base + k, q = i * STRIDE, src = logoPerm[k] % Math.max(1, NA), so = src * 8;
     const w = k < K && logoW > 0.003 ? ease(clamp(logoW * 1.6 - sD[src] * 0.6, 0, 1)) : 0;
     if (w <= 0) { tmp[q + 11] = 0; depth[i] = -1e9; continue; }
     const lx = LOGO.x[k] * sz, ly = LOGO.y[k] * sz + LX.y0, lz = (sC[src] - 0.5) * 0.05 * sz + LX.z0 + Math.sin(LOGO.y[k] * 9 - t * 1.6) * A.low * 0.06;
@@ -1568,7 +2148,8 @@ const GRADES = [
 ].map(([name, st]) => ({ name, stops: st ? st.map(lin) : null }));
 const gradeCur = [[0, 0, 0], [0.1, 0.1, 0.1], [0.5, 0.5, 0.5], [1, 1, 1]];
 let gradeMix = 0, huePhase = 0, hueNow = 0;
-const V = { glow: S.glow, trail: S.trail, dof: S.dof, echo: S.echo };
+const V = { glow: S.glow, trail: S.trail, dof: S.dof, echo: S.echo, lensSize: S.lensSize, lensAmt: S.lensAmt, lensPos: S.lensPos };
+for (const k2 of COLOR_KEYS) V[k2] = S[k2];
 const MIRRORS = [0, 3, 4, 6, 8, 12];
 let mirN = 0, mirMix = 0, mirRot = 0;
 function hueRotJS(c, a, o) {
@@ -1641,8 +2222,9 @@ function camTick(dt) {
 /* Frame                                                               */
 /* ================================================================== */
 const FOV = 30 * Math.PI / 180;
-const tmp = new Float32Array(TOT * STRIDE), depth = new Float32Array(TOT), order = Array.from({ length: TOT }, (_, i) => i);
-const fview = new Float32Array(16000 * 3);
+let fovNow = FOV;
+const tmp = new Float32Array(TOT * STRIDE), depth = new Float32Array(TOT), order = new Int32Array(TOT);
+const fview = new Float32Array(20000 * 3);
 let tPrev = 0, tSim = 0, nextThought = 2.5, running = false;
 const light = (() => { const v = [0.45, 0.62, 0.64], l = Math.hypot(...v); return v.map(x => x / l); })();
 const LP = new Float32Array(16), LC = new Float32Array(12);
@@ -1691,7 +2273,7 @@ function gatherLinks(links, weight, base) {
 // Turn a screen position into a point in the world's own space, on the plane through its centre facing the camera
 function screenHit(u, v, s, fromCam) {
   if (!WORLDS.length) return;
-  const th = Math.tan(FOV / 2), nx = (u * 2 - 1) * th * cam.aspect, ny = (v * 2 - 1) * th;
+  const th = Math.tan(fovNow / 2), nx = (u * 2 - 1) * th * cam.aspect, ny = (v * 2 - 1) * th;
   const dx = cam.fx + cam.rx * nx + cam.ux * ny, dy = cam.fy + cam.ry * nx + cam.uy * ny, dz = cam.fz + cam.rz * nx + cam.uz * ny;
   const den = dx * cam.fx + dy * cam.fy + dz * cam.fz;
   const tt = ((cam.Cx - cam.px) * cam.fx + (cam.Cy - cam.py) * cam.fy + (cam.Cz - cam.pz) * cam.fz) / den;
@@ -1699,6 +2281,43 @@ function screenHit(u, v, s, fromCam) {
   pushRipple((wx - cam.Cx) / cam.sc, (wy - cam.Cy) / cam.sc, (wz - cam.Cz) / cam.sc, s * 1.15, 2.3);
   fire('touch', s * (fromCam ? 0.7 : 1));
 }
+
+// A world hears the spectrum through its own bass / mid / treble response
+const bandSave = new Float32Array(NB);
+function withGains(P, fn) {
+  if (P.gLow === 1 && P.gMid === 1 && P.gHigh === 1) { fn(); return; }
+  bandSave.set(A.bands); const l = A.level, lo = A.low, mi = A.mid, hi = A.high;
+  for (let b = 0; b < NB; b++) A.bands[b] = Math.min(1.25, A.bands[b] * (b < 5 ? P.gLow : b < 11 ? P.gMid : P.gHigh));
+  bandGroups(); A.level = Math.min(1.25, l * (P.gLow * 0.45 + P.gMid * 0.35 + P.gHigh * 0.2));
+  try { fn(); } finally { A.bands.set(bandSave); A.level = l; A.low = lo; A.mid = mi; A.high = hi; }
+}
+// Run one world on its own clock, then apply the shared look: particle size, brightness and a slow 3D turbulence
+function runWorld(w, out, dt) {
+  const P = w.P, dts = dt * P.speed;
+  w.tl += dts; w.spinAng = wrap(w.spinAng + dt * P.camSpin * 0.18, -Math.PI, Math.PI);
+  withGains(P, () => { w.update(dts); w.write(w.tl, out); });
+  const n = w.n, sz = P.size, br = P.bright, tb = P.turb * (0.16 + A.level * 0.12), t = w.tl;
+  if (sz === 1 && br === 1 && tb < 0.002) return;
+  for (let i = 0, o = 0; i < n; i++, o += 8) {
+    out[o + 3] *= sz; out[o + 7] *= br;
+    if (tb < 0.002) continue;
+    const x = out[o], y = out[o + 1], z = out[o + 2];
+    out[o] = x + tb * (Math.sin(y * 1.7 + t * 0.61 + z * 0.9) + 0.5 * Math.sin(z * 3.1 - t * 0.93 + sA[i] * 6));
+    out[o + 1] = y + tb * (Math.sin(z * 1.3 - t * 0.53 + x * 1.1) + 0.5 * Math.sin(x * 2.9 + t * 0.77 + sB[i] * 6));
+    out[o + 2] = z + tb * (Math.sin(x * 1.5 + t * 0.47 + y * 0.8) + 0.5 * Math.sin(y * 2.7 - t * 0.71 + sC[i] * 6));
+  }
+}
+// Shared camera controls merged with whatever the world asks for (crane moves, worm's-eye, fog)
+const CAMK = 13;
+function camOf(w, o) {
+  const P = w.P, c = w.cam || {}, fg = w.fog;
+  o[0] = P.camDist * (c.D ?? 1); o[1] = P.camHeight; o[2] = P.camOrbit * (w.swayMul ?? 1); o[3] = P.camDrift * (w.driftMul ?? 1);
+  o[4] = P.camRoll; o[5] = P.focus * (w.dofMul ?? 1); o[6] = c.el || 0; o[7] = c.az || 0; o[8] = c.ty || 0; o[9] = w.spinAng;
+  o[10] = w.trailFloor || 0; o[11] = fg ? fg.d : 0; o[12] = c.fov || 1;
+  return o;
+}
+const camA = new Float32Array(CAMK), camB = new Float32Array(CAMK), fogC = [0, 0, 0];
+let limG = 1, lensMode = 0, lensMix = 0;
 
 const PERF = { frames: 0, last: 0, cpu: 0, low: 0, high: 0, fpsAvg: 60 };
 function frame(now) {
@@ -1716,12 +2335,15 @@ function frame(now) {
     if (nextThought <= 0) { const s = 0.18 + Math.random() * 0.14; pushRipple(0, 0, 0, s); fire('idle', s); nextThought = 2.8 + Math.random() * 3.5; }
   } else nextThought = Math.max(nextThought, 1.5);
   if (S.auto) { autoT += dt; if ((autoT > 34 && A.level > 0.05) || autoT > 70 || (kicksSince >= 64 && autoT > 20)) autoNext(t); }
+  tweenParams(dt);
+  checkRebuilds(t);
 
-  const k = (t - trStart) / TR_DUR, inTr = k < 1;
+  const k = (t - trStart) / TR_DUR, inTr = k < 1 && prev >= 0;
   const wCur = WORLDS[cur], wPrev = prev >= 0 ? WORLDS[prev] : null;
-  wCur.update(dt); wCur.write(t, outs[cur]);
-  const prevLive = inTr && !snapMode && wPrev;
-  if (prevLive) { wPrev.update(dt); wPrev.write(t, outs[prev]); }
+  const prevLive = inTr && !snapMode && wPrev && wPrev !== wCur;
+  NA = inTr ? Math.max(wCur.n, snapMode ? naSnap : wPrev.n) : wCur.n;
+  runWorld(wCur, outs[cur], dt);
+  if (prevLive) runWorld(wPrev, outs[prev], dt);
   blend(t);
   applyRipples(fin);
   const tk = inTr ? ease(clamp(k, 0, 1)) : 1;
@@ -1732,67 +2354,90 @@ function frame(now) {
   updateLook(dt);
   const kc = wCur.kinds || null, kp = wPrev && inTr ? (wPrev.kinds || null) : null;
 
-  // drift and camera
-  const wmul = (key) => lerp(wPrev && inTr ? (wPrev[key] ?? 1) : (wCur[key] ?? 1), wCur[key] ?? 1, inTr ? ease(clamp(k, 0, 1)) : 1);
-  const dm = (reduceMotion ? 0.3 : 0.75) * wmul('driftMul');
+  // camera: shared controls blended across the morph, plus each world's own moves
+  camOf(wCur, camA);
+  if (wPrev && inTr && wPrev !== wCur) {
+    camOf(wPrev, camB);
+    for (let j = 0; j < CAMK; j++) camA[j] = j === 9 ? camB[9] + wrap(camA[9] - camB[9], -Math.PI, Math.PI) * tk : lerp(camB[j], camA[j], tk);
+  }
+  const [cDist, cHeight, cOrbit, cDrift, cRoll, cFocus, cEl, cAz, cTy, cSpin, cTrail, cFogD, cFov] = camA;
+  fovNow = FOV * cFov;
+  {
+    const fc = wCur.fog ? wCur.fog.col : null, fp = wPrev && inTr && wPrev.fog ? wPrev.fog.col : null, a = fp || fc || fogC, b = fc || fp || fogC;
+    for (let j = 0; j < 3; j++) fogC[j] = lerp(a[j], b[j], inTr ? tk : 1);
+  }
+  const dm = (reduceMotion ? 0.3 : 0.75) * cDrift;
   const Cx = dm * (0.55 * Math.sin(t * 0.061) + 0.22 * Math.sin(t * 0.143 + 2.1));
   const Cy = dm * (0.25 * Math.sin(t * 0.083 + 0.7) + 0.1 * Math.sin(t * 0.19));
   const Cz = dm * 0.45 * Math.sin(t * 0.051 + 1.9);
   const sc = 1 + 0.018 * Math.sin(t * 0.55) + A.level * 0.035;
   const aspect = W / H;
-  const D = 8.6 * Math.pow(Math.max(1, 1.15 / aspect), 0.6);
-  const swA = (reduceMotion ? 0.05 : 0.22) * wmul('swayMul');
-  const az = swA * (Math.sin(t * 0.05) * 0.8 + Math.sin(t * 0.021 + 1.3) * 0.2), el = 0.05 + 0.06 * Math.sin(t * 0.037);
-  const tx = Cx * 0.4, ty = Cy * 0.4, tz = Cz * 0.4;
+  const D = 8.6 * Math.pow(Math.max(1, 1.15 / aspect), 0.6) * cDist * Math.tan(FOV / 2) / Math.tan(fovNow / 2);
+  const swA = (reduceMotion ? 0.05 : 0.22) * cOrbit;
+  const az = swA * (Math.sin(t * 0.05) * 0.8 + Math.sin(t * 0.021 + 1.3) * 0.2) + cAz + cSpin;
+  const el = clamp(0.05 + 0.06 * Math.sin(t * 0.037) * Math.min(1, cOrbit) + cEl + cHeight * 0.5, -1.35, 1.35);
+  const tx = Cx * 0.4, ty = Cy * 0.4 + cTy, tz = Cz * 0.4;
   const px = tx + Math.sin(az) * Math.cos(el) * D, py = ty + Math.sin(el) * D, pz = tz + Math.cos(az) * Math.cos(el) * D;
   let fx = tx - px, fy = ty - py, fz = tz - pz; const fl = Math.hypot(fx, fy, fz); fx /= fl; fy /= fl; fz /= fl;
   let rx = -fz, ry = 0, rz = fx; const rl = Math.hypot(rx, ry, rz); rx /= rl; ry /= rl; rz /= rl;
-  const ux = ry * fz - rz * fy, uy = rz * fx - rx * fz, uz = rx * fy - ry * fx;
+  let ux = ry * fz - rz * fy, uy = rz * fx - rx * fz, uz = rx * fy - ry * fx;
+  const roll = cRoll * (0.5 + 0.08 * Math.sin(t * 0.13));
+  if (Math.abs(roll) > 1e-4) {
+    const cr = Math.cos(roll), sr = Math.sin(roll), Rx = rx, Ry = ry, Rz = rz;
+    rx = Rx * cr + ux * sr; ry = Ry * cr + uy * sr; rz = Rz * cr + uz * sr;
+    ux = -Rx * sr + ux * cr; uy = -Ry * sr + uy * cr; uz = -Rz * sr + uz * cr;
+  }
   Object.assign(cam, { px, py, pz, rx, ry, rz, ux, uy, uz, fx, fy, fz, Cx, Cy, Cz, sc, aspect });
-  const dofMul = lerp(wPrev && inTr ? (wPrev.dofMul || 1) : (wCur.dofMul || 1), wCur.dofMul || 1, inTr ? ease(clamp(k, 0, 1)) : 1);
-  const focus = Math.hypot(Cx - px, Cy - py, Cz - pz), ap = V.dof * 0.05 * dofMul;
+  const focus = Math.hypot(Cx - px, Cy - py, Cz - pz), ap = V.dof * 0.05 * cFocus;
 
-  for (let i = 0, o = 0; i < N; i++, o += 8) {
+  let nv = 0;
+  const eCap = 1.2 + V.hot * 5;
+  for (let i = 0, o = 0; i < NA; i++, o += 8) {
     const q = i * STRIDE, R = fin[o + 3] * sc;
+    if (R <= 0.0004) continue;
     xform(fin[o], fin[o + 1], fin[o + 2], tmp, q);
     const vz = -tmp[q + 2], e = fin[o + 7];
+    if (vz <= 0.25) continue;
     tmp[q + 3] = R;
     const warm = clamp((e - 1.0) * 0.35, 0, 0.5) * (0.6 + A.centroid * 0.6);
     tmp[q + 4] = lerp(fin[o + 4], flashC[0], warm); tmp[q + 5] = lerp(fin[o + 5], flashC[1], warm); tmp[q + 6] = lerp(fin[o + 6], flashC[2], warm);
-    tmp[q + 7] = Math.min(e, 3.2);
+    tmp[q + 7] = Math.min(e, eCap);
     tmp[q + 8] = Math.min(ap * Math.abs(vz - focus), 0.06 * Math.max(vz, 0.1));
-    let kd = kc ? kc[i] : 0;
-    if (inTr && (kp || kc)) kd = lerp(kp ? kp[i] : 0, kc ? kc[i] : 0, ease(clamp(k * 1.5 - sD[i] * 0.5, 0, 1)));
-    tmp[q + 9] = kd > 0.5 ? 1 : 0; tmp[q + 10] = sD[i]; tmp[q + 11] = (vz > 0.25 && R > 0.0004) ? 1 : 0;
-    depth[i] = -vz;
+    let kd = kc && i < kc.length ? kc[i] : 0;
+    if (inTr && (kp || kc)) kd = lerp(kp && i < kp.length ? kp[i] : 0, kc && i < kc.length ? kc[i] : 0, ease(clamp(k * 1.5 - sD[i] * 0.5, 0, 1)));
+    tmp[q + 9] = kd > 0.5 ? 1 : 0; tmp[q + 10] = sD[i]; tmp[q + 11] = 1;
+    depth[i] = -vz; order[nv++] = i;
   }
   for (let j = 0; j < M; j++) {
-    const i = N + j, q = i * STRIDE, sdj = mseed[j];
+    const i = NMAX + j, q = i * STRIDE, sdj = mseed[j];
     const wx = wrap(mb[j * 3] + mv[j * 3] * t + Math.sin(t * 0.21 + sdj * 30) * 0.25, BOX[0][0], BOX[0][1]);
     const wy = wrap(mb[j * 3 + 1] + mv[j * 3 + 1] * t + Math.sin(t * 0.17 + sdj * 50) * 0.2, BOX[1][0], BOX[1][1]);
     const wz = wrap(mb[j * 3 + 2] + mv[j * 3 + 2] * t, BOX[2][0], BOX[2][1]);
     toView(wx, wy, wz, tmp, q);
     const vz = -tmp[q + 2];
+    if (vz <= 0.3) continue;
     tmp[q + 3] = msz[j]; tmp[q + 4] = mcol[j * 3]; tmp[q + 5] = mcol[j * 3 + 1]; tmp[q + 6] = mcol[j * 3 + 2];
     tmp[q + 7] = me[j] * (0.7 + 0.6 * Math.pow(0.5 + 0.5 * Math.sin(t * (0.4 + sdj) + sdj * 90), 6)) + A.high * 0.25;
     tmp[q + 8] = Math.min((ap * 1.6 + 0.004) * Math.abs(vz - focus), 0.07 * Math.max(vz, 0.1));
-    tmp[q + 9] = 1; tmp[q + 10] = sdj; tmp[q + 11] = vz > 0.3 ? 0.9 : 0;
-    depth[i] = -vz;
+    tmp[q + 9] = 1; tmp[q + 10] = sdj; tmp[q + 11] = 0.9;
+    depth[i] = -vz; order[nv++] = i;
   }
   for (let w = 0; w < WISP; w++) {
-    const i = N + M + w, q = i * STRIDE;
+    const i = NMAX + M + w, q = i * STRIDE;
     xform(wispPos[w * 3], wispPos[w * 3 + 1], wispPos[w * 3 + 2], tmp, q);
     const vz = -tmp[q + 2];
     tmp[q + 3] = 0.026 * sc; tmp[q + 4] = wispCols[w][0]; tmp[q + 5] = wispCols[w][1]; tmp[q + 6] = wispCols[w][2];
     tmp[q + 7] = 1.6 + wispFlash[w] * 2.5 + A.level * 0.8;
     tmp[q + 8] = Math.min(ap * Math.abs(vz - focus), 0.05 * Math.max(vz, 0.1));
     tmp[q + 9] = 1; tmp[q + 10] = 0.5; tmp[q + 11] = vz > 0.3 ? 1 : 0;
-    depth[i] = -vz;
+    depth[i] = -vz; if (vz > 0.3) order[nv++] = i;
     LP[4 + w * 4] = tmp[q]; LP[5 + w * 4] = tmp[q + 1]; LP[6 + w * 4] = tmp[q + 2];
     LP[7 + w * 4] = 0.5 + 0.25 * Math.sin(t * 1.3 + w * 2) + wispFlash[w] * 1.8 + A.level * 0.7;
     LC[3 + w * 3] = wispCols[w][0]; LC[4 + w * 3] = wispCols[w][1]; LC[5 + w * 3] = wispCols[w][2];
   }
-  writeLogo(dt, t, N + M + WISP, focus, ap);
+  const LB = NMAX + M + WISP;
+  writeLogo(dt, t, LB, focus, ap);
+  if (logoW > 0.003) for (let j = 0; j < LG; j++) if (tmp[(LB + j) * STRIDE + 11] > 0) order[nv++] = LB + j;
   {
     const cl = rot1(wCur.coreLocal, wCur.ay, wCur.ax);
     let cc = wCur.coreLight, cg = wCur.coreGain;
@@ -1806,20 +2451,24 @@ function frame(now) {
 
   fcount = 0;
   const gNew = inTr ? ease(clamp(k * 1.25, 0, 1)) : 1;
-  for (const F of wCur.fils) gatherFil(F, 1, gNew);
-  if (prevLive) { const wOld = 1 - smooth(0, 0.6, k); for (const F of wPrev.fils) gatherFil(F, wOld, 1); }
-  if (wCur.links) gatherLinks(wCur.links, inTr ? smooth(0.55, 1, k) : 1);
+  for (const F of wCur.fils) gatherFil(F, wCur.P.bright, gNew);
+  if (prevLive) { const wOld = (1 - smooth(0, 0.6, k)) * wPrev.P.bright; for (const F of wPrev.fils) gatherFil(F, wOld, 1); }
+  if (wCur.links) gatherLinks(wCur.links, (inTr ? smooth(0.55, 1, k) : 1) * wCur.P.bright);
   if (prevLive && wPrev.links) gatherLinks(wPrev.links, 1 - smooth(0, 0.25, k));
-  if (logoLinks && LX.follow > 0.05) gatherLinks(logoLinks, logoW * LX.follow * 0.8, N + M + WISP);
+  if (logoLinks && LX.follow > 0.05) gatherLinks(logoLinks, logoW * LX.follow * 0.8, LB);
   gatherFil(wispFil, 1, 1);
 
-  order.sort((a, b) => depth[a] - depth[b]);
-  for (let kk = 0; kk < TOT; kk++) { const s = order[kk] * STRIDE, d = kk * STRIDE; for (let c = 0; c < STRIDE; c++) inst[d + c] = tmp[s + c]; }
+  const ov = order.subarray(0, nv); ov.sort((a, b) => depth[a] - depth[b]);
+  for (let kk = 0; kk < nv; kk++) { const s = ov[kk] * STRIDE, d = kk * STRIDE; for (let c = 0; c < STRIDE; c++) inst[d + c] = tmp[s + c]; }
 
   const ex = Cx - px, ey = Cy - py, ez = Cz - pz;
   const evx = ex * rx + ey * ry + ez * rz, evy = ex * ux + ey * uy + ez * uz, evz = ex * fx + ey * fy + ez * fz;
-  const f = 1 / Math.tan(FOV / 2), cu = 0.5 + 0.5 * (f / aspect) * evx / evz, cvv = 0.5 + 0.5 * f * evy / evz;
-  const proj = perspective(FOV, aspect, 0.1, 100), pxs = 2 * Math.tan(FOV / 2) / H;
+  const f = 1 / Math.tan(fovNow / 2), cu = 0.5 + 0.5 * (f / aspect) * evx / evz, cvv = 0.5 + 0.5 * f * evy / evz;
+  const proj = perspective(fovNow, aspect, 0.1, 100), pxs = 2 * Math.tan(fovNow / 2) / H;
+  const fogS = Math.max(2, focus * 0.55), hot = 0.15 + V.hot * 2.1;
+  limG = follow(limG, 1 / (1 + V.limiter * (A.level * 0.45 + coreFlash * 0.55)), dt, 0.04, 0.7);
+  if (lensMode !== S.lens) { lensMix -= dt * 3; if (lensMix <= 0 || lensMode === 0) { lensMix = 0; lensMode = S.lens; } }
+  else lensMix = Math.min(1, lensMix + dt * 1.4);
   const cpuMid = performance.now();
 
   /* ---- render ---- */
@@ -1829,6 +2478,7 @@ function frame(now) {
   gl.uniform2f(pBg.u('uRes'), W, H); gl.uniform1f(pBg.u('uTime'), t); gl.uniform1f(pBg.u('uLevel'), A.level); gl.uniform2f(pBg.u('uCenter'), cu, cvv);
   { const th = hueRotJS(tint, hueNow, [0, 0, 0]), lum = 0.2126 * th[0] + 0.7152 * th[1] + 0.0722 * th[2] + 1e-3, kk = Math.min(0.32 / lum, 1.3); gl.uniform3f(pBg.u('uTint'), th[0] * kk, th[1] * kk, th[2] * kk); }
   gl.uniform1f(pBg.u('uCamAmt'), CAM.on ? S.camAmt : 0); gl.uniform1f(pBg.u('uCamAsp'), CAM.aspect); gl.uniform1f(pBg.u('uCamMirror'), CAM.mirror ? 1 : 0); gl.uniform1f(pBg.u('uMotion'), A.motion);
+  gl.uniform3fv(pBg.u('uFogC'), fogC); gl.uniform1f(pBg.u('uFogAmt'), Math.min(1, cFogD * 7));
   bindTex(2, camTex, pBg, 'uCam');
   drawFS();
 
@@ -1837,23 +2487,27 @@ function frame(now) {
     gl.useProgram(pFil);
     gl.uniformMatrix4fv(pFil.u('uProj'), false, proj);
     gl.uniform1f(pFil.u('uPx'), pxs); gl.uniform1f(pFil.u('uFocus'), focus); gl.uniform1f(pFil.u('uAp'), ap * 0.8); gl.uniform1f(pFil.u('uHue'), hueNow);
+    gl.uniform1f(pFil.u('uHot'), hot); gl.uniform1f(pFil.u('uFogD'), cFogD); gl.uniform1f(pFil.u('uFogS'), fogS); gl.uniform3fv(pFil.u('uFogC'), fogC);
     gl.bindVertexArray(FV.vao); gl.bindBuffer(gl.ARRAY_BUFFER, FV.ib); gl.bufferSubData(gl.ARRAY_BUFFER, 0, finst, 0, fcount * FSTRIDE);
     gl.drawArraysInstanced(gl.TRIANGLE_STRIP, 0, 4, fcount);
   }
-  gl.useProgram(pPart);
-  gl.uniformMatrix4fv(pPart.u('uProj'), false, proj);
-  gl.uniform1f(pPart.u('uPx'), pxs); gl.uniform3f(pPart.u('uL'), light[0], light[1], light[2]);
-  gl.uniform1f(pPart.u('uTime'), t); gl.uniform1f(pPart.u('uHue'), hueNow);
-  gl.uniform4fv(pPart.u('uLp[0]'), LP); gl.uniform3fv(pPart.u('uLc[0]'), LC);
-  gl.bindVertexArray(PV.vao); gl.bindBuffer(gl.ARRAY_BUFFER, PV.ib); gl.bufferSubData(gl.ARRAY_BUFFER, 0, inst);
-  gl.drawArraysInstanced(gl.TRIANGLE_STRIP, 0, 4, TOT);
+  if (nv > 0) {
+    gl.useProgram(pPart);
+    gl.uniformMatrix4fv(pPart.u('uProj'), false, proj);
+    gl.uniform1f(pPart.u('uPx'), pxs); gl.uniform3f(pPart.u('uL'), light[0], light[1], light[2]);
+    gl.uniform1f(pPart.u('uTime'), t); gl.uniform1f(pPart.u('uHue'), hueNow);
+    gl.uniform1f(pPart.u('uHot'), hot); gl.uniform1f(pPart.u('uFogD'), cFogD); gl.uniform1f(pPart.u('uFogS'), fogS); gl.uniform3fv(pPart.u('uFogC'), fogC);
+    gl.uniform4fv(pPart.u('uLp[0]'), LP); gl.uniform3fv(pPart.u('uLc[0]'), LC);
+    gl.bindVertexArray(PV.vao); gl.bindBuffer(gl.ARRAY_BUFFER, PV.ib); gl.bufferSubData(gl.ARRAY_BUFFER, 0, inst, 0, nv * STRIDE);
+    gl.drawArraysInstanced(gl.TRIANGLE_STRIP, 0, 4, nv);
+  }
   gl.bindVertexArray(null); gl.disable(gl.BLEND);
 
   const tw_ = trails[trailIdx], tr_ = trails[1 - trailIdx];
   gl.bindFramebuffer(gl.FRAMEBUFFER, tw_.fb);
   gl.useProgram(pTrail);
   bindTex(0, scene.tex, pTrail, 'uScene'); bindTex(1, tr_.tex, pTrail, 'uPrev');
-  { const dT = V.trail > 0.01 ? 0.55 + 0.38 * V.trail : 0, dE = V.echo > 0.01 ? 0.8 + 0.17 * V.echo : 0;
+  { const trl = Math.max(V.trail, cTrail), dT = trl > 0.01 ? 0.55 + 0.38 * trl : 0, dE = V.echo > 0.01 ? 0.8 + 0.17 * V.echo : 0;
     gl.uniform1f(pTrail.u('uDecay'), Math.pow(Math.max(dT, dE), dt * 60));
     gl.uniform1f(pTrail.u('uZoom'), 1 - V.echo * 0.022 * (1 + A.level * 0.8));
     gl.uniform1f(pTrail.u('uRot'), V.echo * 0.006 * Math.sin(t * 0.045 + 0.7));
@@ -1864,7 +2518,7 @@ function frame(now) {
   let src = tw_;
   for (let i = 0; i < mips.length; i++) {
     const m = mips[i]; gl.bindFramebuffer(gl.FRAMEBUFFER, m.fb); gl.viewport(0, 0, m.w, m.h);
-    bindTex(0, src.tex, pDown, 'uTex'); gl.uniform2f(pDown.u('uTexel'), 1 / src.w, 1 / src.h); gl.uniform1f(pDown.u('uFirst'), i === 0 ? 1 : 0);
+    bindTex(0, src.tex, pDown, 'uTex'); gl.uniform2f(pDown.u('uTexel'), 1 / src.w, 1 / src.h); gl.uniform1f(pDown.u('uFirst'), i === 0 ? 1 : 0); gl.uniform1f(pDown.u('uThr'), V.thr);
     drawFS(); src = m;
   }
   gl.useProgram(pUp); gl.enable(gl.BLEND); gl.blendFunc(gl.ONE, gl.ONE);
@@ -1876,12 +2530,18 @@ function frame(now) {
 
   gl.bindFramebuffer(gl.FRAMEBUFFER, null); gl.viewport(0, 0, W, H);
   gl.useProgram(pComp);
-  bindTex(0, tw_.tex, pComp, 'uScene'); bindTex(1, mips[0].tex, pComp, 'uBloom');
+  bindTex(0, tw_.tex, pComp, 'uScene'); bindTex(1, mips[0].tex, pComp, 'uBloom'); bindTex(3, logoTex, pComp, 'uLogo');
   gl.uniform2f(pComp.u('uRes'), W, H); gl.uniform1f(pComp.u('uBloomStr'), 0.01 + V.glow * 0.065); gl.uniform1f(pComp.u('uFlash'), coreFlash);
   gl.uniform1f(pComp.u('uMirN'), mirN); gl.uniform1f(pComp.u('uMirMix'), mirN > 0 ? mirMix : 0); gl.uniform1f(pComp.u('uMirRot'), mirRot);
   gl.uniform1f(pComp.u('uGradeMix'), gradeMix); gl.uniform1f(pComp.u('uGradeHue'), hueNow);
   gl.uniform3fv(pComp.u('uG0'), gradeCur[0]); gl.uniform3fv(pComp.u('uG1'), gradeCur[1]); gl.uniform3fv(pComp.u('uG2'), gradeCur[2]); gl.uniform3fv(pComp.u('uG3'), gradeCur[3]);
   gl.uniform1f(pComp.u('uTime'), t); gl.uniform1f(pComp.u('uCA'), 0.02); gl.uniform1f(pComp.u('uGrain'), HDR ? 0.03 : 0.02);
+  gl.uniform1f(pComp.u('uExpo'), V.exposure * limG); gl.uniform1f(pComp.u('uRoll'), V.rolloff); gl.uniform1f(pComp.u('uWhite'), V.white);
+  gl.uniform1f(pComp.u('uSat'), V.sat); gl.uniform1f(pComp.u('uCon'), V.contrast);
+  gl.uniform1f(pComp.u('uLens'), logoSdfOK ? lensMode : 0); gl.uniform1f(pComp.u('uLensMix'), lensMix * V.lensAmt);
+  gl.uniform1f(pComp.u('uLensSize'), V.lensSize * (1 + S.lensPulse * coreFlash * 0.07));
+  gl.uniform2f(pComp.u('uLensOff'), 0, -0.27 * V.lensPos); gl.uniform1f(pComp.u('uLensRot'), S.lensSpin ? mirRot * 3 : 0);
+  gl.uniform1f(pComp.u('uLevel'), A.level); gl.uniform1f(pComp.u('uKick'), coreFlash * (0.4 + S.lensPulse));
   drawFS();
   trailIdx = 1 - trailIdx;
 
@@ -1934,27 +2594,191 @@ function pills(boxId, items, onClick) {
   const box = $(boxId); box.textContent = '';
   items.forEach((lab, i) => { const b = document.createElement('button'); b.className = 'pill'; b.innerHTML = lab; b.addEventListener('click', () => { onClick(i); poke(); }); box.appendChild(b); });
 }
+const LENSES = ['Off', 'Glass', 'Holo foil', 'Displace', 'Ghost', 'Window'];
+const cap = s => s.charAt(0) + s.slice(1).toLowerCase();
+const fmt = (v, st) => st >= 1 ? String(Math.round(v)) : (+v).toFixed(2);
+let saveT = 0;
+function saveSoon() { clearTimeout(saveT); saveT = setTimeout(save, 400); }
 function buildUI() {
   pills('#worlds', WORLDS.map((w, i) => `<i>${ROMAN[i]}</i>${w.name}`), i => setWorld(i, tSim));
   pills('#kaleidos', MIRRORS.map(m => m ? m + ' fold' : 'No mirror'), i => { S.kaleido = i; save(); updateUI(); });
-  pills('#grades', GRADES.map(g => g.name.charAt(0) + g.name.slice(1).toLowerCase()), i => { S.grade = i; save(); updateUI(); });
+  pills('#grades', GRADES.map(g => cap(g.name)), i => { S.grade = i; save(); updateUI(); });
   pills('#cams', ['Off', 'Front', 'Back'], i => setCam(['off', 'user', 'environment'][i]));
+  pills('#lenses', LENSES, i => { S.lens = i; save(); updateUI(); });
+  pills('#lensPos', ['Center', 'Lower third'], i => { S.lensPos = i; save(); updateUI(); });
   document.querySelectorAll('input[data-k]').forEach(el => {
     const out = el.parentElement.querySelector('output'), show = () => { if (out) out.textContent = (+S[el.dataset.k]).toFixed(2); };
     el.value = S[el.dataset.k]; show();
-    el.addEventListener('input', () => { S[el.dataset.k] = parseFloat(el.value); show(); save(); });
+    el.addEventListener('input', () => { S[el.dataset.k] = parseFloat(el.value); show(); saveSoon(); });
+  });
+  buildWorldSettings(); buildPresets();
+}
+
+/* ---- per-world settings, generated from the schema ---- */
+let wsetFor = '';
+function buildWorldSettings() {
+  const name = NAMES[cur], T = WT[name], box = $('#wset');
+  box.textContent = ''; wsetFor = name; $('#wsetTitle').textContent = cap(name);
+  const defs = SCHEMA[name].concat(COMMON), groups = [];
+  for (const d of defs) { let g = groups.find(x => x.name === d.g); if (!g) groups.push(g = { name: d.g, defs: [] }); g.defs.push(d); }
+  groups.forEach((g, gi) => {
+    const det = document.createElement('details'); det.className = 'grp'; if (gi === 0) det.open = true;
+    det.innerHTML = `<summary>${g.name}</summary><div class="body"></div>`;
+    const body = det.querySelector('.body');
+    for (const d of g.defs) {
+      const row = document.createElement('div'), id = 'w_' + d.k; row.className = 'ctl';
+      row.innerHTML = `<label for="${id}">${d.l}${d.rb ? '<em>rebuild</em>' : ''}</label><output></output><input type="range" id="${id}" min="${d.min}" max="${d.max}" step="${d.st}">`;
+      const inp = row.querySelector('input'), out = row.querySelector('output');
+      inp.dataset.wk = d.k; inp.value = T[d.k]; out.textContent = fmt(T[d.k], d.st);
+      inp.addEventListener('input', () => { T[d.k] = parseFloat(inp.value); out.textContent = fmt(T[d.k], d.st); if (d.rb) scheduleRebuild(name); saveSoon(); });
+      body.appendChild(row);
+    }
+    box.appendChild(det);
   });
 }
+function syncWorldSettings() {
+  const name = NAMES[cur]; if (wsetFor !== name) { buildWorldSettings(); return; }
+  const T = WT[name], defs = schemaOf(name);
+  $('#wset').querySelectorAll('input[data-wk]').forEach(inp => {
+    const k = inp.dataset.wk, d = defs.find(x => x.k === k);
+    if (+inp.value !== +T[k]) { inp.value = T[k]; inp.parentElement.querySelector('output').textContent = fmt(T[k], d.st); }
+  });
+}
+function rebuildIfNeeded(name) { if (schemaOf(name).some(d => d.rb && WT[name][d.k] !== WP[name][d.k])) scheduleRebuild(name); }
+function resetWorld() { const name = NAMES[cur]; Object.assign(WT[name], WORLD_DEF[name]); rebuildIfNeeded(name); save(); syncWorldSettings(); toast(cap(name) + ' reset'); }
+// Mutate: nudge every look-and-motion setting of this world somewhere new; the tweening turns it into a slow morph
+function mutate() {
+  const name = NAMES[cur], T = WT[name];
+  for (const d of SCHEMA[name].concat(COMMON.filter(c => c.g === 'Look' && !c.rb))) {
+    if (d.rb || ['foldSync', 'layout', 'speed'].includes(d.k)) continue;
+    let v = T[d.k] + (Math.random() - 0.5) * (d.max - d.min) * 0.45;
+    if (d.st >= 1) v = Math.round(v);
+    T[d.k] = clamp(v, d.min, d.max);
+  }
+  save(); syncWorldSettings(); toast('Mutating ' + cap(name));
+}
+
+/* ---- presets: factory looks, your own, share links ---- */
+const FACTORY = [
+  { name: 'Broadcast', world: 'TOWER', wp: {} },
+  { name: 'Transmission storm', world: 'TOWER', wp: { pulseRate: 2.2, toward: 1.8, expand: 2, bolts: 2, life: 3 }, look: { echo: 0.45 } },
+  { name: 'Quiet signal', world: 'TOWER', wp: { pulseRate: 0.45, expand: 0.8, toward: 0.4, bolts: 0.25, thick: 0.1 } },
+  { name: 'Fourth of July', world: 'LOT', wp: { fwRate: 2.4, fwSize: 1.3, finale: 0.8 } },
+  { name: 'Lantern festival', world: 'LOT', wp: { fwRate: 0.25, lanterns: 2, beams: 3, sweep: 0.4 } },
+  { name: 'Supercell', world: 'STORM', wp: {} },
+  { name: 'Rope tornado', world: 'STORM', wp: { baseWidth: 0.6, noiseAmt: 2, noiseScale: 1.6, funnel: 1.5, psize: 0.7 } },
+  { name: 'Wedge', world: 'STORM', wp: { baseWidth: 2.8, noiseAmt: 0.5, subVort: 5, worm: 0.6 } },
+  { name: 'Kelp cathedral', world: 'REEF', wp: { height: 1.6, variation: 0.35, travel: 0.6, stalks: 60 } },
+  { name: 'Night dive', world: 'REEF', wp: { fog: 2, snow: 2, fogHue: 0.85, travel: 1.4 } },
+  { name: 'Endless blossom', world: 'BLOOM', wp: {} },
+  { name: 'Mandala', world: 'BLOOM', wp: { foldSync: 1, sharp: 1.6, twist: 0.3 }, look: { kaleido: 3, echo: 0.4 } },
+  { name: 'Rose', world: 'BLOOM', wp: { petals: 5, ruffle: 2.6, sharp: 0.5, cup: 2.2, palette: 3 } },
+  { name: 'Pacific', world: 'TIDE', wp: {} },
+  { name: 'Hi-fi ocean', world: 'TIDE', wp: { cols: 180, rows: 88, pearls: 0.6, smoothing: 0.5 } },
+  { name: 'Storm sea', world: 'TIDE', wp: { height: 2.2, swell: 1.6, roll: 1.8, fog: 1.2 } },
+  { name: 'Night drive', world: 'HIGHWAY', wp: {} },
+  { name: 'Hyperspace', world: 'HIGHWAY', wp: { drive: 3.4, variance: 0.8, radius: 2.4, curve: 0.3 }, look: { echo: 0.6 } },
+  { name: 'Bass road', world: 'HIGHWAY', wp: { ripple: 2.4, rdecay: 0.4, wavelen: 3, rspeed: 8 } },
+  { name: 'Glass mandala', world: 'BLOOM', wp: { foldSync: 1 }, look: { lens: 1, kaleido: 2, lensSize: 0.6 } },
+  { name: 'Holo tunnel', world: 'HIGHWAY', wp: {}, look: { lens: 2, kaleido: 3, echo: 0.35 } },
+  { name: 'Through the letters', world: 'REEF', wp: {}, look: { lens: 5, lensSize: 0.8 } }
+];
+let USER = [];
+try { USER = JSON.parse(localStorage.getItem('htv2-presets') || '[]').filter(p => p && NAMES.includes(p.world)); } catch (e) { USER = []; }
+function saveUser() { try { localStorage.setItem('htv2-presets', JSON.stringify(USER)); } catch (e) {} }
+function snapshot(name) {
+  const w = NAMES[cur], look = {};
+  for (const k of LOOK_KEYS) look[k] = S[k];
+  return { name, world: w, wp: Object.assign({}, WT[w]), look };
+}
+function applyPreset(p, quiet) {
+  const name = p.world, i = NAMES.indexOf(name); if (i < 0) return;
+  const T = WT[name];
+  for (const d of schemaOf(name)) { const v = p.wp && Number.isFinite(+p.wp[d.k]) ? +p.wp[d.k] : d.d; T[d.k] = clamp(v, d.min, d.max); }
+  if (p.look) for (const k of LOOK_KEYS) if (k in p.look && typeof p.look[k] === typeof DEF[k]) S[k] = p.look[k];
+  if (WORLDS.length) {
+    if (i !== cur) { for (const d of schemaOf(name)) if (d.rb) WP[name][d.k] = T[d.k]; WORLDS[i] = buildWorld(i); outs[i] = new Float32Array(NMAX * 8); setWorld(i, tSim, quiet); }
+    else rebuildIfNeeded(name);
+  }
+  S.auto = false; save();
+  if (!WORLDS.length) return;
+  updateUI(); syncWorldSettings();
+  if (!quiet) toast(p.name + (p.look ? '' : ' · ' + cap(name)));
+}
+function buildPresets() {
+  const box = $('#presets'); box.textContent = '';
+  const here = NAMES[cur], all = FACTORY.map(p => ({ p, user: false })).concat(USER.map((p, j) => ({ p, user: true, j })));
+  const sorted = all.filter(x => x.p.world === here).concat(all.filter(x => x.p.world !== here));
+  let lastHere = null;
+  for (const x of sorted) {
+    const isHere = x.p.world === here;
+    if (isHere !== lastHere) { const l = document.createElement('div'); l.className = 'lab'; l.textContent = isHere ? 'This world' : 'Elsewhere'; box.appendChild(l); lastHere = isHere; }
+    const b = document.createElement('button'); b.className = 'pill';
+    b.innerHTML = `<small>${ROMAN[NAMES.indexOf(x.p.world)]}</small>${x.p.name.replace(/[<>&]/g, '')}${x.user ? '<span class="x" title="Delete">×</span>' : ''}`;
+    b.addEventListener('click', e => {
+      if (e.target.classList.contains('x')) { USER.splice(x.j, 1); saveUser(); buildPresets(); toast('Preset deleted'); return; }
+      applyPreset(x.p); poke();
+    });
+    box.appendChild(b);
+  }
+}
+const b64e = str => btoa(unescape(encodeURIComponent(str))).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+const b64d = str => decodeURIComponent(escape(atob(str.replace(/-/g, '+').replace(/_/g, '/'))));
+function shareCode() {
+  const p = snapshot('Shared look'), d = WORLD_DEF[p.world], wp = {};
+  for (const k in p.wp) if (Math.abs(p.wp[k] - d[k]) > 1e-4) wp[k] = Math.round(p.wp[k] * 1000) / 1000;
+  return b64e(JSON.stringify({ v: 1, w: p.world, p: wp, l: p.look }));
+}
+function readShare(code) { const o = JSON.parse(b64d(code)); return { name: 'Shared look', world: o.w, wp: Object.assign({}, WORLD_DEF[o.w], o.p || {}), look: o.l || null }; }
+$('#savePreset').addEventListener('click', () => {
+  const el = $('#presetName'), nm = (el.value.trim() || `${cap(NAMES[cur])} ${USER.filter(p => p.world === NAMES[cur]).length + 1}`).slice(0, 40);
+  const snap2 = snapshot(nm), j = USER.findIndex(p => p.name === nm && p.world === snap2.world);
+  if (j >= 0) USER[j] = snap2; else USER.push(snap2);
+  saveUser(); buildPresets(); el.value = ''; el.blur(); toast('Saved · ' + nm);
+});
+$('#presetName').addEventListener('keydown', e => { if (e.key === 'Enter') $('#savePreset').click(); });
+$('#shareBtn').addEventListener('click', async () => {
+  const url = location.origin + location.pathname + '#p=' + shareCode();
+  try {
+    if (navigator.share && matchMedia('(pointer:coarse)').matches) { await navigator.share({ title: 'HOME TEAM FM · ' + cap(NAMES[cur]), url }); return; }
+    await navigator.clipboard.writeText(url); toast('Link copied');
+  } catch (e) { if (e && e.name === 'AbortError') return; const el = $('#presetName'); el.value = url; el.select(); toast('Copy the link from the name field'); }
+});
+$('#exportBtn').addEventListener('click', () => {
+  if (!USER.length) { toast('Save a preset first'); return; }
+  const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([JSON.stringify({ app: 'hometeam-v2', presets: USER }, null, 1)], { type: 'application/json' }));
+  a.download = 'hometeam-presets.json'; document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 500);
+});
+$('#importBtn').addEventListener('click', () => $('#importFile').click());
+$('#importFile').addEventListener('change', async e => {
+  const f = e.target.files && e.target.files[0]; if (!f) return;
+  try {
+    const o = JSON.parse(await f.text()), list = (o.presets || o).filter(p => p && p.name && NAMES.includes(p.world));
+    for (const p of list) { const j = USER.findIndex(q => q.name === p.name && q.world === p.world); if (j >= 0) USER[j] = p; else USER.push(p); }
+    saveUser(); buildPresets(); toast(`Imported ${list.length} preset${list.length === 1 ? '' : 's'}`);
+  } catch (err) { toast('That file is not a preset export'); }
+  e.target.value = '';
+});
+$('#mutateBtn').addEventListener('click', mutate);
+$('#resetBtn').addEventListener('click', resetWorld);
+$('#colorReset').addEventListener('click', () => { for (const k of COLOR_KEYS) S[k] = DEF[k]; save(); updateUI(); toast('Color reset'); });
+$('#lensSpinBtn').addEventListener('click', () => toggle('lensSpin'));
+
 function setCam(mode) { S.cam = mode; if (mode === 'off') stopCam(); else startCam(mode); updateUI(); }
+let presetsFor = '';
 function updateUI() {
   if (!WORLDS.length) return;
   $('#worlds').querySelectorAll('.pill').forEach((b, i) => b.classList.toggle('on', i === cur));
   $('#grades').querySelectorAll('.pill').forEach((b, i) => b.classList.toggle('on', i === S.grade));
   $('#kaleidos').querySelectorAll('.pill').forEach((b, i) => b.classList.toggle('on', i === S.kaleido));
+  $('#lenses').querySelectorAll('.pill').forEach((b, i) => b.classList.toggle('on', i === S.lens));
+  $('#lensPos').querySelectorAll('.pill').forEach((b, i) => b.classList.toggle('on', i === Math.round(S.lensPos)));
   document.querySelectorAll('input[data-k]').forEach(el => { if (+el.value !== +S[el.dataset.k]) { el.value = S[el.dataset.k]; const o = el.parentElement.querySelector('output'); if (o) o.textContent = (+S[el.dataset.k]).toFixed(2); } });
   $('#cams').querySelectorAll('.pill').forEach((b, i) => b.classList.toggle('on', ['off', 'user', 'environment'][i] === S.cam));
-  [['#autoBtn', 'auto'], ['#cycleBtn', 'cycle'], ['#logoBtn', 'logo'], ['#motionBtn', 'camMotion'], ['#demoBtn', 'demo'], ['#statsBtn', 'stats']].forEach(([id, k]) => $(id).classList.toggle('on', !!S[k]));
+  [['#autoBtn', 'auto'], ['#cycleBtn', 'cycle'], ['#logoBtn', 'logo'], ['#motionBtn', 'camMotion'], ['#demoBtn', 'demo'], ['#statsBtn', 'stats'], ['#lensSpinBtn', 'lensSpin']].forEach(([id, k]) => $(id).classList.toggle('on', !!S[k]));
   $('#stats').hidden = !S.stats;
+  if (wsetFor !== NAMES[cur]) buildWorldSettings();
+  if (presetsFor !== NAMES[cur]) { presetsFor = NAMES[cur]; buildPresets(); }
 }
 const toggle = (k, msgOn, msgOff) => { S[k] = !S[k]; save(); updateUI(); if (msgOn) toast(S[k] ? msgOn : msgOff); };
 $('#autoBtn').addEventListener('click', () => toggle('auto', 'Auto travel on', 'Staying in this world'));
@@ -2002,7 +2826,7 @@ canvas.addEventListener('pointermove', e => {
   if (now - p.t > 70 && Math.hypot(u - p.u, v - p.v) > 0.03) { pushRippleAt(u, v, 0.45); p.u = u; p.v = v; p.t = now; }
 });
 function pushRippleAt(u, v, s) {
-  const th = Math.tan(FOV / 2), nx = (u * 2 - 1) * th * cam.aspect, ny = (v * 2 - 1) * th;
+  const th = Math.tan(fovNow / 2), nx = (u * 2 - 1) * th * cam.aspect, ny = (v * 2 - 1) * th;
   const dx = cam.fx + cam.rx * nx + cam.ux * ny, dy = cam.fy + cam.ry * nx + cam.uy * ny, dz = cam.fz + cam.rz * nx + cam.uz * ny;
   const tt = ((cam.Cx - cam.px) * cam.fx + (cam.Cy - cam.py) * cam.fy + (cam.Cz - cam.pz) * cam.fz) / (dx * cam.fx + dy * cam.fy + dz * cam.fz);
   pushRipple((cam.px + dx * tt - cam.Cx) / cam.sc, (cam.py + dy * tt - cam.Cy) / cam.sc, (cam.pz + dz * tt - cam.Cz) / cam.sc, s, 1.8);
@@ -2011,13 +2835,15 @@ const endPtr = e => ptrs.delete(e.pointerId);
 canvas.addEventListener('pointerup', endPtr); canvas.addEventListener('pointercancel', endPtr);
 
 window.addEventListener('keydown', e => {
-  if (!running || e.metaKey || e.ctrlKey) return;
+  if (!running || e.metaKey || e.ctrlKey || (e.target && e.target.tagName === 'INPUT' && e.target.type === 'text')) return;
   const k = e.key.toLowerCase();
   if (k >= '1' && k <= '9' && +k <= WORLDS.length) setWorld(+k - 1, tSim);
   else if (k === 'arrowright') setWorld((cur + 1) % WORLDS.length, tSim);
   else if (k === 'arrowleft') setWorld((cur + WORLDS.length - 1) % WORLDS.length, tSim);
   else if (k === 'a') toggle('auto', 'Auto travel on', 'Staying in this world');
   else if (k === 'l') toggle('logo');
+  else if (k === 'm') mutate();
+  else if (k === 'o') { S.lens = (S.lens + 1) % LENSES.length; save(); updateUI(); toast('Logo overlay · ' + LENSES[S.lens]); }
   else if (k === 'k') { S.kaleido = (S.kaleido + 1) % MIRRORS.length; save(); updateUI(); toast(MIRRORS[S.kaleido] ? MIRRORS[S.kaleido] + ' fold kaleidoscope' : 'Kaleidoscope off'); }
   else if (k === 'e') { S.echo = S.echo > 0.5 ? 0 : S.echo > 0.15 ? 0.85 : 0.35; save(); updateUI(); toast('Echo ' + Math.round(S.echo * 100)); }
   else if (k === 'g') { S.grade = (S.grade + 1) % GRADES.length; save(); updateUI(); toast(GRADES[S.grade].name); }
@@ -2067,8 +2893,12 @@ function startEngine() {
 }
 async function init() {
   await loadLogo();
-  WORLDS = [makeTower(), makeLot(), makeStorm(), makeReef(), makeBloom(), makeTide(), makeHighway()];
-  outs = WORLDS.map(() => new Float32Array(N * 8));
+  if (location.hash.startsWith('#p=')) {
+    try { const p = readShare(location.hash.slice(3)); applyPreset(p, true); S.world = NAMES.indexOf(p.world); S.auto = false; } catch (e) { console.warn('bad share link', e); }
+    history.replaceState(null, '', location.pathname + location.search);
+  }
+  WORLDS = NAMES.map((_, i) => buildWorld(i));
+  outs = WORLDS.map(() => new Float32Array(NMAX * 8));
   initLogoPool();
   cur = clamp(S.world | 0, 0, WORLDS.length - 1);
   tint = WORLDS[cur].tint.slice(); tintFrom = tint.slice();
