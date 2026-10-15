@@ -126,7 +126,7 @@ const GRADES = [
 ].map(([name, st]) => ({ name, stops: st ? st.map(lin) : null }));
 const gradeCur = [[0, 0, 0], [0.1, 0.1, 0.1], [0.5, 0.5, 0.5], [1, 1, 1]];
 let gradeMix = 0, huePhase = 0, hueNow = 0;
-const V = { glow: S.glow, trail: S.trail, dof: S.dof, echo: S.echo, lensSize: S.lensSize, lensAmt: S.lensAmt, lensPos: S.lensPos };
+const V = { echoZoom: S.echoZoom, glow: S.glow, trail: S.trail, dof: S.dof, echo: S.echo, lensSize: S.lensSize, lensAmt: S.lensAmt, lensPos: S.lensPos };
 for (const k2 of COLOR_KEYS) V[k2] = S[k2];
 const MIRRORS = [0, 3, 4, 6, 8, 12];
 let mirN = 0, mirMix = 0, mirRot = 0;

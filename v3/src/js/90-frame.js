@@ -243,10 +243,10 @@ function frame(now) {
   gl.bindFramebuffer(gl.FRAMEBUFFER, tw_.fb);
   gl.useProgram(pTrail);
   bindTex(0, scene.tex, pTrail, 'uScene'); bindTex(1, tr_.tex, pTrail, 'uPrev');
-  { const tf = Math.max(wCur.trailFloor || 0, 0), trl = Math.max(V.trail, tf), dT = trl > 0.01 ? 0.55 + 0.38 * trl : 0, dE = V.echo > 0.01 ? 0.8 + 0.17 * V.echo : 0;
+  { const tf = Math.max(wCur.trailFloor || 0, 0), trl = Math.max(V.trail, tf), dT = trl > 0.01 ? 0.55 + 0.38 * trl : 0, dE = V.echo > 0.01 ? 0.55 + 0.37 * Math.pow(V.echo, 0.8) : 0;
     gl.uniform1f(pTrail.u('uDecay'), Math.pow(Math.max(dT, dE), dt * 60));
-    gl.uniform1f(pTrail.u('uZoom'), 1 - V.echo * 0.022 * (1 + A.level * 0.8) * echoZoomNow);
-    gl.uniform1f(pTrail.u('uRot'), V.echo * 0.006 * Math.sin(t * 0.045 + 0.7));
+    gl.uniform1f(pTrail.u('uZoom'), 1 - V.echoZoom * 0.022 * (1 + A.level * 0.8) * echoZoomNow);
+    gl.uniform1f(pTrail.u('uRot'), V.echoZoom * 0.006 * Math.sin(t * 0.045 + 0.7));
     gl.uniform1f(pTrail.u('uAsp'), aspect); }
   drawFS();
 

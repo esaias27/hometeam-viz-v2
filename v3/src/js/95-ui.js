@@ -171,10 +171,10 @@ const FACTORY = [
   { name: 'Kick rings', world: 'TIDE', wp: { source: 4, gain: 1.4, cross: 0.6 } },
   { name: 'Wireframe ocean', world: 'TIDE', wp: { source: 5, cross: 1, pearls: 0.2, gain: 1.3 } },
   { name: 'Night drive', world: 'HIGHWAY', wp: {} },
-  { name: 'Hyperspace', world: 'HIGHWAY', wp: { drive: 3.4, variance: 0.8, radius: 2.4, curve: 0.3 }, look: { echo: 0.6 } },
+  { name: 'Hyperspace', world: 'HIGHWAY', wp: { drive: 3.4, variance: 0.8, radius: 2.4, curve: 0.3 }, look: { echo: 0.6, echoZoom: 0.6 } },
   { name: 'Bass road', world: 'HIGHWAY', wp: { ripple: 2.4, rdecay: 0.4, wavelen: 3, rspeed: 8 } },
   { name: 'Glass mandala', world: 'BLOOM', wp: { foldSync: 1 }, look: { lens: 1, kaleido: 2, lensSize: 0.6 } },
-  { name: 'Holo tunnel', world: 'HIGHWAY', wp: {}, look: { lens: 2, kaleido: 3, echo: 0.35 } },
+  { name: 'Holo tunnel', world: 'HIGHWAY', wp: {}, look: { lens: 2, kaleido: 3, echo: 0.35, echoZoom: 0.35 } },
   { name: 'Through the letters', world: 'REEF', wp: {}, look: { lens: 5, lensSize: 0.8 } }
 ];
 let USER = [];

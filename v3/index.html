@@ -211,10 +211,11 @@ input[type=text]::placeholder{color:var(--dim)}
     <div class="row" id="kaleidos"></div>
     <div class="row"><button class="pill" id="wispBtn">Light wisps</button></div>
     <div class="ctl"><label for="s_echo">Echo</label><output></output><input type="range" id="s_echo" data-k="echo" min="0" max="1" step="0.01"></div>
+    <div class="ctl"><label for="s_ez">Echo zoom (tunnel)</label><output></output><input type="range" id="s_ez" data-k="echoZoom" min="0" max="1" step="0.01"></div>
     <div class="ctl"><label for="s_glow">Glow</label><output></output><input type="range" id="s_glow" data-k="glow" min="0" max="1" step="0.01"></div>
     <div class="ctl"><label for="s_trail">Trails</label><output></output><input type="range" id="s_trail" data-k="trail" min="0" max="1" step="0.01"></div>
     <div class="ctl"><label for="s_dof">Focus blur</label><output></output><input type="range" id="s_dof" data-k="dof" min="0" max="1" step="0.01"></div>
-    <div class="hint">Kaleidoscope folds the frame into mirrored wedges. Echo feeds each frame back into the next, so the light recedes forever.</div></div></details>
+    <div class="hint">Kaleidoscope folds the frame into mirrored wedges. Echo leaves afterimages along the path each light travels. Echo zoom pulls them toward the centre instead, for the endless-tunnel look.</div></div></details>
   <details class="sec"><summary>Logo</summary><div class="body">
     <div class="sub">Overlay</div>
     <div class="row" id="lenses"></div>
@@ -309,9 +310,9 @@ const DEF = { world: 0, auto: true, grade: 0, cycle: true, logo: false, logoSize
   glow: 0.6, trail: 0.3, dof: 0.5, quality: 1, stats: false, kaleido: 0, echo: 0.2,
   exposure: 0.95, rolloff: 0.6, white: 4, sat: 1.05, contrast: 1.0, hot: 0.4, thr: 0.12, limiter: 0.45,
   lens: 0, lensSize: 0.55, lensAmt: 0.7, lensPulse: 0.5, lensPos: 0, lensSpin: false,
-  detail: (window.matchMedia && matchMedia('(pointer:coarse)').matches) ? 0.6 : 1, fly: false, tour: 0, tourEvery: 16, wisps: true };
+  detail: (window.matchMedia && matchMedia('(pointer:coarse)').matches) ? 0.6 : 1, fly: false, tour: 0, tourEvery: 16, wisps: true, echoZoom: 0 };
 // keys that travel with a preset or share link, besides the world's own parameters
-const LOOK_KEYS = ['wisps', 'kaleido', 'echo', 'glow', 'trail', 'dof', 'grade', 'cycle', 'exposure', 'rolloff', 'white', 'sat', 'contrast', 'hot', 'thr', 'limiter',
+const LOOK_KEYS = ['wisps', 'kaleido', 'echo', 'echoZoom', 'glow', 'trail', 'dof', 'grade', 'cycle', 'exposure', 'rolloff', 'white', 'sat', 'contrast', 'hot', 'thr', 'limiter',
   'logo', 'logoSize', 'lens', 'lensSize', 'lensAmt', 'lensPulse', 'lensPos', 'lensSpin'];
 const COLOR_KEYS = ['exposure', 'rolloff', 'white', 'sat', 'contrast', 'hot', 'thr', 'limiter'];
 const S = Object.assign({}, DEF);
@@ -2210,7 +2211,7 @@ void seg(int id, out vec3 A, out vec3 B, out float wA, out float wB, out vec4 cA
 }`;
 const REEF_GLSL = `
 ${REEF_SHARED}
-uniform int uSL, uCO0, uSN0, uSA0, uNClump, uFI0, uPerSchool; uniform float uTravel, uKick, uFT, uStartle;
+uniform int uSL, uCO0, uSN0, uSA0, uNClump, uFI0, uPerSchool; uniform float uTravel, uKick, uFT, uStartle, uWag;
 // a school's path through the water (z unwrapped; the caller wraps after adding each fish's offset)
 vec3 schoolRaw(int sc, float t){
   float hs = h1(sc, 41), hy = h1(sc, 42), hz = h1(sc, 43), dir = h1(sc, 44) < 0.5 ? -1.0 : 1.0, sp = 0.45 + 0.7 * h1(sc, 45);
@@ -2226,7 +2227,7 @@ void fish(int j, inout vec3 p, inout float r, inout vec3 c, inout float e){
   vec3 c0 = schoolRaw(sc, tt), c1 = schoolRaw(sc, tt + 0.05);
   vec3 fwd = normalize(c1 - c0 + vec3(1e-4, 0.0, 0.0));
   vec3 side = normalize(cross(fwd, vec3(0.0, 1.0, 0.0)) + vec3(1e-4)), up = cross(side, fwd);
-  float spread = p_school * (1.0 + uStartle * 1.8), ra = uFT * 0.2 * (q.x - 0.5);
+  float spread = p_school * (1.0 + uStartle * 0.45), ra = uFT * 0.2 * (q.x - 0.5);
   vec3 o = (q.xyz - 0.5) * vec3(1.7, 0.6, 1.7) * spread;
   o = vec3(o.x * cos(ra) - o.z * sin(ra), o.y + sin(uFT * 0.7 + q.w * 9.0) * 0.08, o.x * sin(ra) + o.z * cos(ra));
   vec3 pos = c0 + o;
@@ -2234,7 +2235,7 @@ void fish(int j, inout vec3 p, inout float r, inout vec3 c, inout float e){
   float vis = sm(ZF, ZF + 10.0, pos.z) * (1.0 - sm(ZN - 1.5, ZN, pos.z));
   if (vis <= 0.001) return;
   float L = (0.13 + 0.1 * h1(sc, 46)) * p_fishSize * (0.8 + 0.4 * q.y);
-  float wag = sin(uFT * (7.0 + 5.0 * p_fishSpeed) * (1.0 + uStartle) + q.z * 6.28);
+  float wag = sin(uWag * (0.85 + 0.3 * q.x) + q.z * 6.28);
   if (k < 10) {
     float u = float(k) / 9.0;
     p = pos + fwd * (0.5 - u) * L + side * wag * u * u * 0.24 * L;
@@ -2247,7 +2248,7 @@ void fish(int j, inout vec3 p, inout float r, inout vec3 c, inout float e){
   float sp = h1(sc, 47), u2 = float(k) / 13.0;
   c = sp < 0.3 ? mix(C_pearl, C_azure, u2 * 0.6) : sp < 0.55 ? mix(C_gold, C_ember, u2) : sp < 0.8 ? (k % 3 == 0 ? C_pink : C_cyan) : mix(C_lime, C_teal, u2);
   r *= vis;
-  e = (0.26 + uHigh * 0.35 * step(0.7, h1(f, int(uT * 6.0))) + uStartle * 0.7 + uLevel * 0.15) * vis;
+  e = (0.26 + uHigh * 0.3 * sm(0.6, 1.0, 0.5 + 0.5 * sin(uT * 3.0 + q.w * 40.0)) + uStartle * 0.25 + uLevel * 0.15) * vis;
 }
 uniform float uSparkleT;
 void particle(int i, vec4 s, inout vec3 p, inout float r, inout vec3 c, inout float e, inout float g){
@@ -2336,7 +2337,7 @@ function makeReef(P) {
   const NB = SL * REEF_BEADS, NCO = Math.floor(cnt(19000, P, P.coral) / 140) * 140, NSNOW = cnt(10000, P, P.snow), NSAND = cnt(8000, P);
   const PER = 36, NFISH = Math.round(cnt(420, P, P.fish) / PER) * PER, FI0 = NB + NCO + NSNOW + NSAND;
   const CO0 = NB, SN0 = CO0 + NCO, SA0 = SN0 + NSNOW, N = Math.min(CAP, FI0 + NFISH * 14);
-  let fishT = 0, startle = 0;
+  let fishT = 0, startle = 0, startleT = 0, wag = 0;
   const slot = new Float32Array(512 * 2 * 4), slotZ = new Float32Array(SL), slotPrev = new Float32Array(SL);
   const dens = d => clamp(0.55 + P.variation * (noise3(d * 0.045, 3.3, 1.1) * 1.3 + noise3(d * 0.13, 7.1, 2.2) * 0.5), 0.02, 1);
   let travel = 0, distIdx = 0, current = 0, kick = 0;
@@ -2359,15 +2360,17 @@ function makeReef(P) {
     lines: [{ prog: progFor('REEF_L', 'REEF', REEF_LINE, true), count: SL * REEF_NODES }],
     get fog() { return { d: 0.05 * P.fog, col: fogCol() }; },
     onset(kind, s) {
-      if (kind === 'kick' || kind === 'touch') { push(0.7 + s, clamp(0.35 + s * 0.5, 0, 1), 2.4); kick = Math.max(kick, s); if (s > 0.8 || kind === 'touch') startle = Math.max(startle, s * 0.8); }
+      if (kind === 'kick' || kind === 'touch') { push(0.7 + s, clamp(0.35 + s * 0.5, 0, 1), 2.4); kick = Math.max(kick, s); if (s > 0.8 || kind === 'touch') startleT = Math.max(startleT, s * 0.8); }
       else if (kind === 'snare') push(0.5 + s * 0.5, 0.3, 3.2);
       else if (kind === 'idle') push(0.5, 0.25, 1.6);
     },
     update(dt, t) {
       for (const q of pz) q.age += dt;
       while (pz.length && (pz[0].age * pz[0].spd > 7.5 || pz[0].age > 8)) pz.shift();
-      kick *= Math.exp(-dt * 2); startle *= Math.exp(-dt * 1.4);
-      fishT += dt * P.fishSpeed * (0.7 + A.level * 0.6 + startle * 1.5);
+      kick *= Math.exp(-dt * 2); startleT *= Math.exp(-dt * 0.8);
+      startle = follow(startle, startleT, dt, 0.35, 1.2);   // eases in and out, never jumps
+      fishT += dt * P.fishSpeed * (0.7 + A.level * 0.4 + startle * 0.8);
+      wag += dt * (7 + 5 * P.fishSpeed) * (1 + startle * 0.8);
       current = lerp(current, P.current * (0.12 + A.low * 0.45 + A.presence * 0.1), 1 - Math.exp(-dt * 2));
       const v = P.travel * (0.9 + A.level * 1.2 + kick * 1.5);
       travel += dt * v; distIdx += dt * v;
@@ -2389,7 +2392,7 @@ function makeReef(P) {
       W.shared(p);
       gl.uniform1i(p.u('uCO0'), CO0); gl.uniform1i(p.u('uSN0'), SN0); gl.uniform1i(p.u('uSA0'), SA0);
       gl.uniform1f(p.u('uTravel'), travel); gl.uniform1f(p.u('uKick'), kick);
-      gl.uniform1i(p.u('uFI0'), FI0); gl.uniform1i(p.u('uPerSchool'), PER); gl.uniform1f(p.u('uFT'), fishT); gl.uniform1f(p.u('uStartle'), startle);
+      gl.uniform1i(p.u('uFI0'), FI0); gl.uniform1i(p.u('uPerSchool'), PER); gl.uniform1f(p.u('uFT'), fishT); gl.uniform1f(p.u('uStartle'), startle); gl.uniform1f(p.u('uWag'), wag);
     }
   };
   W.lines[0].uniforms = p => W.shared(p);
@@ -2880,7 +2883,7 @@ const GRADES = [
 ].map(([name, st]) => ({ name, stops: st ? st.map(lin) : null }));
 const gradeCur = [[0, 0, 0], [0.1, 0.1, 0.1], [0.5, 0.5, 0.5], [1, 1, 1]];
 let gradeMix = 0, huePhase = 0, hueNow = 0;
-const V = { glow: S.glow, trail: S.trail, dof: S.dof, echo: S.echo, lensSize: S.lensSize, lensAmt: S.lensAmt, lensPos: S.lensPos };
+const V = { echoZoom: S.echoZoom, glow: S.glow, trail: S.trail, dof: S.dof, echo: S.echo, lensSize: S.lensSize, lensAmt: S.lensAmt, lensPos: S.lensPos };
 for (const k2 of COLOR_KEYS) V[k2] = S[k2];
 const MIRRORS = [0, 3, 4, 6, 8, 12];
 let mirN = 0, mirMix = 0, mirRot = 0;
@@ -3378,10 +3381,10 @@ function frame(now) {
   gl.bindFramebuffer(gl.FRAMEBUFFER, tw_.fb);
   gl.useProgram(pTrail);
   bindTex(0, scene.tex, pTrail, 'uScene'); bindTex(1, tr_.tex, pTrail, 'uPrev');
-  { const tf = Math.max(wCur.trailFloor || 0, 0), trl = Math.max(V.trail, tf), dT = trl > 0.01 ? 0.55 + 0.38 * trl : 0, dE = V.echo > 0.01 ? 0.8 + 0.17 * V.echo : 0;
+  { const tf = Math.max(wCur.trailFloor || 0, 0), trl = Math.max(V.trail, tf), dT = trl > 0.01 ? 0.55 + 0.38 * trl : 0, dE = V.echo > 0.01 ? 0.55 + 0.37 * Math.pow(V.echo, 0.8) : 0;
     gl.uniform1f(pTrail.u('uDecay'), Math.pow(Math.max(dT, dE), dt * 60));
-    gl.uniform1f(pTrail.u('uZoom'), 1 - V.echo * 0.022 * (1 + A.level * 0.8) * echoZoomNow);
-    gl.uniform1f(pTrail.u('uRot'), V.echo * 0.006 * Math.sin(t * 0.045 + 0.7));
+    gl.uniform1f(pTrail.u('uZoom'), 1 - V.echoZoom * 0.022 * (1 + A.level * 0.8) * echoZoomNow);
+    gl.uniform1f(pTrail.u('uRot'), V.echoZoom * 0.006 * Math.sin(t * 0.045 + 0.7));
     gl.uniform1f(pTrail.u('uAsp'), aspect); }
   drawFS();
 
@@ -3612,10 +3615,10 @@ const FACTORY = [
   { name: 'Kick rings', world: 'TIDE', wp: { source: 4, gain: 1.4, cross: 0.6 } },
   { name: 'Wireframe ocean', world: 'TIDE', wp: { source: 5, cross: 1, pearls: 0.2, gain: 1.3 } },
   { name: 'Night drive', world: 'HIGHWAY', wp: {} },
-  { name: 'Hyperspace', world: 'HIGHWAY', wp: { drive: 3.4, variance: 0.8, radius: 2.4, curve: 0.3 }, look: { echo: 0.6 } },
+  { name: 'Hyperspace', world: 'HIGHWAY', wp: { drive: 3.4, variance: 0.8, radius: 2.4, curve: 0.3 }, look: { echo: 0.6, echoZoom: 0.6 } },
   { name: 'Bass road', world: 'HIGHWAY', wp: { ripple: 2.4, rdecay: 0.4, wavelen: 3, rspeed: 8 } },
   { name: 'Glass mandala', world: 'BLOOM', wp: { foldSync: 1 }, look: { lens: 1, kaleido: 2, lensSize: 0.6 } },
-  { name: 'Holo tunnel', world: 'HIGHWAY', wp: {}, look: { lens: 2, kaleido: 3, echo: 0.35 } },
+  { name: 'Holo tunnel', world: 'HIGHWAY', wp: {}, look: { lens: 2, kaleido: 3, echo: 0.35, echoZoom: 0.35 } },
   { name: 'Through the letters', world: 'REEF', wp: {}, look: { lens: 5, lensSize: 0.8 } }
 ];
 let USER = [];

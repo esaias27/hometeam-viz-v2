@@ -46,9 +46,9 @@ const DEF = { world: 0, auto: true, grade: 0, cycle: true, logo: false, logoSize
   glow: 0.6, trail: 0.3, dof: 0.5, quality: 1, stats: false, kaleido: 0, echo: 0.2,
   exposure: 0.95, rolloff: 0.6, white: 4, sat: 1.05, contrast: 1.0, hot: 0.4, thr: 0.12, limiter: 0.45,
   lens: 0, lensSize: 0.55, lensAmt: 0.7, lensPulse: 0.5, lensPos: 0, lensSpin: false,
-  detail: (window.matchMedia && matchMedia('(pointer:coarse)').matches) ? 0.6 : 1, fly: false, tour: 0, tourEvery: 16, wisps: true };
+  detail: (window.matchMedia && matchMedia('(pointer:coarse)').matches) ? 0.6 : 1, fly: false, tour: 0, tourEvery: 16, wisps: true, echoZoom: 0 };
 // keys that travel with a preset or share link, besides the world's own parameters
-const LOOK_KEYS = ['wisps', 'kaleido', 'echo', 'glow', 'trail', 'dof', 'grade', 'cycle', 'exposure', 'rolloff', 'white', 'sat', 'contrast', 'hot', 'thr', 'limiter',
+const LOOK_KEYS = ['wisps', 'kaleido', 'echo', 'echoZoom', 'glow', 'trail', 'dof', 'grade', 'cycle', 'exposure', 'rolloff', 'white', 'sat', 'contrast', 'hot', 'thr', 'limiter',
   'logo', 'logoSize', 'lens', 'lensSize', 'lensAmt', 'lensPulse', 'lensPos', 'lensSpin'];
 const COLOR_KEYS = ['exposure', 'rolloff', 'white', 'sat', 'contrast', 'hot', 'thr', 'limiter'];
 const S = Object.assign({}, DEF);
