@@ -15,9 +15,9 @@ All seven share one particle budget, so switching morphs one into the next.
 
 1. **Tower** – the HOME TEAM tower in pearls of light; kicks send signal rings across the receivers, snares throw radio waves, hats crack lightning
 2. **Lot** – lanterns rising over a crowd of phone lights; kicks ripple through the crowd
-3. **Storm** – a spinning storm cell; hits fire branching lightning
+3. **Storm** – a supercell: spiral cloud deck, roping tornado, debris ring; kicks pulse up the funnel and fire fractal lightning
 4. **Reef** – kelp forest; bass is the current, kicks run light up the stalks
-5. **Bloom** – golden-angle flower that opens with the music
+5. **Bloom** – an endless blossom: each new flower is born at the heart as a different species and opens outward forever
 6. **Tide** – the spectrum as rolling ridgelines
 7. **Highway** – the drive home
 
@@ -25,10 +25,12 @@ All seven share one particle budget, so switching morphs one into the next.
 
 WebGL2 HDR renderer: sphere-impostor particles lit by a core light and three orbiting wisps, filament ribbons, feedback trails, dual-filter bloom, depth of field, ACES tonemapping and colour grades. Audio is split into 16 log bands with per-band auto gain and separate kick / snare / hat onset detection. Taps and camera motion send shockwaves from where they happen. The logo forms out of its own particle pool.
 
-Laptop keys: `1–7` worlds · `←/→` travel · `A` auto · `L` logo · `G` color · `C` camera · `D` demo · `Space` kick · `H` hide · `F` full screen · `P` stats
+Lens: a kaleidoscope (3–12 fold) and an echo that feeds each frame back into the next, so the light recedes forever.
+
+Laptop keys: `1–7` worlds · `←/→` travel · `A` auto · `K` kaleidoscope · `E` echo · `L` logo · `G` color · `C` camera · `D` demo · `Space` kick · `H` hide · `F` full screen · `P` stats
 
 ## Building
 
-`src/app.html` is the source. `python3 src/build.py` inlines the font and logo into `index.html` and writes `manifest.webmanifest` and the offline service worker `sw.js`.
+`src/app.html` is the source. `python3 src/build.py` inlines the fonts (Oswald, IBM Plex Mono, Instrument Serif — all SIL OFL) and logo into `index.html` and writes `manifest.webmanifest` and the offline service worker `sw.js`.
 
 Test locally: `python3 -m http.server` then open http://localhost:8000/ (the mic needs https or localhost).

@@ -6,7 +6,10 @@ os.makedirs(OUT, exist_ok=True)
 font = base64.b64encode(open(os.path.join(SRC, 'oswald-600.woff2'), 'rb').read()).decode()
 svg = open(os.path.join(SRC, 'logo.svg')).read()
 svg = re.sub(r'\s+width="\d+" height="\d+"', '', svg, count=1)
-html = open(os.path.join(SRC, 'app.html')).read().replace('{{FONT}}', font).replace('{{LOGO_SVG}}', svg)
+f64 = lambda n: base64.b64encode(open(os.path.join(SRC, n), 'rb').read()).decode()
+html = (open(os.path.join(SRC, 'app.html')).read().replace('{{FONT}}', font).replace('{{LOGO_SVG}}', svg)
+        .replace('{{FONT_MONO4}}', f64('ibm-plex-mono-latin-400-normal.woff2')).replace('{{FONT_MONO5}}', f64('ibm-plex-mono-latin-500-normal.woff2'))
+        .replace('{{FONT_SERIF}}', f64('instrument-serif-latin-400-italic.woff2')))
 open(os.path.join(OUT, 'index.html'), 'w').write(html)
 ver = hashlib.sha1(html.encode()).hexdigest()[:10]
 manifest = {
