@@ -1,0 +1,238 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="HOME TEAM FM">
+<meta name="theme-color" content="#000000">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icon-180.png">
+<link rel="icon" type="image/png" href="icon-192.png">
+<title>HOME TEAM FM</title>
+<style>
+@font-face{font-family:"HT";src:url(data:font/woff2;base64,{{FONT}}) format("woff2");font-weight:600;font-display:block}
+@font-face{font-family:"Mono";src:url(data:font/woff2;base64,{{FONT_MONO4}}) format("woff2");font-weight:400;font-display:block}
+@font-face{font-family:"Mono";src:url(data:font/woff2;base64,{{FONT_MONO5}}) format("woff2");font-weight:500;font-display:block}
+@font-face{font-family:"Serif";src:url(data:font/woff2;base64,{{FONT_SERIF}}) format("woff2");font-style:italic;font-weight:400;font-display:block}
+/* Instrument styling: hairline glass, mono labels, serif numerals. The panel stays hidden until called. */
+:root{--bg:#04050b;--ink:#ece8f7;--dim:#8f8ca9;--line:rgba(196,186,255,.16);--line-hi:rgba(240,228,255,.4);--glass:rgba(9,9,20,.58);
+  --acc:#ff7ad9;--acc2:#6ff0ff;--live:#7ff0dc;--mono:"Mono",ui-monospace,SFMono-Regular,Menlo,monospace;--serif:"Serif",Georgia,serif;--brand:"HT",-apple-system,"Helvetica Neue",sans-serif;color-scheme:dark}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+html,body{margin:0;height:100%;background:var(--bg);color:var(--ink);overflow:hidden;overscroll-behavior:none;font-family:var(--mono);font-size:12px;-webkit-font-smoothing:antialiased}
+canvas#c{position:fixed;inset:0;width:100vw;height:100vh;height:100dvh;display:block;touch-action:none;background:var(--bg)}
+body.nocursor,body.nocursor *{cursor:none!important}
+button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:pointer}
+button:focus-visible,input:focus-visible{outline:1px solid var(--acc);outline-offset:2px}
+.glass{background:var(--glass);border:1px solid var(--line);border-radius:2px;backdrop-filter:blur(14px) saturate(1.3);-webkit-backdrop-filter:blur(14px) saturate(1.3)}
+
+#start{position:fixed;inset:0;z-index:20;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3.4vmin;padding:max(24px,env(safe-area-inset-top)) 24px max(24px,env(safe-area-inset-bottom));
+  background:radial-gradient(120% 90% at 50% 38%,#1d0a30 0%,#08050f 55%,#020206 100%);text-align:center;transition:opacity .9s}
+#start.gone{opacity:0;pointer-events:none}
+#start .logo{width:min(52vw,38vh);filter:drop-shadow(0 0 18px rgba(255,79,216,.4)) drop-shadow(0 0 44px rgba(60,242,255,.22));animation:float 6s ease-in-out infinite}
+#start .logo svg{width:100%;height:auto;display:block}
+@keyframes float{50%{transform:translateY(-1.2vmin) scale(1.012)}}
+#start .title{display:flex;align-items:baseline;gap:.7em;font-size:11px;letter-spacing:.42em;text-transform:uppercase;color:var(--dim)}
+#start .title i{font-family:var(--serif);font-size:20px;letter-spacing:0;text-transform:none;color:var(--ink)}
+#go{font-size:12px;letter-spacing:.34em;text-transform:uppercase;padding:15px 30px 15px 34px;border:1px solid var(--line-hi);border-radius:2px;background:rgba(255,255,255,.04);
+  box-shadow:0 0 0 0 rgba(255,122,217,.0),inset 0 0 24px rgba(111,240,255,.06);transition:border-color .3s,background .3s;animation:breathe 2.8s ease-in-out infinite}
+#go:hover{border-color:var(--acc);background:rgba(255,122,217,.08)}
+#go[disabled]{opacity:.35;animation:none}
+@keyframes breathe{50%{box-shadow:0 0 34px 2px rgba(255,122,217,.18),inset 0 0 24px rgba(111,240,255,.12)}}
+#start .sub{font-size:11px;line-height:1.7;letter-spacing:.04em;color:var(--dim);max-width:36em}
+#start .v1{font-size:10.5px;letter-spacing:.08em;color:var(--dim)}
+#start .v1 a{color:var(--ink);text-decoration:none;border-bottom:1px solid var(--line-hi)}
+
+#menuBtn{position:fixed;z-index:12;top:max(14px,env(safe-area-inset-top));right:max(14px,env(safe-area-inset-right));width:44px;height:44px;display:grid;place-items:center;transition:opacity .8s,border-color .2s}
+#menuBtn:hover{border-color:var(--line-hi)}
+#menuBtn.idle{opacity:.14}
+#menuBtn.hidden{opacity:0;pointer-events:none}
+#flyBtn{position:fixed;z-index:12;top:max(14px,env(safe-area-inset-top));right:calc(max(14px,env(safe-area-inset-right)) + 52px);width:44px;height:44px;display:grid;place-items:center;transition:opacity .8s,border-color .2s;color:var(--ink)}
+#flyBtn.on{border-color:var(--acc2);color:var(--acc2);box-shadow:0 0 14px rgba(111,240,255,.25)}
+#flyBtn.idle{opacity:.14}#flyBtn.hidden{opacity:0;pointer-events:none}
+#slots .pill{min-width:44px;justify-content:center}#slots .pill.has{border-color:var(--line-hi)}#slots .pill.has::after{content:'';width:4px;height:4px;border-radius:50%;background:var(--acc2)}
+#storeBtn.on{border-color:var(--acc2);color:var(--acc2)}
+#menuBtn i{display:block;width:16px;height:1px;background:var(--ink);box-shadow:0 -5px 0 var(--ink),0 5px 0 var(--ink)}
+
+#panel{position:fixed;z-index:11;right:0;bottom:0;left:0;max-height:74vh;overflow-y:auto;-webkit-overflow-scrolling:touch;touch-action:pan-y;
+  border-width:1px 0 0;border-radius:0;padding:16px max(16px,env(safe-area-inset-right)) max(18px,env(safe-area-inset-bottom)) max(16px,env(safe-area-inset-left));
+  transform:translateY(105%);transition:transform .4s cubic-bezier(.2,.8,.2,1);display:grid;gap:4px}
+#panel.open{transform:none}
+@media (orientation:landscape){
+  #panel{left:auto;top:0;width:min(380px,48vw);max-height:none;border-width:0 0 0 1px;padding-top:max(16px,env(safe-area-inset-top));transform:translateX(105%);align-content:start}
+  #panel.open{transform:none}
+  #start .logo{width:min(30vw,36vh)}
+}
+.phead{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;padding:2px 108px 10px 0}
+.mark{display:flex;flex-direction:column;gap:3px}
+.word{font-family:var(--brand);font-size:22px;letter-spacing:.12em;line-height:1}
+.word i{font-family:var(--serif);font-weight:400;letter-spacing:0;margin-left:.3em;color:var(--acc)}
+.msub{font-size:9.5px;letter-spacing:.24em;text-transform:uppercase;color:var(--dim)}
+.status{display:flex;align-items:center;gap:8px;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--dim);white-space:nowrap}
+.dot{width:7px;height:7px;border-radius:50%;background:var(--dim);transition:background .3s}
+.dot.live{background:var(--live);box-shadow:0 0 10px var(--live)}
+.sec{padding:11px 0 6px;border-top:1px solid var(--line)}
+.sec h3{margin:0 0 9px;font-size:10px;font-weight:500;letter-spacing:.24em;text-transform:uppercase;color:var(--acc)}
+.row{display:flex;flex-wrap:wrap;gap:5px;align-items:center}
+.row+.row,.ctl+.row,.row+.ctl,.ctl+.ctl{margin-top:8px}
+.pill{font-size:10px;letter-spacing:.14em;text-transform:uppercase;padding:8px 11px;min-height:34px;border:1px solid var(--line);border-radius:2px;background:rgba(255,255,255,.035);
+  display:inline-flex;align-items:center;gap:7px;white-space:nowrap;transition:border-color .2s,color .2s,background .2s}
+.pill:hover{border-color:var(--line-hi)}
+.pill.on{border-color:var(--acc);color:#ffd6f2;background:rgba(255,122,217,.1)}
+.grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:5px}
+.grid .pill{flex-direction:column;align-items:flex-start;gap:1px;padding:6px 9px 8px;min-width:0;font-size:9.5px;letter-spacing:.1em}
+.grid .pill i{font-family:var(--serif);font-size:16px;letter-spacing:0;text-transform:none;color:var(--dim)}
+.grid .pill.on i{color:var(--acc)}
+.ctl{display:grid;grid-template-columns:1fr auto;gap:2px 10px;align-items:center}
+.ctl label{font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--dim)}
+.ctl output{font-size:10px;color:var(--ink);font-variant-numeric:tabular-nums}
+.ctl input{grid-column:1/-1}
+input[type=range]{width:100%;-webkit-appearance:none;appearance:none;height:22px;background:transparent;margin:0}
+input[type=range]::-webkit-slider-runnable-track{height:2px;background:linear-gradient(90deg,var(--acc),var(--acc2));opacity:.75}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:12px;height:12px;margin-top:-5px;border-radius:50%;background:var(--ink);border:0;box-shadow:0 0 10px rgba(255,122,217,.6)}
+input[type=range]::-moz-range-track{height:2px;background:linear-gradient(90deg,var(--acc),var(--acc2))}
+input[type=range]::-moz-range-thumb{width:12px;height:12px;border:0;border-radius:50%;background:var(--ink)}
+#meter{width:176px;height:30px;display:block}
+#micStat{font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--dim);font-variant-numeric:tabular-nums}
+.hint{font-size:10.5px;line-height:1.6;color:var(--dim);margin-top:8px;letter-spacing:.02em}
+.keys{font-size:10px;line-height:1.9;letter-spacing:.12em;text-transform:uppercase;color:var(--dim);margin-top:6px}
+.keys b{font-weight:500;color:var(--ink)}
+details.sec{padding:0}
+details.sec>summary{list-style:none;cursor:pointer;display:flex;justify-content:space-between;align-items:center;padding:13px 0 12px;font-size:10px;font-weight:500;letter-spacing:.24em;text-transform:uppercase;color:var(--acc)}
+details.sec>summary::-webkit-details-marker,details.grp>summary::-webkit-details-marker{display:none}
+details.sec>summary::after,details.grp>summary::after{content:'+';font-size:13px;letter-spacing:0;color:var(--dim);font-weight:400}
+details[open]>summary::after{content:'\2013'}
+details.sec>.body{padding:0 0 14px}
+details.grp{border-top:1px dashed var(--line);margin-top:2px}
+details.grp>summary{list-style:none;cursor:pointer;display:flex;justify-content:space-between;align-items:center;padding:10px 0 8px;font-size:9.5px;letter-spacing:.2em;text-transform:uppercase;color:var(--ink)}
+details.grp>.body{padding-bottom:8px}
+.sub{font-size:9.5px;letter-spacing:.2em;text-transform:uppercase;color:var(--dim);margin:12px 0 6px}
+em.rb,.ctl label em{font-style:normal;font-size:8.5px;letter-spacing:.12em;color:var(--acc2);border:1px solid rgba(111,240,255,.3);padding:0 4px;margin-left:5px;border-radius:2px;text-transform:uppercase}
+.plist{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:8px}
+.plist .pill{padding:6px 9px;min-height:30px;font-size:9.5px}
+.plist .pill small{font-family:var(--serif);font-style:italic;font-size:13px;letter-spacing:0;text-transform:none;color:var(--dim)}
+.plist .pill .x{margin-left:2px;color:var(--dim);padding:0 2px}
+.plist .pill .x:hover{color:var(--acc)}
+.plist .lab{flex-basis:100%;font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:var(--dim);margin:6px 0 1px}
+input[type=text]{flex:1;min-width:0;font:inherit;font-size:11px;letter-spacing:.06em;color:var(--ink);background:rgba(255,255,255,.04);border:1px solid var(--line);border-radius:2px;padding:8px 10px;min-height:34px;-webkit-user-select:text;user-select:text}
+input[type=text]::placeholder{color:var(--dim)}
+
+#toast{position:fixed;z-index:30;left:50%;top:max(16px,env(safe-area-inset-top));transform:translate(-50%,-160%);transition:transform .35s;padding:10px 16px;
+  font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;max-width:90vw;text-align:center}
+#toast.show{transform:translate(-50%,0)}
+#lookName{position:fixed;z-index:5;left:50%;bottom:max(26px,env(safe-area-inset-bottom));transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:7px;
+  opacity:0;transition:opacity 1s;pointer-events:none;white-space:nowrap;text-align:center}
+#lookName.show{opacity:.92}
+#lookName i{font-family:var(--serif);font-size:clamp(18px,3vmin,26px);color:var(--acc);text-shadow:0 0 18px rgba(0,0,0,.9)}
+#lookName b{font-family:var(--brand);font-weight:600;font-size:clamp(18px,3.6vmin,30px);letter-spacing:.55em;margin-right:-.55em;text-shadow:0 0 18px rgba(0,0,0,.9)}
+#lookName span{font-size:clamp(9.5px,1.5vmin,11.5px);letter-spacing:.22em;text-transform:uppercase;color:var(--dim);text-shadow:0 1px 3px #000}
+
+#help{position:fixed;inset:0;z-index:40;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.7);padding:20px}
+#help.show{display:flex}
+#help .card{padding:20px 22px;max-width:440px;font-size:11.5px;line-height:1.65;letter-spacing:.02em}
+#help h2{font-family:var(--brand);font-weight:600;letter-spacing:.14em;margin:0 0 8px;font-size:20px}
+#help ol{padding-left:20px;margin:8px 0}
+#help .row{margin-top:14px}
+#err{position:fixed;inset:0;display:none;place-items:center;text-align:center;padding:30px;z-index:50;background:#000;line-height:1.7;letter-spacing:.06em}
+#stats{position:fixed;z-index:6;left:max(14px,env(safe-area-inset-left));top:max(14px,env(safe-area-inset-top));margin:0;padding:9px 12px;
+  font:10.5px/1.6 var(--mono);white-space:pre;pointer-events:none;font-variant-numeric:tabular-nums}
+@media (prefers-reduced-motion:reduce){#start .logo,#go{animation:none}}
+</style>
+</head>
+<body>
+<canvas id="c" aria-label="HOME TEAM audio reactive visuals"></canvas>
+
+<div id="start">
+  <div class="logo">{{LOGO_SVG}}</div>
+  <div class="title">Live visuals <i>v3</i></div>
+  <button id="go" disabled>Loading</button>
+  <div class="sub">Listens through your mic. Nothing is recorded or sent anywhere.<br>Tap anywhere to send a shockwave. Rotate any way you like.</div>
+  <div class="v1">Earlier versions: <a href="../">v2</a> · <a href="https://esaias27.github.io/hometeam-viz/">v1</a></div>
+</div>
+
+<button id="menuBtn" class="glass" aria-label="Controls" aria-expanded="false" aria-controls="panel"><i></i></button>
+<button id="flyBtn" class="glass" aria-label="Fly the camera" aria-pressed="false"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.3"><circle cx="12" cy="12" r="3"/><path d="M12 2v4M12 18v4M2 12h4M18 12h4"/></svg></button>
+<div id="lookName"><i></i><b></b><span></span></div>
+<div id="toast" class="glass" role="status"></div>
+<pre id="stats" class="glass" hidden></pre>
+
+<div id="panel" class="glass">
+  <div class="phead">
+    <div class="mark"><span class="word">HOME TEAM<i>fm</i></span><span class="msub">Live visuals · v3 · GPU</span></div>
+    <div class="status"><span class="dot" id="dot"></span><span id="status">Idle</span></div>
+  </div>
+  <details class="sec" open><summary>World</summary><div class="body"><div class="grid" id="worlds"></div>
+    <div class="row"><button class="pill" id="autoBtn">Auto travel</button></div>
+    <div class="hint">Every world is the same light in a different shape, so they morph into each other.</div></div></details>
+  <details class="sec" open id="wsetSec"><summary><span><span id="wsetTitle">World</span> settings</span></summary><div class="body"><div id="wset"></div>
+    <div class="row"><button class="pill" id="mutateBtn">Mutate</button><button class="pill" id="resetBtn">Reset world</button></div>
+    <div class="hint">Every change glides into place. Settings marked <em class="rb">rebuild</em> regrow the world, and it morphs out of the old one.</div></div></details>
+  <details class="sec" id="camSec"><summary><span><span id="camTitle">World</span> camera</span></summary><div class="body">
+    <div class="sub">Stored angles</div>
+    <div class="row" id="slots"></div>
+    <div class="row"><button class="pill" id="storeBtn">Store</button><button class="pill" id="flyBtn2">Fly</button><button class="pill" id="camReset">Reset camera</button></div>
+    <div class="sub">Tour</div>
+    <div class="row" id="tours"></div>
+    <div class="ctl"><label for="c_tev">Every</label><output></output><input type="range" id="c_tev" min="2" max="64" step="1"></div>
+    <div id="camset"></div>
+    <div class="hint">Alt + left drag tumbles, Alt + middle drag tracks, Alt + right drag dollies, scroll to dolly (Maya and Cinema 4D style). On a phone, turn on Fly: one finger orbits, two fingers pan and pinch. Shift + 1–6 stores an angle, F1–F6 or Alt + 1–6 recalls it.</div></div></details>
+  <details class="sec"><summary>Presets</summary><div class="body"><div class="plist" id="presets"></div>
+    <div class="row"><input type="text" id="presetName" placeholder="Name this look" maxlength="40" autocomplete="off"><button class="pill" id="savePreset">Save</button></div>
+    <div class="row"><button class="pill" id="shareBtn">Share link</button><button class="pill" id="exportBtn">Export</button><button class="pill" id="importBtn">Import</button><input type="file" id="importFile" accept="application/json,.json" hidden></div>
+    <div class="hint">A preset keeps the world and its settings plus the lens, logo and color. A share link opens straight into the look.</div></div></details>
+  <details class="sec"><summary>Lens</summary><div class="body">
+    <div class="row" id="kaleidos"></div>
+    <div class="ctl"><label for="s_echo">Echo</label><output></output><input type="range" id="s_echo" data-k="echo" min="0" max="1" step="0.01"></div>
+    <div class="ctl"><label for="s_glow">Glow</label><output></output><input type="range" id="s_glow" data-k="glow" min="0" max="1" step="0.01"></div>
+    <div class="ctl"><label for="s_trail">Trails</label><output></output><input type="range" id="s_trail" data-k="trail" min="0" max="1" step="0.01"></div>
+    <div class="ctl"><label for="s_dof">Focus blur</label><output></output><input type="range" id="s_dof" data-k="dof" min="0" max="1" step="0.01"></div>
+    <div class="hint">Kaleidoscope folds the frame into mirrored wedges. Echo feeds each frame back into the next, so the light recedes forever.</div></div></details>
+  <details class="sec"><summary>Logo</summary><div class="body">
+    <div class="sub">Overlay</div>
+    <div class="row" id="lenses"></div>
+    <div class="ctl"><label for="s_lsz">Size</label><output></output><input type="range" id="s_lsz" data-k="lensSize" min="0.2" max="1.1" step="0.01"></div>
+    <div class="ctl"><label for="s_lam">Strength</label><output></output><input type="range" id="s_lam" data-k="lensAmt" min="0" max="1" step="0.01"></div>
+    <div class="ctl"><label for="s_lpu">Kick pulse</label><output></output><input type="range" id="s_lpu" data-k="lensPulse" min="0" max="2" step="0.01"></div>
+    <div class="row" id="lensPos"></div>
+    <div class="row"><button class="pill" id="lensSpinBtn">Turn with kaleidoscope</button></div>
+    <div class="sub">Particles</div>
+    <div class="row"><button class="pill" id="logoBtn">Logo from light</button></div>
+    <div class="ctl"><label for="s_logo">Size</label><output></output><input type="range" id="s_logo" data-k="logoSize" min="0.25" max="1" step="0.01"></div>
+    <div class="hint">The overlay sits on top of everything, kaleidoscope included. The particle logo flies out of the world's own light; in Tower the whole world is the logo.</div></div></details>
+  <details class="sec"><summary>Color</summary><div class="body"><div class="row" id="grades"></div>
+    <div class="row"><button class="pill" id="cycleBtn">Color drift</button></div>
+    <div class="ctl"><label for="c_ex">Exposure</label><output></output><input type="range" id="c_ex" data-k="exposure" min="0.3" max="2" step="0.01"></div>
+    <div class="ctl"><label for="c_ro">Highlight roll-off</label><output></output><input type="range" id="c_ro" data-k="rolloff" min="0" max="1" step="0.01"></div>
+    <div class="ctl"><label for="c_wh">White point</label><output></output><input type="range" id="c_wh" data-k="white" min="1" max="12" step="0.1"></div>
+    <div class="ctl"><label for="c_ho">Hot cores</label><output></output><input type="range" id="c_ho" data-k="hot" min="0" max="1" step="0.01"></div>
+    <div class="ctl"><label for="c_th">Glow threshold</label><output></output><input type="range" id="c_th" data-k="thr" min="0" max="1" step="0.01"></div>
+    <div class="ctl"><label for="c_li">Flash limiter</label><output></output><input type="range" id="c_li" data-k="limiter" min="0" max="1.5" step="0.01"></div>
+    <div class="ctl"><label for="c_sa">Saturation</label><output></output><input type="range" id="c_sa" data-k="sat" min="0" max="2" step="0.01"></div>
+    <div class="ctl"><label for="c_co">Contrast</label><output></output><input type="range" id="c_co" data-k="contrast" min="0.6" max="1.6" step="0.01"></div>
+    <div class="row"><button class="pill" id="colorReset">Reset color</button></div>
+    <div class="hint">Whites running hot? Raise roll-off so bright cores keep their colour, lower hot cores, or let the limiter pull exposure down on big hits.</div></div></details>
+  <details class="sec"><summary>Webcam</summary><div class="body"><div class="row" id="cams"></div>
+    <div class="ctl"><label for="s_cam">Backdrop</label><output></output><input type="range" id="s_cam" data-k="camAmt" min="0" max="1.5" step="0.01"></div>
+    <div class="row"><button class="pill" id="motionBtn">Motion shockwaves</button></div></div></details>
+  <details class="sec"><summary>Audio</summary><div class="body">
+    <div class="row"><canvas id="meter" width="352" height="60"></canvas><span id="micStat">—</span></div>
+    <div class="row"><button class="pill" id="demoBtn">Demo groove</button><button class="pill" id="micBtn">Reconnect mic</button></div>
+    <div class="ctl"><label for="s_sens">Sensitivity</label><output></output><input type="range" id="s_sens" data-k="sens" min="0.4" max="2.6" step="0.01"></div></div></details>
+  <details class="sec"><summary>Performance</summary><div class="body">
+    <div class="ctl"><label for="s_q">Resolution</label><output></output><input type="range" id="s_q" data-k="quality" min="0.5" max="1" step="0.05"></div>
+    <div class="ctl"><label for="s_det">Detail (particle counts)</label><output></output><input type="range" id="s_det" data-k="detail" min="0.25" max="2" step="0.05"></div>
+    <div class="row"><button class="pill" id="statsBtn">Stats</button><button class="pill" id="fsBtn">Full screen</button></div>
+    <div class="keys"><b>1–7</b> worlds · <b>←/→</b> travel · <b>A</b> auto · <b>M</b> mutate · <b>V</b> fly · <b>⇧1–6</b> store camera · <b>F1–F6</b> recall · <b>K</b> kaleido · <b>E</b> echo · <b>O</b> logo overlay · <b>L</b> particle logo · <b>G</b> color · <b>C</b> webcam · <b>D</b> demo · <b>Space</b> kick · <b>H</b> hide · <b>F</b> full screen · <b>P</b> stats</div></div></details>
+</div>
+
+<div id="help"><div class="card glass"><h2 id="helpTitle">MIC NOT AVAILABLE</h2><div id="helpBody"></div>
+  <div class="row"><button class="pill on" id="retryMic">Try again</button><button class="pill" id="useDemo">Use demo groove</button></div></div></div>
+<div id="err"></div>
+
+<script>
+{{JS}}
+</script>
+</body>
+</html>
